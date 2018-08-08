@@ -23,8 +23,8 @@ public class StreamWriterTest
 		StreamWriter vWriter = StreamWriter.getStreamWriter();
 		StreamWriterResult vResult = vWriter.writeStream();
 		
-		assertTrue(0 == vResult.getStream().length);
-		assertTrue(0 == vResult.getPositions().length);
+		assertEquals(0, vResult.getStream().length);
+		assertEquals(0, vResult.getPositions().length);
 	}
 	
 	@Test
@@ -33,14 +33,14 @@ public class StreamWriterTest
 		StreamWriter vWriter = StreamWriter.getStreamWriter().setTupleList(getEmptyTupleList());
 		StreamWriterResult vResult = vWriter.writeStream();
 		
-		assertTrue(0 == vResult.getStream().length);
-		assertTrue(0 == vResult.getPositions().length);
+		assertEquals(0, vResult.getStream().length);
+		assertEquals(0, vResult.getPositions().length);
 	}
 	
 	@Test
 	public void Writer_StreamFormUnsupportedTuple_Error()
 	{
-		StreamWriter vWriter = StreamWriter.getStreamWriter().setTupleList(getListWithUsupportedT());
+		StreamWriter vWriter = StreamWriter.getStreamWriter().setTupleList(getListWithUnsupportedT());
 		boolean vError = false;
 		
 		try

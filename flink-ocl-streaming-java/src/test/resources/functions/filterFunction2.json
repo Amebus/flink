@@ -1,0 +1,12 @@
+{
+  "functions": [
+    {
+      "type":"filter",
+      "name":"filterFunction",
+      "input":"tupleTwo",
+      "function": [
+        "_r0 = _t0 > 2"
+      ]
+    }
+  ]
+}

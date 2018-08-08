@@ -1,0 +1,12 @@
+{
+  "functions": [
+    {
+      "type":"flatMap",
+      "name":"f1",
+      "input":"tupleOne",
+      "function": [
+        "map1_line1"
+      ]
+    }
+  ]
+}

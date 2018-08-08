@@ -36,3 +36,5 @@ out/
 tools/flink
 tools/flink-*
 tools/releasing/release
+
+Cpp/Out/*

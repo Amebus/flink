@@ -1,0 +1,26 @@
+{
+  "functions": [
+    {
+      "type":"map",
+      "name":"map1",
+      "input":"tupleOne",
+      "output":"tupleTwo",
+      "function": [
+        "map1_line1",
+        "map1_line2",
+        "map1_line3"
+      ]
+    },
+    {
+      "type":"map",
+      "name":"map2",
+      "input":"tupleTwo",
+      "output":"tupleOne",
+      "function": [
+        "map2_line1",
+        "map2_line2",
+        "map2_line3"
+      ]
+    }
+  ]
+}

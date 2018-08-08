@@ -1,0 +1,13 @@
+{
+  "functions": [
+    {
+      "type":"unknownType",
+      "name":"map1",
+      "input":"tupleOne",
+      "output":"tupleTwo",
+      "function": [
+        "line1"
+      ]
+    }
+  ]
+}

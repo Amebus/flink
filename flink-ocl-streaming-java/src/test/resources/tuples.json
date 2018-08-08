@@ -1,0 +1,11 @@
+{
+  "tupleOne": {
+    "t0": "int",
+    "t1": "string",
+    "t2": "double",
+    "t3": "int"
+  },
+  "tupleTwo": {
+    "t0": "double"
+  }
+}

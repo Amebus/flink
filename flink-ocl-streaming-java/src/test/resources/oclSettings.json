@@ -1,0 +1,9 @@
+{
+  "contextOptions": {
+    "kernelsBuildFolder" : "oclKernels",
+    "removeTempFoldersOnClose": "true"
+  },
+  "kernelOptions": {
+
+  }
+}

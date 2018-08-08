@@ -34,7 +34,6 @@ public class TupleGetters
 			int j = i - 1;
 			vExpectedPositions[i] = vExpectedPositions[j];
 			
-			int vI = i;
 			IOclTuple vOclTuple = pExpectedList.get(j);
 			Object vT;
 			for (int k = 0; k < vOclTuple.getArityOcl(); k++)
@@ -43,12 +42,12 @@ public class TupleGetters
 				switch (vT.getClass().getName())
 				{
 					case "java.lang.Double":
-						vExpectedPositions[vI] += Dimensions.DOUBLE;
+						vExpectedPositions[i] += Dimensions.DOUBLE;
 						break;
 					case "java.lang.String":
-						vExpectedPositions[vI] += ((String)vT).length();
+						vExpectedPositions[i] += ((String)vT).length();
 					case "java.lang.Integer":
-						vExpectedPositions[vI] += Dimensions.INT;
+						vExpectedPositions[i] += Dimensions.INT;
 						break;
 					default:
 						throw new IllegalArgumentException("Object type not recognized, unable to serialize it");
@@ -64,7 +63,7 @@ public class TupleGetters
 		return new ArrayList<>();
 	}
 	
-	public static List<IOclTuple> getListWithUsupportedT()
+	public static List<IOclTuple> getListWithUnsupportedT()
 	{
 		List<IOclTuple> vList = new ArrayList<>();
 		

@@ -1,0 +1,10 @@
+{
+  "functions": [
+    {
+      "type":"map",
+      "name":"f1",
+      "input":"tupleOne",
+      "output":"tupleTwo"
+    }
+  ]
+}

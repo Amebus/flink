@@ -1,0 +1,38 @@
+{
+  "functions": [
+    {
+      "type":"map",
+      "name":"map1",
+      "input":"tupleOne",
+      "output":"tupleTwo",
+      "function": [
+        "line1"
+      ]
+    },
+    {
+      "type":"filter",
+      "name":"filter1",
+      "input":"tupleTwo",
+      "function": [
+        "line1"
+      ]
+    },
+    {
+      "type":"flatMap",
+      "name":"flatMap1",
+      "input":"tupleTwo",
+      "output":"tupleTwo",
+      "function": [
+        "line1"
+      ]
+    },
+    {
+      "type":"reduce",
+      "name":"reduce1",
+      "input":"tupleTwo",
+      "function": [
+        "line1"
+      ]
+    }
+  ]
+}
