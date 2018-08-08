@@ -1,6 +1,7 @@
-package org.apache.flink.api.engine;
+package org.apache.flink.api.engine.kernel.builder;
 
 import org.apache.flink.api.common.IBuilder;
+import org.apache.flink.api.engine.IUserFunction;
 import org.apache.flink.configuration.IOclContextOptions;
 import org.apache.flink.configuration.IOclKernelsOptions;
 import org.apache.flink.configuration.ITupleDefinitionsRepository;

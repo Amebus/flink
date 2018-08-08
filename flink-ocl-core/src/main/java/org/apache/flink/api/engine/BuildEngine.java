@@ -1,5 +1,7 @@
 package org.apache.flink.api.engine;
 
+import org.apache.flink.api.engine.kernel.KernelCodeBuilderEngine;
+import org.apache.flink.api.engine.kernel.OclKernel;
 import org.apache.flink.configuration.ISettingsRepository;
 import org.apache.flink.configuration.ITupleDefinitionsRepository;
 
@@ -18,11 +20,6 @@ public class BuildEngine
 	{
 		mCppLibraryInfo = new KernelCodeBuilderEngine(mSettingsRepository, pTupleDefinitions, pUserFunctions).generateKernels();
 		return this;
-	}
-	
-	public void loadCppLibrary()
-	{
-//		System.loadLibrary("OCL");
 	}
 	
 	public CppLibraryInfo getCppLibraryInfo()

@@ -1,4 +1,4 @@
-package org.apache.flink.streaming.api.bridge;
+package org.apache.flink.api.bridge;
 
 public abstract class AbstractOclBridge
 {

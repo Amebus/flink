@@ -1,9 +1,8 @@
 package org.apache.flink.api.engine.kernel.builder;
 
 import org.apache.flink.api.common.IBuilder;
-import org.apache.flink.api.engine.KernelBuilderOptions;
-import org.apache.flink.api.engine.OclKernel;
-import org.apache.flink.api.engine.VarDefinition;
+import org.apache.flink.api.engine.kernel.OclKernel;
+import org.apache.flink.api.engine.tuple.variable.VarDefinition;
 import org.apache.flink.api.engine.kernel.line.DoubleVarDefinitionLine;
 import org.apache.flink.api.engine.kernel.line.IntVarDefinitionLine;
 import org.apache.flink.api.engine.kernel.line.StringVarDefinitionLine;

@@ -1,7 +1,7 @@
 package org.apache.flink.api.engine.kernel.line;
 
 import org.apache.flink.api.common.utility.StreamUtility;
-import org.apache.flink.api.engine.VarDefinition;
+import org.apache.flink.api.engine.tuple.variable.VarDefinition;
 import org.apache.flink.configuration.CTType;
 
 import java.util.ArrayList;

@@ -1,7 +1,5 @@
 package org.apache.flink.api.engine.kernel.builder;
 
-import org.apache.flink.api.engine.KernelBuilderOptions;
-
 import java.util.ArrayList;
 
 public abstract class KernelWithoutOutputTupleBuilder extends KernelBuilder

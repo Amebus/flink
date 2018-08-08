@@ -1,7 +1,5 @@
 package org.apache.flink.api.engine.kernel.builder;
 
-import org.apache.flink.api.engine.KernelBuilderOptions;
-
 public class FilterBuilder extends MapBuilder
 {
 	public FilterBuilder(KernelBuilderOptions pKernelBuilderOptions)

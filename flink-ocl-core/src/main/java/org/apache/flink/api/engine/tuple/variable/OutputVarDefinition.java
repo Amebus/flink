@@ -1,6 +1,5 @@
 package org.apache.flink.api.engine.tuple.variable;
 
-import org.apache.flink.api.engine.VarDefinition;
 import org.apache.flink.configuration.CTType;
 
 public class OutputVarDefinition extends VarDefinition

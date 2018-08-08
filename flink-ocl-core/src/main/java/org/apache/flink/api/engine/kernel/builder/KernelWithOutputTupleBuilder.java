@@ -1,6 +1,5 @@
 package org.apache.flink.api.engine.kernel.builder;
 
-import org.apache.flink.api.engine.KernelBuilderOptions;
 import org.apache.flink.configuration.ITupleDefinition;
 
 import java.util.ArrayList;

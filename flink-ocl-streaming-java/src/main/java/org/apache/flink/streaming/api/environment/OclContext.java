@@ -6,7 +6,7 @@ import org.apache.flink.api.engine.IUserFunctionsRepository;
 import org.apache.flink.api.tuple.IOclTuple;
 import org.apache.flink.configuration.ISettingsRepository;
 import org.apache.flink.configuration.ITupleDefinitionsRepository;
-import org.apache.flink.streaming.api.bridge.OclBridge;
+import org.apache.flink.api.bridge.OclBridge;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -37,7 +37,7 @@ public class OclContext
 	
 	public void open()
 	{
-		createAndBuildAndLoadKernels();
+		generatesKernels();
 		
 		mOclBridgeContext.initialize(mCppLibraryInfo.getKernelsFolder());
 	}
@@ -50,13 +50,11 @@ public class OclContext
 			deleteLocalFiles();
 	}
 	
-	private void createAndBuildAndLoadKernels()
+	private void generatesKernels()
 	{
-		BuildEngine vBuildEngine = new BuildEngine(mSettingsRepository)
-			.generateKernels(mTupleDefinitionsRepository, mFunctionRepository.getUserFunctions());
-		
-		vBuildEngine.loadCppLibrary();
-		mCppLibraryInfo = vBuildEngine.getCppLibraryInfo();
+		mCppLibraryInfo = new BuildEngine(mSettingsRepository)
+			.generateKernels(mTupleDefinitionsRepository, mFunctionRepository.getUserFunctions())
+			.getCppLibraryInfo();
 	}
 	
 	private void deleteLocalFiles()
