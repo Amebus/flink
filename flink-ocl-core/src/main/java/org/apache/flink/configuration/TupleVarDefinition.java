@@ -1,6 +1,8 @@
 package org.apache.flink.configuration;
 
-public class TupleVarDefinition
+import java.io.Serializable;
+
+public class TupleVarDefinition implements Serializable
 {
 	private JavaTType mJavaTType;
 	private CTType mCTType;

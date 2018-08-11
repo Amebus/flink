@@ -1,6 +1,8 @@
 package org.apache.flink.api.engine;
 
-public interface IUserFunction
+import java.io.Serializable;
+
+public interface IUserFunction extends Serializable
 {
 	String getType();
 	

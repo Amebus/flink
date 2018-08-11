@@ -2,9 +2,10 @@ package org.apache.flink.configuration;
 
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.RegularExpression;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public abstract class TType
+public abstract class TType implements Serializable
 {
 	
 	public static class ConfigTypes

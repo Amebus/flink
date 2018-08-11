@@ -1,0 +1,13 @@
+{
+  "functions": [
+    {
+      "type":"map",
+      "name":"mapFunction",
+      "input":"tupleTwo",
+      "output":"tupleOne",
+      "function": [
+        "_r0 = 'a'"
+      ]
+    }
+  ]
+}

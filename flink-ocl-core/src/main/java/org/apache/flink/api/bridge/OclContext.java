@@ -1,37 +1,39 @@
-package org.apache.flink.streaming.api.environment;
+package org.apache.flink.api.bridge;
 
 import org.apache.flink.api.engine.BuildEngine;
 import org.apache.flink.api.engine.CppLibraryInfo;
 import org.apache.flink.api.engine.IUserFunctionsRepository;
+import org.apache.flink.api.serialization.StreamReader;
 import org.apache.flink.api.tuple.IOclTuple;
 import org.apache.flink.configuration.ISettingsRepository;
 import org.apache.flink.configuration.ITupleDefinitionsRepository;
 import org.apache.flink.api.bridge.OclBridge;
 
 import java.io.File;
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-public class OclContext
+public class OclContext implements Serializable
 {
-	private ISettingsRepository mSettingsRepository;
-	private ITupleDefinitionsRepository mTupleDefinitionsRepository;
-	private IUserFunctionsRepository mFunctionRepository;
+	transient private ISettingsRepository mSettingsRepository;
+	transient private ITupleDefinitionsRepository mTupleDefinitionsRepository;
+	transient private IUserFunctionsRepository mFunctionRepository;
 	
-	private CppLibraryInfo mCppLibraryInfo;
+	transient private CppLibraryInfo mCppLibraryInfo;
 	
 	private OclBridge mOclBridgeContext;
 	
 	public OclContext(ISettingsRepository pSettingsRepository,
 					  ITupleDefinitionsRepository pTupleDefinitionsRepository,
-					  IUserFunctionsRepository pRepository)
+					  IUserFunctionsRepository pUserFunctionsRepository)
 	{
 		mSettingsRepository = pSettingsRepository;
 		mTupleDefinitionsRepository = pTupleDefinitionsRepository;
-		mFunctionRepository = pRepository;
+		mFunctionRepository = pUserFunctionsRepository;
 		mOclBridgeContext = new OclBridge();
 	}
 	
@@ -39,7 +41,7 @@ public class OclContext
 	{
 		generatesKernels();
 		
-		mOclBridgeContext.initialize(mCppLibraryInfo.getKernelsFolder());
+//		mOclBridgeContext.initialize(mCppLibraryInfo.getKernelsFolder());
 	}
 	
 	public void close()
@@ -76,7 +78,7 @@ public class OclContext
 			vToFile.delete();
 	}
 	
-	public List< ? extends IOclTuple> filter(String pUserFunctionName, List< ? extends IOclTuple> pTuples)
+	public Iterable< ? extends IOclTuple> filter(String pUserFunctionName, List< ? extends IOclTuple> pTuples)
 	{
 		boolean[] vFilter = mOclBridgeContext.filter(pUserFunctionName, pTuples);
 		List<IOclTuple> vResult = new LinkedList<>();
@@ -90,4 +92,11 @@ public class OclContext
 		}
 		return vResult;
 	}
+	
+	public Iterable< ? extends IOclTuple> map(String pUserFunctionName, List< ? extends IOclTuple> pTuples)
+	{
+		byte[] vStream = mOclBridgeContext.map(pUserFunctionName, pTuples);
+		return StreamReader.getStreamReader().setStream(vStream);
+	}
+	
 }

@@ -1,5 +1,7 @@
 package org.apache.flink.configuration;
 
-public interface IOclKernelsOptions
+import java.io.Serializable;
+
+public interface IOclKernelsOptions extends Serializable
 {
 }

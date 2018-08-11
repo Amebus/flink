@@ -528,11 +528,11 @@ Java_org_apache_flink_api_bridge_AbstractOclBridge_OclFilter
         exit(1);
     }
 
-    for(int i = 0; i < vResultLength; i++)
-    {
-        std::cout << i << ": ";
-        printf("%d\n", vResult[i]);
-    }
+    //for(int i = 0; i < vResultLength; i++)
+    //{
+        //std::cout << i << ": ";
+        //printf("%d\n", vResult[i]);
+    //}
 
     jbooleanArray vRet = pEnv->NewBooleanArray(vResultLength);
 	pEnv->SetBooleanArrayRegion(vRet, 0, vResultLength, vResult);
@@ -625,7 +625,7 @@ std::vector<std::string> GetKernelsSourceFiles(std::string pKernelsFolder)
         {
             if (vDot.compare(vFile->d_name) != 0 && vDotDot.compare(vFile->d_name) != 0)
             {
-                printf ("%s\n", vFile->d_name);
+                //printf ("%s\n", vFile->d_name);
                 vFiles.push_back(vFile->d_name);          
             }
         }

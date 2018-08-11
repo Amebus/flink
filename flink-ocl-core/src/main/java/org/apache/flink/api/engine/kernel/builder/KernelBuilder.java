@@ -228,15 +228,6 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 			   getUserFunction().getFunction() + "\n" +
 			   getOutputSection() +
 			   "\n};\n";
-//		return "__kernel \n" +
-//			   "void filterFunction(__global int *A, \n" +
-//			   "                    __global int *B, \n" +
-//			   "                    __global int *C) \n" +
-//			   "{\n" +
-//			   "\t\n" +
-//			   "\tint idx = get_global_id(0);\n" +
-//			   "\tC[idx] = A[idx] + B[idx];\n" +
-//			   "}\n;";
 	}
 	
 	@Override
@@ -277,6 +268,7 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 			   getSerializationMacroForDouble() + "\n" +
 			   getSerializationMacroForString() + "\n";
 	}
+	
 	protected String getDeserializationMacros()
 	{
 		return getDeserializationMacroForInt() + "\n" +
@@ -336,7 +328,6 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 	{
 		StringBuilder vBuilder = new StringBuilder();
 		Iterable<VarDefinition> vDefinitions = getInputTupleVariablesForInput();
-		
 		
 		vDefinitions.forEach(x ->
 							 {

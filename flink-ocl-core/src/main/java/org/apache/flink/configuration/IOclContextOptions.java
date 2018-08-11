@@ -1,6 +1,8 @@
 package org.apache.flink.configuration;
 
-public interface IOclContextOptions
+import java.io.Serializable;
+
+public interface IOclContextOptions extends Serializable
 {
 	String getKernelsBuildFolder();
 	

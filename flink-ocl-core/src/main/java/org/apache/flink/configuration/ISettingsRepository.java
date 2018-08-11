@@ -1,6 +1,8 @@
 package org.apache.flink.configuration;
 
-public interface ISettingsRepository
+import java.io.Serializable;
+
+public interface ISettingsRepository extends Serializable
 {
 	IOclContextOptions getContextOptions();
 	

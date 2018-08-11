@@ -30,4 +30,12 @@ public class OclBridge extends AbstractOclBridge
 		
 		return super.OclFilter(pUserFunctionName, vWriterResult.getStream(), vWriterResult.getPositions());
 	}
+	
+	public byte[] map(String pUserFunctionName, List< ? extends IOclTuple> pTuples)
+	{
+		StreamWriterResult vWriterResult =
+			StreamWriter.getStreamWriter().setTupleList(pTuples).writeStream();
+		
+		return super.OclMap(pUserFunctionName, vWriterResult.getStream(), vWriterResult.getPositions());
+	}
 }

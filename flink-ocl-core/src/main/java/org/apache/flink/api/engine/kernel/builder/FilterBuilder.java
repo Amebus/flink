@@ -1,6 +1,6 @@
 package org.apache.flink.api.engine.kernel.builder;
 
-public class FilterBuilder extends MapBuilder
+public class FilterBuilder extends KernelWithOutputTupleBuilder
 {
 	public FilterBuilder(KernelBuilderOptions pKernelBuilderOptions)
 	{
@@ -11,7 +11,6 @@ public class FilterBuilder extends MapBuilder
 	protected String getOutputVarDeclaration()
 	{
 		return "unsigned char _r0 = 0;\n";
-//		return "";
 	}
 	
 	@Override

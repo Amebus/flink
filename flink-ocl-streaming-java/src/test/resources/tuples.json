@@ -6,6 +6,9 @@
     "t3": "int"
   },
   "tupleTwo": {
-    "t0": "double"
+    "t0": "int"
+  },
+  "tupleThree": {
+    "t0": "string:11"
   }
 }

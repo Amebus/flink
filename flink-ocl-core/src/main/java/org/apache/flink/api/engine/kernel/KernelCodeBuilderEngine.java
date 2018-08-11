@@ -91,7 +91,6 @@ public class KernelCodeBuilderEngine
 								  if(Files.exists(vFile))
 								  {
 									  Files.delete(vFile);
-					
 								  }
 				
 								  Files.write(vFile, lines, StandardCharsets.UTF_8);

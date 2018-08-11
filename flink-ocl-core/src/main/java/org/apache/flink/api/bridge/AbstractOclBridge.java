@@ -1,6 +1,8 @@
 package org.apache.flink.api.bridge;
 
-public abstract class AbstractOclBridge
+import java.io.Serializable;
+
+public abstract class AbstractOclBridge implements Serializable
 {
 	
 	protected AbstractOclBridge(String pLibraryName)

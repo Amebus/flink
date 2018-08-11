@@ -1,6 +1,8 @@
 package org.apache.flink.api.engine;
 
-public class CppLibraryInfo
+import java.io.Serializable;
+
+public class CppLibraryInfo implements Serializable
 {
 	private String mKernelsFolder;
 	

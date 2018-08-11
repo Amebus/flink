@@ -1,8 +1,9 @@
 package org.apache.flink.configuration;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
-public interface ITupleDefinition extends Iterable<TType>
+public interface ITupleDefinition extends Iterable<TType>, Serializable
 {
 	int T_LIMIT = 22;
 	

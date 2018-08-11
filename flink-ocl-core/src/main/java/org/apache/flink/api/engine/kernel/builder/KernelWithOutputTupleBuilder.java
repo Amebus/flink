@@ -1,5 +1,7 @@
 package org.apache.flink.api.engine.kernel.builder;
 
+import org.apache.flink.api.engine.tuple.variable.OutputVarDefinition;
+import org.apache.flink.api.engine.tuple.variable.VarDefinition;
 import org.apache.flink.configuration.ITupleDefinition;
 
 import java.util.ArrayList;
@@ -17,28 +19,21 @@ public abstract class KernelWithOutputTupleBuilder extends KernelBuilder
 		return getTupleDefinitions().getTupleDefinition(getUserFunction().getOutputTupleName());
 	}
 	
-	protected Iterable<String> getOutputTupleVariablesAsInput()
+	protected Iterable<VarDefinition> getOutputTupleVariablesAsResult()
 	{
-//		return getTupleVariables(getOutputTuple(),
-//								 (r, t, i) -> r.add(new OutputVarDefinition(t, i)));
-		return new ArrayList<>();
-	}
-	
-	protected Iterable<String> getOutputTupleVariablesAsResult()
-	{
-//		return getTupleVariables(getInputTuple(),
-//								 (r, t, i) -> r.add(new OutputVarDefinition(t, i)));
-		return new ArrayList<>();
+		return getTupleVariables(getOutputTuple(),
+								 (r, t, i) -> r.add(new OutputVarDefinition(t, i)));
+//		return new ArrayList<>();
 	}
 	
 	@Override
 	protected String getOutputVarDeclaration()
 	{
-		StringBuilder vBuilder = new StringBuilder();
+		Iterable<VarDefinition> vDefinitions = getOutputTupleVariablesAsResult();
 		
-		getOutputTupleVariablesAsResult().forEach( x -> vBuilder.append(x)
-																.append(";\n"));
-		
-		return vBuilder.toString();
+		return getDeclarationLineForInteger(vDefinitions) +
+			   getDeclarationLineForDouble(vDefinitions) +
+			   getDeclarationLineForString(vDefinitions) +
+			   "\n";
 	}
 }
