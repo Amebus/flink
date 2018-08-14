@@ -4,6 +4,20 @@ import java.util.Iterator;
 
 public abstract class AbstractTupleDefinition implements ITupleDefinition
 {
+	protected boolean mWasMaxDimensionCompute = false;
+	protected int mMaxDimension = 0;
+	
+	@Override
+	public int getMaxDimension()
+	{
+		if (!mWasMaxDimensionCompute)
+		{
+			mMaxDimension = ITupleDefinition.super.getMaxDimension();
+			mWasMaxDimensionCompute = true;
+		}
+		return mMaxDimension;
+	}
+	
 	@Override
 	public Iterator<TType> iterator()
 	{

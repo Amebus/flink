@@ -36,11 +36,21 @@ public interface ITupleDefinition extends Iterable<TType>, Serializable
 	
 	/**
 	 * Return the tuple arity
-	 * @return an int representing the arity of the tuple
+	 * @return a byte representing the arity of the tuple
 	 */
 	Byte getArity();
 	
 	Iterator<TType> cIterator();
 	
 	boolean equals(Object obj);
+	
+	default int getMaxDimension()
+	{
+		int vResult = 0;
+		for (TType vTType : this)
+		{
+			vResult += vTType.getMaxByteDimension();
+		}
+		return vResult;
+	}
 }

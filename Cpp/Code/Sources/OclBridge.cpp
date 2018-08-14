@@ -470,8 +470,8 @@ JNIEXPORT void Java_org_apache_flink_api_bridge_AbstractOclBridge_Dispose(JNIEnv
 }
 
 JNIEXPORT jbooleanArray JNICALL 
-Java_org_apache_flink_api_bridge_AbstractOclBridge_OclFilter
-(JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes)
+Java_org_apache_flink_api_bridge_AbstractOclBridge_OclFilter(
+    JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes)
 {
     std::string vKernelName = GetStringFromJavaString(pEnv, pKernelName);
 
@@ -608,7 +608,7 @@ std::string GetKernelNameFromKernelFileName(std::string pKernelName)
 
 std::vector<std::string> GetKernelsSourceFiles(std::string pKernelsFolder)
 {
-    std::cout << "Kernels Folder:" << pKernelsFolder << '\n' << '\n';
+    //std::cout << "Kernels Folder:" << pKernelsFolder << '\n' << '\n';
 
     DIR *vDirectory;
 

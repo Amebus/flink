@@ -38,7 +38,7 @@ public abstract class VarDefinition
 	
 	public abstract boolean isInputVar();
 	
-	public boolean isOutputvar()
+	public boolean isOutputVar()
 	{
 		return !isInputVar();
 	}

@@ -4,7 +4,7 @@
       "type":"map",
       "name":"mapFunction",
       "input":"tupleTwo",
-      "output":"tupleOne",
+      "output":"tupleThree",
       "function": [
         "_r0 = 'a'"
       ]

@@ -2,6 +2,7 @@ package org.apache.flink.api.engine.kernel.line;
 
 import org.apache.flink.api.common.utility.StreamUtility;
 import org.apache.flink.api.engine.tuple.variable.VarDefinition;
+import org.apache.flink.api.engine.tuple.variable.VarDefinitionHelper;
 import org.apache.flink.configuration.CTType;
 
 import java.util.stream.Collectors;
@@ -15,8 +16,7 @@ public class DoubleVarDefinitionLine extends VarDefinitionKernelLine
 	
 	private static Iterable<String> getDoubleVariableNames(Iterable<VarDefinition> pVarDefinitions)
 	{
-		return StreamUtility.streamFrom(pVarDefinitions)
-							.filter(x -> x.getCType().isDouble())
+		return VarDefinitionHelper.getDoubleVarDefinitionsAsStream(pVarDefinitions)
 							.map(VarDefinition::getName)
 							.collect(Collectors.toList());
 		

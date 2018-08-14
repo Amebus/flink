@@ -58,6 +58,8 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 												"        si++;                       \\\n" +
 												"        r[si] = t & 0xFF;           \\\n";
 		
+//		public static final String SER_STRING = "#define SER_STRING()"
+		
 		public static final String DESER_INT = "#define DESER_INT(d, si, r) \\\n" +
 											   "            r <<= 8;        \\\n" +
 											   "            r |= d[si];     \\\n" +
@@ -100,7 +102,7 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 		public static final String DESER_STRING = "#define DESER_STRING(d, si, rs, ri) \\\n" +
 												  "            DESER_INT(d, si, ri);   \\\n" +
 												  "            si++;                   \\\n" +
-												  "            rs = d[si];             \\\n";
+												  "            rs = &d[si];            \\\n";
 	}
 	
 	public static final class MACRO_CALL
@@ -128,6 +130,17 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 												  P1 + ", " +
 												  P2 +
 												  " );";
+		
+		public static final String SER_INT = "SER_INT( " +
+											 P1 + ", " +
+											 P2 + ", " +
+											 RESULT + " );";
+		
+		public static final String SER_DOUBLE = "SER_DOUBLE( " +
+												P1 + ", " +
+											 	P2 + ", " +
+											 	RESULT + ", " +
+											 	LONG_TEMP + " );";
 	}
 	
 	private IUserFunction mUserFunction;
@@ -291,7 +304,7 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 		return "int " + G_ID + " = get_global_id(0);\n" +
 			   "unsigned char " + ARITY + " = " + dataOf(0) + ";\n" +
 			   "int " + INDEX + " = " + dataIndexOf(G_ID) + ";\n" +
-			   "long " + LONG_TEMP + " = 0;"+
+			   "long " + LONG_TEMP + " = 0;" +
 			   "\n";
 	}
 	
@@ -349,7 +362,6 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 														 .replace(MACRO_CALL.P2, vDimName)
 													)
 											 .append("\n");
-				
 								 }
 							 });
 		return vBuilder.toString();
