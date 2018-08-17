@@ -6,7 +6,7 @@
       "input":"tupleTwo",
       "output":"tupleThree",
       "function": [
-        "_r0 = 'a'"
+        "integerToString(_t0, _r0, _rsl0);"
       ]
     }
   ]

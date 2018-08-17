@@ -18,7 +18,7 @@ public class OutputVarDefinition extends VarDefinition
 	@Override
 	public int getLength()
 	{
-		return getCType().getMaxByteDimension();
+		return getCType().getMaxByteOccupation();
 	}
 	
 	@Override

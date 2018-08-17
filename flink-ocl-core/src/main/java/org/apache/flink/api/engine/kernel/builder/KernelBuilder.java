@@ -58,7 +58,13 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 												"        si++;                       \\\n" +
 												"        r[si] = t & 0xFF;           \\\n";
 		
-//		public static final String SER_STRING = "#define SER_STRING()"
+		public static final String SER_STRING = "#define SER_STRING(s, si, l, r)                \\\n" +
+												"        SER_INT(l, si, r);                     \\\n" +
+												"        si++;                                  \\\n" +
+												"        for(int _ii = 0; _ii < l; _ii++, si++) \\\n" +
+												"        {                                      \\\n" +
+												"            r[si] = s[_ii];                    \\\n" +
+												"        }                                      \\\n";
 		
 		public static final String DESER_INT = "#define DESER_INT(d, si, r) \\\n" +
 											   "            r <<= 8;        \\\n" +
@@ -102,7 +108,8 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 		public static final String DESER_STRING = "#define DESER_STRING(d, si, rs, ri) \\\n" +
 												  "            DESER_INT(d, si, ri);   \\\n" +
 												  "            si++;                   \\\n" +
-												  "            rs = &d[si];            \\\n";
+												  "            rs = &d[si];            \\\n" +
+												  "            si+=ri;                 \\\n";
 	}
 	
 	public static final class MACRO_CALL
@@ -138,9 +145,67 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 		
 		public static final String SER_DOUBLE = "SER_DOUBLE( " +
 												P1 + ", " +
-											 	P2 + ", " +
-											 	RESULT + ", " +
-											 	LONG_TEMP + " );";
+												P2 + ", " +
+												RESULT + ", " +
+												LONG_TEMP + " );";
+		
+		public static final String SER_STRING = "SER_STRING( " +
+												P1 + ", " +
+												P2 + ", " +
+												P3 + ", " +
+												RESULT + " );";
+	}
+	
+	public static final class UTILITY_FUNCTIONS
+	{
+		public static final String INTEGER_TO_STRING = "void integerToString(int n, char *s, int sl)\n" +
+													   "{\n" +
+													   "    fillStringWith(0, sl, '\\0', s);\n" +
+													   "    char const digit[] = \"0123456789\";\n" +
+													   "    char* p = s;\n" +
+													   "    if(n<0){\n" +
+													   "        *p++ = '-';\n" +
+													   "        n *= -1;\n" +
+													   "    }\n" +
+													   "    int shifter = n;\n" +
+													   "    do{\n" +
+													   "        ++p;\n" +
+													   "        shifter = shifter/10;\n" +
+													   "    }while(shifter);\n" +
+													   "    *p = '\\0';\n" +
+													   "    do{\n" +
+													   "        *--p = digit[n%10];\n" +
+													   "        n = n/10;\n" +
+													   "    }while(n);\n" +
+													   "}\n";
+		
+		public static final String STRING_TO_INTEGER = "int stringToInteger(char *s)\n" +
+													   "{\n" +
+													   "    const char z = '0';\n" +
+													   "    int r = 0, st = 0, p = 1;\n" +
+													   "    \n" +
+													   "    while(s[st] != '\\0')\n" +
+													   "    {\n" +
+													   "        st++;\n" +
+													   "    }\n" +
+													   "    for(int i = st-1; i >= 0 && s[i] != '-' ; i--)\n" +
+													   "    {\n" +
+													   "        r+=((s[i]-z)*p);\n" +
+													   "        p*=10;\n" +
+													   "    }\n" +
+													   "    if(s[0]=='-')\n" +
+													   "    {\n" +
+													   "        r*=-1;\n" +
+													   "    }\n" +
+													   "    return r;\n" +
+													   "}\n";
+		
+		public static final String FILL_STRING_WITH = "void fillStringWith(int si,int sl, char c, char *s)\n" +
+													  "{\n" +
+													  "    for (; si < sl; si++) {\n" +
+													  "        s[si] = c;\n" +
+													  "    }\n" +
+													  "}\n";
 	}
 	
 	private IUserFunction mUserFunction;
@@ -165,6 +230,7 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 	{
 		return mOclContextOptions;
 	}
+	
 	protected IOclKernelsOptions getOclKernelOptions()
 	{
 		return mOclKernelOptions;
@@ -175,6 +241,7 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 	{
 		return dataOf(Integer.toString(pI));
 	}
+	
 	protected String dataOf(String pS)
 	{
 		return DATA + "[" + pS + "]";
@@ -184,6 +251,7 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 	{
 		return dataOf(Integer.toString(pI));
 	}
+	
 	protected String dataIndexOf(String pS)
 	{
 		return DATA_INDEXES + "[" + pS + "]";
@@ -193,6 +261,7 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 	{
 		return mTupleDefinitions;
 	}
+	
 	protected ITupleDefinition getInputTuple()
 	{
 		return mTupleDefinitions.getTupleDefinition(mUserFunction.getInputTupleName());
@@ -215,11 +284,12 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 	{
 		final int[] vIndex = {0};
 		Collection<VarDefinition> vResult = new ArrayList<>(pTuple.getArity());
-		pTuple.cIterator().forEachRemaining( t ->
-											 {
-												 pResultAdder.addTo(vResult, (CTType) t, vIndex[0]);
-												 vIndex[0]++;
-											 });
+		pTuple.cIterator()
+			  .forEachRemaining(t ->
+								{
+									pResultAdder.addTo(vResult, (CTType) t, vIndex[0]);
+									vIndex[0]++;
+								});
 		return vResult;
 	}
 	
@@ -231,7 +301,8 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 	
 	protected String getKernelCode()
 	{
-		return getSerializationMacros() +
+		return getUtilityFunctions() +
+			   getSerializationMacros() +
 			   getDeserializationMacros() +
 			   getKernelSignature() +
 			   "\n{\n" +
@@ -249,14 +320,23 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 		return new OclKernel(getKernelName(), getKernelCode());
 	}
 	
+	public String getUtilityFunctions()
+	{
+		return UTILITY_FUNCTIONS.FILL_STRING_WITH + "\n" +
+			   UTILITY_FUNCTIONS.INTEGER_TO_STRING + "\n" +
+			   UTILITY_FUNCTIONS.STRING_TO_INTEGER + "\n";
+	}
+	
 	protected String getDeserializationMacroForInt()
 	{
 		return MACRO.DESER_INT;
 	}
+	
 	protected String getDeserializationMacroForDouble()
 	{
 		return MACRO.DESER_DOUBLE;
 	}
+	
 	protected String getDeserializationMacroForString()
 	{
 		return MACRO.DESER_STRING;
@@ -266,13 +346,15 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 	{
 		return MACRO.SER_INT;
 	}
+	
 	protected String getSerializationMacroForDouble()
 	{
 		return MACRO.SER_DOUBLE;
 	}
+	
 	protected String getSerializationMacroForString()
 	{
-		return "";
+		return MACRO.SER_STRING;
 	}
 	
 	protected String getSerializationMacros()
@@ -295,7 +377,7 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 			   getKernelName() +
 			   "(\n" +
 			   "\t__global unsigned char *" + DATA + ", \n" +
-			   "\t__global int *" + DATA_INDEXES +", \n" +
+			   "\t__global int *" + DATA_INDEXES + ", \n" +
 			   "\t__global unsigned char *" + RESULT + ")";
 	}
 	
@@ -328,10 +410,12 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 	{
 		return new IntVarDefinitionLine(pDefinitions).toKernelLine();
 	}
+	
 	protected String getDeclarationLineForDouble(Iterable<VarDefinition> pDefinitions)
 	{
 		return new DoubleVarDefinitionLine(pDefinitions).toKernelLine();
 	}
+	
 	protected String getDeclarationLineForString(Iterable<VarDefinition> pDefinitions)
 	{
 		return new StringVarDefinitionLine(pDefinitions).toKernelLine();
@@ -344,17 +428,17 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 		
 		vDefinitions.forEach(x ->
 							 {
-								 if(x.getCType().isInteger())
+								 if (x.getCType().isInteger())
 								 {
 									 vBuilder.append(MACRO_CALL.DESER_INT.replace(MACRO_CALL.P1, x.getName()))
 											 .append("\n");
 								 }
-								 else if(x.getCType().isDouble())
+								 else if (x.getCType().isDouble())
 								 {
 									 vBuilder.append(MACRO_CALL.DESER_DOUBLE.replace(MACRO_CALL.P1, x.getName()))
 											 .append("\n");
 								 }
-								 else if(x.getCType().isString())
+								 else if (x.getCType().isString())
 								 {
 									 String vDimName = "_sl" + x.getIndex();
 									 vBuilder.append(MACRO_CALL.DESER_STRING
@@ -368,5 +452,6 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 	}
 	
 	protected abstract String getOutputVarDeclaration();
+	
 	protected abstract String getOutputSection();
 }

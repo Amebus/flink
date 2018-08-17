@@ -3,6 +3,7 @@ package org.apache.flink.api.engine.kernel.builder;
 import org.apache.flink.api.engine.tuple.variable.OutputVarDefinition;
 import org.apache.flink.api.engine.tuple.variable.VarDefinition;
 import org.apache.flink.api.engine.tuple.variable.VarDefinitionHelper;
+import org.apache.flink.configuration.CTType;
 import org.apache.flink.configuration.ITupleDefinition;
 
 import java.util.Iterator;
@@ -85,12 +86,18 @@ public abstract class KernelWithOutputTupleBuilder extends KernelBuilder
 	
 	private String getTailResultIndex(VarDefinition pCurrentDefinition, VarDefinition pPreviousDefinition)
 	{
+		CTType vPreviousType = pPreviousDefinition.getCType();
+		int vPreviousTypeDim = vPreviousType.getMaxByteOccupation();
+		if (vPreviousType.isString())
+		{
+			vPreviousTypeDim += 4;
+		}
 		return "int " +
 			   getResultIndex(pCurrentDefinition.getIndex()) +
 			   " = " +
 			   getResultIndex(pPreviousDefinition.getIndex()) +
 			   " + " +
-			   pPreviousDefinition.getCType().getMaxByteDimension() +
+			   vPreviousTypeDim +
 			   ";\n";
 	}
 	
@@ -132,21 +139,31 @@ public abstract class KernelWithOutputTupleBuilder extends KernelBuilder
 		StringBuilder vBuilder = new StringBuilder();
 		
 		getOutputTupleVariablesAsResult()
-			.forEach(x ->
+			.forEach(pVD ->
 					 {
-						 if(x.getCType().isInteger())
+						 if(pVD.getCType().isInteger())
 						 {
 							 vBuilder.append(MACRO_CALL.SER_INT
-												 .replace(MACRO_CALL.P1, x.getName())
-												 .replace(MACRO_CALL.P2, getResultIndex(x.getIndex())))
-									 .append("\n");
+												 .replace(MACRO_CALL.P1, pVD.getName())
+												 .replace(MACRO_CALL.P2, getResultIndex(pVD.getIndex())));
 						 }
-						 else if(x.getCType().isDouble())
+						 else if(pVD.getCType().isDouble())
 						 {
 							 vBuilder.append(MACRO_CALL.SER_DOUBLE
-												 .replace(MACRO_CALL.P1, x.getName())
-												 .replace(MACRO_CALL.P2, getResultIndex(x.getIndex())))
-									 .append("\n");
+												 .replace(MACRO_CALL.P1, pVD.getName())
+												 .replace(MACRO_CALL.P2, getResultIndex(pVD.getIndex())));
+						 }
+						 else if(pVD.getCType().isString())
+						 {
+						 	vBuilder.append(MACRO_CALL.SER_STRING
+												.replace(MACRO_CALL.P1, pVD.getName())
+												.replace(MACRO_CALL.P2, getResultIndex(pVD.getIndex()))
+												.replace(MACRO_CALL.P3, String.valueOf(pVD.getLength())));
+						 }
+						 
+						 if(pVD.getCType().isKnown())
+						 {
+						 	vBuilder.append("\n");
 						 }
 					 });
 		return vBuilder.toString();

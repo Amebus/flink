@@ -19,7 +19,15 @@ public class StreamWriter
 	
 	public static StreamWriter getStreamWriter()
 	{
-		return sStreamWriter;
+		return getStreamWriter(false);
+	}
+	
+	public static StreamWriter getStreamWriter(boolean forParallelComputation)
+	{
+		if(forParallelComputation)
+			return new StreamWriter();
+		else
+			return sStreamWriter;
 	}
 	
 	private StreamWriter()

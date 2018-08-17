@@ -5,7 +5,7 @@
       "name":"filterFunction",
       "input":"tupleTwo",
       "function": [
-        "_r0 = _t0 > 2"
+        "_r0 = _t0 > 2;"
       ]
     }
   ]

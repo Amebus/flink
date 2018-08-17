@@ -18,7 +18,7 @@ public class InputVarDefinition extends VarDefinition
 	@Override
 	public int getLength()
 	{
-		return getCType().getByteDimension();
+		return getCType().getByteOccupation();
 	}
 	
 	@Override

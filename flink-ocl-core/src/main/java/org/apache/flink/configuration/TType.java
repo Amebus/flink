@@ -22,19 +22,19 @@ public abstract class TType implements Serializable
 	
 	private static final String COLUMN = ":";
 	private String mType;
-	private int mByteDimension;
-	private int mMaxByteDimension;
+	private int mByteOccupation;
+	private int mMaxByteOccupation;
 	
-	protected TType(String pType, int pByteDimension, int pMaxByteDimension)
+	protected TType(String pType, int pByteOccupation, int pMaxByteOccupation)
 	{
 		mType = pType;
-		mByteDimension = pByteDimension;
-		mMaxByteDimension = pMaxByteDimension;
+		mByteOccupation = pByteOccupation;
+		mMaxByteOccupation = pMaxByteOccupation;
 	}
 	
 	// protected TType(TType pTType)
 	// {
-	// 	this(pTType.getT(), pTType.getByteDimension(), pTType.getMaxByteDimension());
+	// 	this(pTType.getT(), pTType.getByteOccupation(), pTType.getMaxByteOccupation());
 	// }
 	
 	public String getT()
@@ -42,27 +42,30 @@ public abstract class TType implements Serializable
 		return mType;
 	}
 	
-	public int getByteDimension()
+	public int getByteOccupation()
 	{
-		return mByteDimension;
+		return mByteOccupation;
 	}
 	
-	public int getMaxByteDimension()
+	public int getMaxByteOccupation()
 	{
-		return mMaxByteDimension;
+		return mMaxByteOccupation;
 	}
 	
 	public abstract boolean isInteger();
 	public abstract boolean isDouble();
 	public abstract boolean isString();
-	public abstract boolean isUnknown();
+	public abstract boolean isKnown();
+	public boolean isUnknown()
+	{
+		return !isKnown();
+	}
 	
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(getByteDimension(), getMaxByteDimension(), getT());
+		return Objects.hash(getByteOccupation(), getMaxByteOccupation(), getT());
 	}
-	
 	
 	@Override
 	public boolean equals(Object pOther)
@@ -75,8 +78,8 @@ public abstract class TType implements Serializable
 		return pOther != null &&
 			   (pOther == this ||
 				getT().equals(pOther.getT()) &&
-				getByteDimension() == pOther.getByteDimension() &&
-				getMaxByteDimension() == pOther.getMaxByteDimension());
+				getByteOccupation() == pOther.getByteOccupation() &&
+				getMaxByteOccupation() == pOther.getMaxByteOccupation());
 	}
 	
 	public static boolean isInteger (String pT)
@@ -103,14 +106,14 @@ public abstract class TType implements Serializable
 	protected static abstract class TTypeBuilder
 	{
 		private String mType;
-		private int mByteDimension;
-		private int mMaxByteDimension;
+		private int mByteOccupation;
+		private int mMaxByteOccupation;
 		
 		
 		public TTypeBuilder(String pType)
 		{
-			mByteDimension = 0;
-			mMaxByteDimension = 100;
+			mByteOccupation = 0;
+			mMaxByteOccupation = 100;
 			mType = pType;
 			setBuildParameters(pType);
 		}
@@ -122,8 +125,8 @@ public abstract class TType implements Serializable
 		
 		private void setBuildParameters(TType pType)
 		{
-			mByteDimension = pType.getByteDimension();
-			mMaxByteDimension = pType.getMaxByteDimension();
+			mByteOccupation = pType.getByteOccupation();
+			mMaxByteOccupation = pType.getMaxByteOccupation();
 			mType = pType.getT();
 		}
 		
@@ -152,25 +155,25 @@ public abstract class TType implements Serializable
 		private void asStringType(String pType)
 		{
 			String[] vStrings = pType.split(COLUMN);
-			mByteDimension = -1;
+			mByteOccupation = -1;
 			
 			if (vStrings.length > 1)
 			{
-				mMaxByteDimension = Integer.parseInt(vStrings[1]);
+				mMaxByteOccupation = Integer.parseInt(vStrings[1]);
 			}
 			mType = vStrings[0];
 		}
 		
 		private void asIntegerType()
 		{
-			mByteDimension = 4;
-			mMaxByteDimension = 4;
+			mByteOccupation = 4;
+			mMaxByteOccupation = 4;
 		}
 		
 		private void asDoubleType()
 		{
-			mByteDimension = 8;
-			mMaxByteDimension = 8;
+			mByteOccupation = 8;
+			mMaxByteOccupation = 8;
 		}
 		
 		public String getType()
@@ -178,14 +181,14 @@ public abstract class TType implements Serializable
 			return mType;
 		}
 		
-		public int getByteDimension()
+		public int getByteOccupation()
 		{
-			return mByteDimension;
+			return mByteOccupation;
 		}
 		
-		public int getMaxByteDimension()
+		public int getMaxByteOccupation()
 		{
-			return mMaxByteDimension;
+			return mMaxByteOccupation;
 		}
 		
 	}

@@ -1,8 +1,6 @@
 package org.apache.flink.api.engine.tuple.variable;
 
 import org.apache.flink.api.common.utility.StreamUtility;
-import org.apache.flink.api.engine.kernel.line.IntVarDefinitionLine;
-import org.apache.flink.configuration.CTType;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -123,7 +121,7 @@ public final class VarDefinitionHelper
 		@Override
 		public int getLength()
 		{
-			return isInputVar() ? getCType().getByteDimension() : getCType().getMaxByteDimension();
+			return isInputVar() ? getCType().getByteOccupation() : getCType().getMaxByteOccupation();
 		}
 		
 		@Override

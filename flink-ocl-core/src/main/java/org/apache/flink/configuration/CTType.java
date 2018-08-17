@@ -33,9 +33,9 @@ public class CTType extends TType
 	}
 	
 	@Override
-	public boolean isUnknown()
+	public boolean isKnown()
 	{
-		return !(isInteger() || isDouble() || isString());
+		return isInteger() || isDouble() || isString();
 	}
 	
 	public static class Builder extends TTypeBuilder
@@ -59,7 +59,7 @@ public class CTType extends TType
 				vType = CTypes.DOUBLE;
 			else
 				vType = CTypes.STRING;
-			return new CTType(vType, getByteDimension(), getMaxByteDimension());
+			return new CTType(vType, getByteOccupation(), getMaxByteOccupation());
 		}
 	}
 }

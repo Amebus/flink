@@ -49,7 +49,11 @@ public interface ITupleDefinition extends Iterable<TType>, Serializable
 		int vResult = 0;
 		for (TType vTType : this)
 		{
-			vResult += vTType.getMaxByteDimension();
+			vResult += vTType.getMaxByteOccupation();
+			if (vTType.isString())
+			{
+				vResult += 4;
+			}
 		}
 		return vResult;
 	}

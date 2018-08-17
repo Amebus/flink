@@ -46,7 +46,7 @@ public class JsonUserFunction extends UserFunction implements IUserFunction
 		
 		StringBuilder vResult = new StringBuilder();
 		
-		mFunctionLines.forEach( x -> vResult.append(x).append(";\n"));
+		mFunctionLines.forEach( x -> vResult.append(x).append("\n"));
 		
 		mFunction = vResult.toString();
 	}

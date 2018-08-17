@@ -34,10 +34,10 @@ JNIEXPORT void JNICALL Java_org_apache_flink_api_bridge_AbstractOclBridge_Dispos
 /*
  * Class:     org_apache_flink_api_bridge_AbstractOclBridge
  * Method:    OclMap
- * Signature: (Ljava/lang/String;[B[I)[B
+ * Signature: (Ljava/lang/String;[B[II[B)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_org_apache_flink_api_bridge_AbstractOclBridge_OclMap
-  (JNIEnv *, jobject, jstring, jbyteArray, jintArray);
+  (JNIEnv *, jobject, jstring, jbyteArray, jintArray, jint, jbyteArray);
 
 /*
  * Class:     org_apache_flink_api_bridge_AbstractOclBridge
@@ -50,10 +50,10 @@ JNIEXPORT jbooleanArray JNICALL Java_org_apache_flink_api_bridge_AbstractOclBrid
 /*
  * Class:     org_apache_flink_api_bridge_AbstractOclBridge
  * Method:    OclReduce
- * Signature: (Ljava/lang/String;[B[I)[B
+ * Signature: (Ljava/lang/String;[B[II[B)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_org_apache_flink_api_bridge_AbstractOclBridge_OclReduce
-  (JNIEnv *, jobject, jstring, jbyteArray, jintArray);
+  (JNIEnv *, jobject, jstring, jbyteArray, jintArray, jint, jbyteArray);
 
 #ifdef __cplusplus
 }

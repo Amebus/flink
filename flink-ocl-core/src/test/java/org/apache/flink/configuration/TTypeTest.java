@@ -142,24 +142,24 @@ public class TTypeTest
 		//String
 		vType = getJavaTString();
 		assertEquals(vType.getT(), JavaTType.JavaTypes.STRING);
-		assertEquals(-1, vType.getByteDimension());
-		assertEquals(100, vType.getMaxByteDimension());
+		assertEquals(-1, vType.getByteOccupation());
+		assertEquals(100, vType.getMaxByteOccupation());
 		
 		vType = getJavaTCString();
 		assertEquals(vType.getT(), JavaTType.JavaTypes.STRING);
-		assertEquals(-1, vType.getByteDimension());
-		assertEquals(100, vType.getMaxByteDimension());
+		assertEquals(-1, vType.getByteOccupation());
+		assertEquals(100, vType.getMaxByteOccupation());
 		
 		//String
 		vType = getCTString();
 		assertEquals(vType.getT(), CTType.CTypes.STRING);
-		assertEquals(-1, vType.getByteDimension());
-		assertEquals(100, vType.getMaxByteDimension());
+		assertEquals(-1, vType.getByteOccupation());
+		assertEquals(100, vType.getMaxByteOccupation());
 		
 		vType = getCTCString();
 		assertEquals(vType.getT(), CTType.CTypes.STRING);
-		assertEquals(-1, vType.getByteDimension());
-		assertEquals(100, vType.getMaxByteDimension());
+		assertEquals(-1, vType.getByteOccupation());
+		assertEquals(100, vType.getMaxByteOccupation());
 	}
 	
 	@Test
@@ -170,24 +170,24 @@ public class TTypeTest
 		//String
 		vType = getJavaTString(33);
 		assertEquals(vType.getT(), JavaTType.JavaTypes.STRING);
-		assertEquals(-1, vType.getByteDimension());
-		assertEquals(33, vType.getMaxByteDimension());
+		assertEquals(-1, vType.getByteOccupation());
+		assertEquals(33, vType.getMaxByteOccupation());
 		
 		vType = getJavaTCString(33);
 		assertEquals(vType.getT(), JavaTType.JavaTypes.STRING);
-		assertEquals(-1, vType.getByteDimension());
-		assertEquals(33, vType.getMaxByteDimension());
+		assertEquals(-1, vType.getByteOccupation());
+		assertEquals(33, vType.getMaxByteOccupation());
 		
 		//String
 		vType = getCTString(33);
 		assertEquals(vType.getT(), CTType.CTypes.STRING);
-		assertEquals(-1, vType.getByteDimension());
-		assertEquals(33, vType.getMaxByteDimension());
+		assertEquals(-1, vType.getByteOccupation());
+		assertEquals(33, vType.getMaxByteOccupation());
 		
 		vType = getCTCString(33);
 		assertEquals(vType.getT(), CTType.CTypes.STRING);
-		assertEquals(-1, vType.getByteDimension());
-		assertEquals(33, vType.getMaxByteDimension());
+		assertEquals(-1, vType.getByteOccupation());
+		assertEquals(33, vType.getMaxByteOccupation());
 	}
 	
 	@Test
@@ -198,24 +198,24 @@ public class TTypeTest
 		//
 		vType = getJavaTInteger();
 		assertEquals(vType.getT(), JavaTType.JavaTypes.INTEGER);
-		assertEquals(4, vType.getByteDimension());
-		assertEquals(4, vType.getMaxByteDimension());
+		assertEquals(4, vType.getByteOccupation());
+		assertEquals(4, vType.getMaxByteOccupation());
 		
 		vType = getJavaTInt();
 		assertEquals(vType.getT(), JavaTType.JavaTypes.INTEGER);
-		assertEquals(4, vType.getByteDimension());
-		assertEquals(4, vType.getMaxByteDimension());
+		assertEquals(4, vType.getByteOccupation());
+		assertEquals(4, vType.getMaxByteOccupation());
 		
 		//
 		vType = getCTInteger();
 		assertEquals(vType.getT(), CTType.CTypes.INTEGER);
-		assertEquals(4, vType.getByteDimension());
-		assertEquals(4, vType.getMaxByteDimension());
+		assertEquals(4, vType.getByteOccupation());
+		assertEquals(4, vType.getMaxByteOccupation());
 		
 		vType = getCTInt();
 		assertEquals(vType.getT(), CTType.CTypes.INTEGER);
-		assertEquals(4, vType.getByteDimension());
-		assertEquals(4, vType.getMaxByteDimension());
+		assertEquals(4, vType.getByteOccupation());
+		assertEquals(4, vType.getMaxByteOccupation());
 	}
 	
 	@Test
@@ -225,13 +225,13 @@ public class TTypeTest
 		
 		vType = getJavaTDouble();
 		assertEquals(vType.getT(), JavaTType.JavaTypes.DOUBLE);
-		assertEquals(8, vType.getByteDimension());
-		assertEquals(8, vType.getMaxByteDimension());
+		assertEquals(8, vType.getByteOccupation());
+		assertEquals(8, vType.getMaxByteOccupation());
 		
 		vType = getCTDouble();
 		assertEquals(vType.getT(), CTType.CTypes.DOUBLE);
-		assertEquals(8, vType.getByteDimension());
-		assertEquals(8, vType.getMaxByteDimension());
+		assertEquals(8, vType.getByteOccupation());
+		assertEquals(8, vType.getMaxByteOccupation());
 	}
 	
 	@Test

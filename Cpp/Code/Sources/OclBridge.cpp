@@ -222,7 +222,6 @@ class OclKernelExecutionInfo
         {
 
         };
-
     public:
         OclKernelExecutionInfo (JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes)
         {
@@ -274,7 +273,7 @@ class OclKernelExecutionInfo
             return mIndexesLegth;
         }
 
-        unsigned char* GetResult()
+        virtual unsigned char* GetResult()
         {
             return mResult;
         }
@@ -304,12 +303,84 @@ class OclFilterExecutionInfo : public OclKernelExecutionInfo
         OclFilterExecutionInfo (JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes)
             : OclKernelExecutionInfo (pEnv, pObj, pKernelName, pStream, pIndexes)
         {
-            
         }
 };
+
+class OclMapExecutionInfo : public OclKernelExecutionInfo
+{
+    protected:
+        int mOutputTupleDimension;
+        int mInfoLength;
+        unsigned char* mInfo;
+        void SetUpResult()
+        {
+
+        }
+    public:
+        OclMapExecutionInfo (JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, 
+                                jint pOutputTupleDimension, jbyteArray pOutputTupleInfo)
+            : OclKernelExecutionInfo (pEnv, pObj, pKernelName, pStream, pIndexes)
+        {
+            mOutputTupleDimension = pOutputTupleDimension;
+            
+            mInfoLength = mEnv->GetArrayLength(pOutputTupleInfo);
+            mInfo = (unsigned char *)mEnv->GetByteArrayElements(pOutputTupleInfo, 0);
+
+            mResultLength = mInfoLength + mIndexesLegth * mOutputTupleDimension;
+            mResultSize = sizeof(unsigned char) * mResultLength;
+            mResult = new unsigned char[mResultLength];
+        }
+        int GetOutputTupleDimension()
+        {
+            return mOutputTupleDimension;
+        }
+        unsigned char* GetResult()
+        {
+            for(int i = 0; i < mInfoLength; i++)
+            {
+                mResult[i] = mInfo[i];
+            }
+            return mResult;
+        }
+};
+
 #pragma endregion
 
 #pragma region Java native implementation
+
+void RunKernel(OclKernelExecutionInfo* pKernelInfo)
+{
+    size_t vStreamSize, vIndexesSize, vResultSize;
+    vStreamSize = pKernelInfo->GetStreamSize();
+    vIndexesSize = pKernelInfo->GetIndexesSize();
+    vResultSize = pKernelInfo->GetResultSize();
+    try
+    {
+        cl::Kernel vKernel = cl::Kernel(gProgrmasList[pKernelInfo->GetKernelName()], pKernelInfo->GetCharKernelName());
+
+        cl::Buffer vStreamBuffer(gContext, CL_MEM_READ_ONLY, vStreamSize);
+        cl::Buffer vIndexesBuffer(gContext, CL_MEM_READ_ONLY, vIndexesSize);
+        cl::Buffer vResultBuffer(gContext, CL_MEM_WRITE_ONLY, vResultSize);
+
+        gCommandQueue.enqueueWriteBuffer(vStreamBuffer, CL_TRUE, 0, vStreamSize, pKernelInfo->GetStream());
+        gCommandQueue.enqueueWriteBuffer(vIndexesBuffer, CL_TRUE, 0, vIndexesSize, pKernelInfo->GetIndexes());
+
+        vKernel.setArg(0, vStreamBuffer);
+        vKernel.setArg(1, vIndexesBuffer);
+        vKernel.setArg(2, vResultBuffer);
+
+        cl::NDRange global(pKernelInfo->GetIndexesLength());
+
+        gCommandQueue.enqueueNDRangeKernel(vKernel, cl::NullRange, global, cl::NullRange);
+
+        gCommandQueue.enqueueReadBuffer(vResultBuffer, CL_TRUE, 0, vResultSize, pKernelInfo->GetResult());
+    }
+    catch(cl::Error *vError)
+    {
+        PrintClError(vError);
+        exit(1);
+    }
+}
 
 JNIEXPORT void Java_org_apache_flink_api_bridge_AbstractOclBridge_ListDevices(JNIEnv *pEnv, jobject pObj)
 {
@@ -538,7 +609,21 @@ Java_org_apache_flink_api_bridge_AbstractOclBridge_OclFilter(
 	pEnv->SetBooleanArrayRegion(vRet, 0, vResultLength, vResult);
 
     return vRet;
+}
 
+JNIEXPORT jbyteArray JNICALL Java_org_apache_flink_api_bridge_AbstractOclBridge_OclMap(
+    JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, jint pOutputTupleDimension, jbyteArray pOutputTupleInfo)
+{
+    OclKernelExecutionInfo *vKernelInfo = new OclMapExecutionInfo(pEnv, pObj, pKernelName, pStream, pIndexes, pOutputTupleDimension, pOutputTupleInfo);
+
+    
+
+    RunKernel(vKernelInfo);
+
+    jbyteArray vRet = pEnv->NewByteArray(vKernelInfo->GetResultLength());
+	pEnv->SetByteArrayRegion(vRet, 0, vKernelInfo->GetResultLength(), (signed char *)vKernelInfo->GetResult());
+
+    return vRet;
 }
 
 #pragma endregion
@@ -625,7 +710,7 @@ std::vector<std::string> GetKernelsSourceFiles(std::string pKernelsFolder)
         {
             if (vDot.compare(vFile->d_name) != 0 && vDotDot.compare(vFile->d_name) != 0)
             {
-                //printf ("%s\n", vFile->d_name);
+                printf ("%s\n", vFile->d_name);
                 vFiles.push_back(vFile->d_name);          
             }
         }

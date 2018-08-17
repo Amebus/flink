@@ -34,9 +34,9 @@ public class JavaTType extends TType
 	}
 	
 	@Override
-	public boolean isUnknown()
+	public boolean isKnown()
 	{
-		return !(isInteger() || isDouble() || isString());
+		return isInteger() || isDouble() || isString();
 	}
 	
 	public static class Builder extends TTypeBuilder
@@ -60,7 +60,7 @@ public class JavaTType extends TType
 				vType = JavaTypes.DOUBLE;
 			else
 				vType = JavaTypes.STRING;
-			return new JavaTType(vType, getByteDimension(), getMaxByteDimension());
+			return new JavaTType(vType, getByteOccupation(), getMaxByteOccupation());
 		}
 	}
 }

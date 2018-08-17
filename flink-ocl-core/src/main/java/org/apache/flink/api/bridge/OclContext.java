@@ -4,15 +4,17 @@ import org.apache.flink.api.engine.BuildEngine;
 import org.apache.flink.api.engine.CppLibraryInfo;
 import org.apache.flink.api.engine.IUserFunctionsRepository;
 import org.apache.flink.api.serialization.StreamReader;
+import org.apache.flink.api.serialization.Types;
 import org.apache.flink.api.tuple.IOclTuple;
 import org.apache.flink.configuration.ISettingsRepository;
+import org.apache.flink.configuration.ITupleDefinition;
 import org.apache.flink.configuration.ITupleDefinitionsRepository;
-import org.apache.flink.api.bridge.OclBridge;
 
 import java.io.File;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -41,7 +43,7 @@ public class OclContext implements Serializable
 	{
 		generatesKernels();
 		
-//		mOclBridgeContext.initialize(mCppLibraryInfo.getKernelsFolder());
+		mOclBridgeContext.initialize(mCppLibraryInfo.getKernelsFolder());
 	}
 	
 	public void close()
@@ -95,8 +97,39 @@ public class OclContext implements Serializable
 	
 	public Iterable< ? extends IOclTuple> map(String pUserFunctionName, List< ? extends IOclTuple> pTuples)
 	{
-		byte[] vStream = mOclBridgeContext.map(pUserFunctionName, pTuples);
+		
+		String vOutputTupleName = mFunctionRepository.getUserFunctionByName(pUserFunctionName).getOutputTupleName();
+		ITupleDefinition vOutputTuple = mTupleDefinitionsRepository.getTupleDefinition(vOutputTupleName);
+		int vTupleDim = vOutputTuple.getMaxDimension();
+		byte vOutputArity = vOutputTuple.getArity();
+		
+		OutputTupleInfo.OutputTupleInfoBuilder vInfoBuilder =
+			new OutputTupleInfo.OutputTupleInfoBuilder()
+				.setArity(vOutputArity);
+		
+		vOutputTuple.cIterator()
+					.forEachRemaining(x ->
+									  {
+									  	byte vType;
+									  	if(x.isInteger())
+										{
+											vType = Types.INT;
+										}
+										else if (x.isDouble())
+										{
+											vType = Types.DOUBLE;
+										}
+										else
+										{
+											vType = Types.STRING;
+										}
+										vInfoBuilder.setTType(vType);
+									  });
+		
+		
+		byte[] vStream = mOclBridgeContext.map(pUserFunctionName, pTuples, vTupleDim, vInfoBuilder.build());
 		return StreamReader.getStreamReader().setStream(vStream);
+		//return new ArrayList<>();
 	}
 	
 }
