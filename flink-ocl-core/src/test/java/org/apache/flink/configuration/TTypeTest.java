@@ -2,7 +2,7 @@ package org.apache.flink.configuration;
 
 import org.junit.Test;
 
-import static org.apache.flink.helpers.TTypesGetter.*;
+import static org.apache.flink.streaming.helpers.TTypesGetter.*;
 import static org.junit.Assert.*;
 
 public class TTypeTest

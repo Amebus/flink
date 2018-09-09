@@ -2,10 +2,10 @@ package org.apache.flink.api.configuration;
 
 import org.apache.flink.api.common.JsonLoader;
 import org.apache.flink.api.common.JsonLoaderOptions;
-import org.apache.flink.configuration.IOclContextOptions;
-import org.apache.flink.configuration.IOclKernelsOptions;
-import org.apache.flink.configuration.IOclSettings;
-import org.apache.flink.configuration.ISettingsRepository;
+import org.apache.flink.streaming.configuration.IOclContextOptions;
+import org.apache.flink.streaming.configuration.IOclKernelsOptions;
+import org.apache.flink.streaming.configuration.IOclSettings;
+import org.apache.flink.streaming.configuration.ISettingsRepository;
 
 public class JsonSettingsRepository implements ISettingsRepository
 {

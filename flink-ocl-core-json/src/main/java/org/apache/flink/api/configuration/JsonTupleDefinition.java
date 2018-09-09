@@ -1,10 +1,10 @@
 package org.apache.flink.api.configuration;
 
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.RegularExpression;
-import org.apache.flink.configuration.AbstractTupleDefinition;
-import org.apache.flink.configuration.ITupleDefinition;
-import org.apache.flink.configuration.TType;
-import org.apache.flink.configuration.TupleVarDefinition;
+import org.apache.flink.streaming.configuration.AbstractTupleDefinition;
+import org.apache.flink.streaming.configuration.ITupleDefinition;
+import org.apache.flink.streaming.configuration.TType;
+import org.apache.flink.streaming.configuration.TupleVarDefinition;
 
 import java.util.*;
 

@@ -8,10 +8,10 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.flink.helpers.Constants.*;
-import static org.apache.flink.helpers.StreamsGetter.getStreamFrom;
-import static org.apache.flink.helpers.StreamsGetter.getStreamWriterFrom;
-import static org.apache.flink.helpers.TupleGetters.*;
+import static org.apache.flink.streaming.helpers.Constants.*;
+import static org.apache.flink.streaming.helpers.StreamsGetter.getStreamFrom;
+import static org.apache.flink.streaming.helpers.StreamsGetter.getStreamWriterFrom;
+import static org.apache.flink.streaming.helpers.TupleGetters.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

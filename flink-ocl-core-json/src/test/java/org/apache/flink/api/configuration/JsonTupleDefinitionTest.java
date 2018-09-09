@@ -1,15 +1,13 @@
 package org.apache.flink.api.configuration;
 
-import org.apache.flink.api.configuration.JsonTupleDefinition;
-import org.apache.flink.api.configuration.JsonTupleDefinitionsRepository;
-import org.apache.flink.configuration.ITupleDefinition;
-import org.apache.flink.configuration.TType;
-import org.apache.flink.helpers.Constants;
+import org.apache.flink.streaming.configuration.ITupleDefinition;
+import org.apache.flink.streaming.configuration.TType;
+import org.apache.flink.streaming.helpers.Constants;
 import org.junit.Test;
 
 import java.util.Iterator;
 
-import static org.apache.flink.helpers.TTypesGetter.*;
+import static org.apache.flink.streaming.helpers.TTypesGetter.*;
 import static org.junit.Assert.*;
 
 public class JsonTupleDefinitionTest

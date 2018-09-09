@@ -3,6 +3,9 @@ package org.apache.flink.api.engine;
 import io.gsonfire.gson.HookInvocationException;
 import org.apache.flink.api.common.JsonLoader;
 import org.apache.flink.api.common.JsonLoaderOptions;
+import org.apache.flink.streaming.api.engine.IUserFunction;
+import org.apache.flink.streaming.api.engine.IUserFunctionCollection;
+import org.apache.flink.streaming.api.engine.IUserFunctionsRepository;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;

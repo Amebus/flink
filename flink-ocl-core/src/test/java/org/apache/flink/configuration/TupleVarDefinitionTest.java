@@ -2,9 +2,9 @@ package org.apache.flink.configuration;
 
 import org.junit.Test;
 
-import static org.apache.flink.helpers.TTypesGetter.getCTDouble;
-import static org.apache.flink.helpers.TTypesGetter.getCTString;
-import static org.apache.flink.helpers.TTypesGetter.getJavaTString;
+import static org.apache.flink.streaming.helpers.TTypesGetter.getCTDouble;
+import static org.apache.flink.streaming.helpers.TTypesGetter.getCTString;
+import static org.apache.flink.streaming.helpers.TTypesGetter.getJavaTString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

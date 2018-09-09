@@ -1,5 +1,7 @@
 package org.apache.flink.api.common;
 
+import org.apache.flink.streaming.common.IBuilder;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;

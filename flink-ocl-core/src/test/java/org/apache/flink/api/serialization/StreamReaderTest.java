@@ -7,8 +7,8 @@ import org.junit.Test;
 import org.apache.flink.api.serialization.StreamReader.*;
 
 
-import static org.apache.flink.helpers.Constants.*;
-import static org.apache.flink.helpers.StreamsGetter.getStreamReaderFrom;
+import static org.apache.flink.streaming.helpers.Constants.*;
+import static org.apache.flink.streaming.helpers.StreamsGetter.getStreamReaderFrom;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 

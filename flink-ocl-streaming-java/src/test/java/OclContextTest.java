@@ -1,17 +1,18 @@
+
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.configuration.JsonSettingsRepository;
 import org.apache.flink.api.configuration.JsonTupleDefinitionsRepository;
 import org.apache.flink.api.engine.JsonUserFunctionRepository;
-import org.apache.flink.api.tuple.IOclTuple;
-import org.apache.flink.api.tuple.Tuple1Ocl;
-import org.apache.flink.helpers.Constants;
-import org.apache.flink.api.bridge.OclContext;
 import org.apache.flink.streaming.SimpleTest;
+import org.apache.flink.streaming.api.bridge.OclContext;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
+import org.apache.flink.streaming.api.tuple.IOclTuple;
+import org.apache.flink.streaming.api.tuple.Tuple1Ocl;
 import org.apache.flink.streaming.api.windowing.windows.GlobalWindow;
+import org.apache.flink.streaming.helpers.Constants;
 import org.apache.flink.util.Collector;
 import org.junit.Rule;
 import org.junit.Test;
@@ -76,17 +77,18 @@ public class OclContextTest
 																			"filterFunction2.json"));
 		vContext.open();
 		
+		int windowDim = 4;
 		
 		DataStream<Integer> dataStream = env
 			.readTextFile("file:///home/federico/GitKraken/ConfigReader" )
 			.map(new SimpleTest.AAA())
 //			.filter( a -> a > 2)
 //			.writeAsText("/home/federico/aaa")
-			.countWindowAll(4)
+			.countWindowAll(windowDim)
 			.process(new ProcessAllWindowFunction<Integer, Integer, GlobalWindow>()
 			{
 				@Override
-				public void process(Context context, Iterable<Integer> elements, Collector<Integer> out) throws Exception
+				public void process(Context context, Iterable<Integer> elements, Collector<Integer> out)
 				{
 					List<IOclTuple> vTuples = new ArrayList<>();
 					for (Integer vElement : elements)
@@ -94,7 +96,7 @@ public class OclContextTest
 						vTuples.add(new Tuple1Ocl<>(vElement));
 					}
 
-					Iterable<? extends IOclTuple> vResult = vContext.filter("filterFunction", vTuples);
+					Iterable<? extends IOclTuple> vResult = vContext.filter("filterFunction", vTuples, windowDim);
 
 					for (IOclTuple vOclTuple : vResult)
 					{
