@@ -1,4 +1,4 @@
-package org.apache.flink.utility;
+package org.apache.flink.api.common.utility;
 
 public class StringHelper
 {

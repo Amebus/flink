@@ -80,9 +80,11 @@ public class OclContext implements Serializable
 			vToFile.delete();
 	}
 	
-	public Iterable< ? extends IOclTuple> filter(String pUserFunctionName, List< ? extends IOclTuple> pTuples)
+	public Iterable< ? extends IOclTuple> filter(String pUserFunctionName,
+												 Iterable< ? extends IOclTuple> pTuples,
+												 int pTuplesCount)
 	{
-		boolean[] vFilter = mOclBridgeContext.filter(pUserFunctionName, pTuples);
+		boolean[] vFilter = mOclBridgeContext.filter(pUserFunctionName, pTuples, pTuplesCount);
 		List<IOclTuple> vResult = new LinkedList<>();
 		int i = 0;
 		
@@ -95,7 +97,10 @@ public class OclContext implements Serializable
 		return vResult;
 	}
 	
-	public Iterable< ? extends IOclTuple> map(String pUserFunctionName, List< ? extends IOclTuple> pTuples)
+	public Iterable< ? extends IOclTuple> map(
+		String pUserFunctionName,
+		Iterable< ? extends IOclTuple> pTuples,
+		int pInputTuplesCount)
 	{
 		
 		String vOutputTupleName = mFunctionRepository.getUserFunctionByName(pUserFunctionName).getOutputTupleName();
@@ -127,7 +132,7 @@ public class OclContext implements Serializable
 									  });
 		
 		
-		byte[] vStream = mOclBridgeContext.map(pUserFunctionName, pTuples, vTupleDim, vInfoBuilder.build());
+		byte[] vStream = mOclBridgeContext.map(pUserFunctionName, pTuples, vTupleDim, vInfoBuilder.build(), pInputTuplesCount);
 		return StreamReader.getStreamReader().setStream(vStream);
 		//return new ArrayList<>();
 	}

@@ -1,0 +1,13 @@
+{
+  "functions": [
+    {
+      "type":"map",
+      "name":"mapFunction",
+      "input":"tupleTwo",
+      "output":"tupleThree",
+      "function": [
+        "integerToString(_t0, _r0, _rsl0);"
+      ]
+    }
+  ]
+}

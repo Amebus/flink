@@ -3,8 +3,6 @@ package org.apache.flink.api.engine;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import io.gsonfire.annotations.PostDeserialize;
-import org.apache.flink.streaming.api.engine.IUserFunction;
-import org.apache.flink.streaming.api.engine.UserFunction;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -23,21 +23,28 @@ public class OclBridge extends AbstractOclBridge
 		ListDevices();
 	}
 	
-	public boolean[] filter(String pUserFunctionName, List< ? extends IOclTuple> pTuples)
+	public boolean[] filter(String pUserFunctionName, Iterable< ? extends IOclTuple> pTuples, int pTuplesCount)
 	{
 		StreamWriterResult vWriterResult =
-			StreamWriter.getStreamWriter().setTupleList(pTuples).writeStream();
+			StreamWriter.getStreamWriter()
+						.setTupleList(pTuples)
+						.setTupleListSize(pTuplesCount)
+						.writeStream();
 		
 		return super.OclFilter(pUserFunctionName, vWriterResult.getStream(), vWriterResult.getPositions());
 	}
 	
 	public byte[] map(String pUserFunctionName,
-					  List< ? extends IOclTuple> pTuples,
+					  Iterable< ? extends IOclTuple> pTuples,
 					  int pOutputTupleDimension,
-					  OutputTupleInfo pOutputTupleInfo)
+					  OutputTupleInfo pOutputTupleInfo,
+					  int pInputTuplesCount)
 	{
 		StreamWriterResult vWriterResult =
-			StreamWriter.getStreamWriter().setTupleList(pTuples).writeStream();
+			StreamWriter.getStreamWriter()
+						.setTupleList(pTuples)
+						.setTupleListSize(pInputTuplesCount)
+						.writeStream();
 		
 		return super.OclMap(pUserFunctionName,
 							vWriterResult.getStream(),

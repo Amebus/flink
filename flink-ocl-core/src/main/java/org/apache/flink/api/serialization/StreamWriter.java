@@ -1,12 +1,12 @@
 package org.apache.flink.api.serialization;
 
-import org.apache.flink.api.tuple.IOclTuple;
 
-import java.util.List;
+import org.apache.flink.api.tuple.IOclTuple;
 
 public class StreamWriter
 {
-	private List<? extends IOclTuple> mTupleList;
+	private Iterable<? extends IOclTuple> mTupleList;
+	private int mTupleListSize = -1;
 	
 	private byte[] mVarTypes;
 	private int mIndex;
@@ -35,21 +35,27 @@ public class StreamWriter
 	
 	}
 	
-	public StreamWriter setTupleList(List<? extends IOclTuple> pTupleList)
+	public StreamWriter setTupleList(Iterable<? extends IOclTuple> pTupleList)
 	{
 		mTupleList = pTupleList;
 		return this;
 	}
 	
+	public StreamWriter setTupleListSize(int pTupleListSize)
+	{
+		mTupleListSize = pTupleListSize;
+		return this;
+	}
+	
 	public StreamWriterResult writeStream()
 	{
-		if (mTupleList == null || mTupleList.size() == 0)
+		if (mTupleList == null || mTupleListSize < 1)
 		{
 			// throw new IllegalArgumentException("The list cannot be empty");
 			return new StreamWriterResult(new byte[0], new int[0]);
 		}
 		
-		IOclTuple vTemplateTuple = mTupleList.get(0);
+		IOclTuple vTemplateTuple = mTupleList.iterator().next();
 		byte vArity = vTemplateTuple.getArityOcl();
 		int vStreamLength = 1 + vArity;
 		mVarTypes = getTypes(vTemplateTuple);
@@ -61,7 +67,7 @@ public class StreamWriter
 		}
 		
 		final byte[] vStream = new byte[vStreamLength];
-		final int[] vTupleIndexes = new int[mTupleList.size()];
+		final int[] vTupleIndexes = new int[mTupleListSize];
 		
 		vStream[0] = vArity;
 		

@@ -1,8 +1,8 @@
 package org.apache.flink.streaming.helpers;
 
-import org.apache.flink.streaming.configuration.CTType;
-import org.apache.flink.streaming.configuration.JavaTType;
-import org.apache.flink.streaming.configuration.TType;
+import org.apache.flink.configuration.CTType;
+import org.apache.flink.configuration.JavaTType;
+import org.apache.flink.configuration.TType;
 
 public class TTypesGetter
 {

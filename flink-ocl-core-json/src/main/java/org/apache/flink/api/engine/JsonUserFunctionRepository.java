@@ -3,9 +3,6 @@ package org.apache.flink.api.engine;
 import io.gsonfire.gson.HookInvocationException;
 import org.apache.flink.api.common.JsonLoader;
 import org.apache.flink.api.common.JsonLoaderOptions;
-import org.apache.flink.streaming.api.engine.IUserFunction;
-import org.apache.flink.streaming.api.engine.IUserFunctionCollection;
-import org.apache.flink.streaming.api.engine.IUserFunctionsRepository;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -61,22 +58,17 @@ public class JsonUserFunctionRepository implements IUserFunctionsRepository
 	
 	private void loadFunctions()
 	{
-		try
-		{
+	
 			mUserFunctions = JsonLoader.loadJsonObject(new JsonLoaderOptions
 															.JsonLoaderOptionsBuilder<JsonUserFunctionCollection>()
 															.setSource(mFilePath, mFileName)
-															.shouldHookClass(JsonUserFunction.class)
 															.setBeanClass(JsonUserFunctionCollection.class)
+															.shouldHookClass(JsonUserFunction.class)
 															.build()
 													  );
-			
+
 			mUserFunctions.forEach(x -> mUserFunctionMap.put(x.getName(), x));
 			mAreFunctionsNotLoadedYet = false;
-		}
-		catch (HookInvocationException ex)
-		{
-			throw new IllegalArgumentException(ex.getCause());
-		}
+	
 	}
 }

@@ -1,6 +1,7 @@
 package org.apache.flink.api.common;
 
 import io.gsonfire.GsonFireBuilder;
+import io.gsonfire.gson.HookInvocationException;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -23,6 +24,17 @@ public class JsonLoader
 		
 		pOptions.getClassesToHook().forEach(vBuilder::enableHooks);
 		
-		return vBuilder.createGson().fromJson(vReader, pOptions.getBeanClass());
+		T vResult;
+		
+		try
+		{
+			vResult = vBuilder.createGson().fromJson(vReader, pOptions.getBeanClass());
+		}
+		catch (HookInvocationException ex)
+		{
+			throw new IllegalArgumentException(ex.getCause());
+		}
+		
+		return vResult;
 	}
 }

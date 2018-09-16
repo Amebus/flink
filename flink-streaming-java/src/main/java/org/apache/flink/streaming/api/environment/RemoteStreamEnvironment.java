@@ -18,6 +18,7 @@
 package org.apache.flink.streaming.api.environment;
 
 import org.apache.flink.annotation.Public;
+import org.apache.flink.api.bridge.OclContext;
 import org.apache.flink.api.common.InvalidProgramException;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -30,7 +31,6 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.CoreOptions;
 import org.apache.flink.configuration.JobManagerOptions;
 import org.apache.flink.streaming.api.graph.StreamGraph;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,8 +82,8 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 	 *            user-defined input formats, or any libraries, those must be
 	 *            provided in the JAR files.
 	 */
-	public RemoteStreamEnvironment(String host, int port, String... jarFiles) {
-		this(host, port, null, jarFiles);
+	public RemoteStreamEnvironment(OclContext pOclContext, String host, int port, String... jarFiles) {
+		this(pOclContext, host, port, null, jarFiles);
 	}
 
 	/**
@@ -105,8 +105,8 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 	 *            user-defined input formats, or any libraries, those must be
 	 *            provided in the JAR files.
 	 */
-	public RemoteStreamEnvironment(String host, int port, Configuration clientConfiguration, String... jarFiles) {
-		this(host, port, clientConfiguration, jarFiles, null);
+	public RemoteStreamEnvironment(OclContext pOclContext, String host, int port, Configuration clientConfiguration, String... jarFiles) {
+		this(pOclContext, host, port, clientConfiguration, jarFiles, null);
 	}
 
 	/**
@@ -133,7 +133,8 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 	 *            protocol (e.g. file://) and be accessible on all nodes (e.g. by means of a NFS share).
 	 *            The protocol must be supported by the {@link java.net.URLClassLoader}.
 	 */
-	public RemoteStreamEnvironment(String host, int port, Configuration clientConfiguration, String[] jarFiles, URL[] globalClasspaths) {
+	public RemoteStreamEnvironment(OclContext pOclContext, String host, int port, Configuration clientConfiguration, String[] jarFiles, URL[] globalClasspaths) {
+		super(pOclContext);
 		if (!ExecutionEnvironment.areExplicitEnvironmentsAllowed()) {
 			throw new InvalidProgramException(
 					"The RemoteEnvironment cannot be used when submitting a program through a client, " +

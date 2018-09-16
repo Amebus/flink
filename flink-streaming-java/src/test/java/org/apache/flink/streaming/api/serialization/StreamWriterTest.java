@@ -1,7 +1,11 @@
 package org.apache.flink.streaming.api.serialization;
 
-import org.apache.flink.streaming.api.tuple.Tuple1Ocl;
-import org.apache.flink.streaming.api.tuple.Tuple2Ocl;
+import org.apache.flink.api.serialization.Dimensions;
+import org.apache.flink.api.serialization.StreamWriter;
+import org.apache.flink.api.serialization.StreamWriterResult;
+import org.apache.flink.api.serialization.Types;
+import org.apache.flink.api.tuple.Tuple1Ocl;
+import org.apache.flink.api.tuple.Tuple2Ocl;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;

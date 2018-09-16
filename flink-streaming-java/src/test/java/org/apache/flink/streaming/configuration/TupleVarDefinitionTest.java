@@ -1,5 +1,7 @@
 package org.apache.flink.streaming.configuration;
 
+import org.apache.flink.configuration.TType;
+import org.apache.flink.configuration.TupleVarDefinition;
 import org.junit.Test;
 
 import static org.apache.flink.streaming.helpers.TTypesGetter.*;

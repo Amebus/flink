@@ -1,5 +1,8 @@
 package org.apache.flink.streaming.configuration;
 
+import org.apache.flink.configuration.CTType;
+import org.apache.flink.configuration.JavaTType;
+import org.apache.flink.configuration.TType;
 import org.junit.Test;
 
 import static org.apache.flink.streaming.helpers.TTypesGetter.*;
@@ -29,7 +32,7 @@ public class TTypeTest
 		vType = getJavaTInt();
 		assertEquals(vType.getT(), JavaTType.JavaTypes.INTEGER);
 		
-		//Integer
+		//Double
 		vType = getJavaTDouble();
 		assertEquals(vType.getT(), JavaTType.JavaTypes.DOUBLE);
 	}

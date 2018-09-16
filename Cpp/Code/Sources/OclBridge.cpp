@@ -1,5 +1,5 @@
 #define __CL_ENABLE_EXCEPTIONS
-#include "../Headers/org_apache_flink_streaming_api_bridge_AbstractOclBridge.h"
+#include "../Headers/org_apache_flink_api_bridge_AbstractOclBridge.h"
 #include "../Headers/OclUtility.h"
 #include "../Headers/JniUtility.h"
 #include <fstream>
@@ -382,7 +382,7 @@ void RunKernel(OclKernelExecutionInfo* pKernelInfo)
     }
 }
 
-JNIEXPORT void Java_org_apache_flink_streaming_api_bridge_AbstractOclBridge_ListDevices(JNIEnv *pEnv, jobject pObj)
+JNIEXPORT void Java_org_apache_flink_api_bridge_AbstractOclBridge_ListDevices(JNIEnv *pEnv, jobject pObj)
 {
     cl_uint numPlatforms = 0;
     gStatus = CL_SUCCESS;
@@ -509,7 +509,7 @@ JNIEXPORT void Java_org_apache_flink_streaming_api_bridge_AbstractOclBridge_List
 	}
 }
 
-JNIEXPORT void Java_org_apache_flink_streaming_api_bridge_AbstractOclBridge_Initialize(JNIEnv *pEnv, jobject pObj, jstring pKernelsFolder)
+JNIEXPORT void Java_org_apache_flink_api_bridge_AbstractOclBridge_Initialize(JNIEnv *pEnv, jobject pObj, jstring pKernelsFolder)
 {
     //TODO improve to accepet external parameters
     std::string vKernelsFolder = GetStringFromJavaString(pEnv, pKernelsFolder);
@@ -531,7 +531,7 @@ JNIEXPORT void Java_org_apache_flink_streaming_api_bridge_AbstractOclBridge_Init
     }
 }
 
-JNIEXPORT void Java_org_apache_flink_streaming_api_bridge_AbstractOclBridge_Dispose(JNIEnv *pEnv, jobject pObj)
+JNIEXPORT void Java_org_apache_flink_api_bridge_AbstractOclBridge_Dispose(JNIEnv *pEnv, jobject pObj)
 {
     DisposePrograms();
     DisposeDevices();
@@ -540,7 +540,7 @@ JNIEXPORT void Java_org_apache_flink_streaming_api_bridge_AbstractOclBridge_Disp
     DisposeContext();
 }
 
-JNIEXPORT jbyteArray JNICALL Java_org_apache_flink_streaming_api_bridge_AbstractOclBridge_OclMap(
+JNIEXPORT jbyteArray JNICALL Java_org_apache_flink_api_bridge_AbstractOclBridge_OclMap(
     JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, jint pOutputTupleDimension, jbyteArray pOutputTupleInfo)
 {
     OclKernelExecutionInfo *vKernelInfo = new OclMapExecutionInfo(pEnv, pObj, pKernelName, pStream, pIndexes, pOutputTupleDimension, pOutputTupleInfo);
@@ -554,7 +554,7 @@ JNIEXPORT jbyteArray JNICALL Java_org_apache_flink_streaming_api_bridge_Abstract
 }
 
 JNIEXPORT jbooleanArray JNICALL 
-Java_org_apache_flink_streaming_api_bridge_AbstractOclBridge_OclFilterr(
+Java_org_apache_flink_api_bridge_AbstractOclBridge_OclFilter(
     JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes)
 {
     std::string vKernelName = GetStringFromJavaString(pEnv, pKernelName);

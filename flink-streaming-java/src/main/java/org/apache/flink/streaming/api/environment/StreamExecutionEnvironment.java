@@ -17,9 +17,11 @@
 
 package org.apache.flink.streaming.api.environment;
 
+import com.esotericsoftware.kryo.Serializer;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.annotation.Public;
 import org.apache.flink.annotation.PublicEvolving;
+import org.apache.flink.api.bridge.OclContext;
 import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.common.InvalidProgramException;
 import org.apache.flink.api.common.JobExecutionResult;
@@ -58,19 +60,7 @@ import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.functions.source.ContinuousFileMonitoringFunction;
-import org.apache.flink.streaming.api.functions.source.ContinuousFileReaderOperator;
-import org.apache.flink.streaming.api.functions.source.FileMonitoringFunction;
-import org.apache.flink.streaming.api.functions.source.FileProcessingMode;
-import org.apache.flink.streaming.api.functions.source.FileReadFunction;
-import org.apache.flink.streaming.api.functions.source.FromElementsFunction;
-import org.apache.flink.streaming.api.functions.source.FromIteratorFunction;
-import org.apache.flink.streaming.api.functions.source.FromSplittableIteratorFunction;
-import org.apache.flink.streaming.api.functions.source.InputFormatSourceFunction;
-import org.apache.flink.streaming.api.functions.source.ParallelSourceFunction;
-import org.apache.flink.streaming.api.functions.source.SocketTextStreamFunction;
-import org.apache.flink.streaming.api.functions.source.SourceFunction;
-import org.apache.flink.streaming.api.functions.source.StatefulSequenceSource;
+import org.apache.flink.streaming.api.functions.source.*;
 import org.apache.flink.streaming.api.graph.StreamGraph;
 import org.apache.flink.streaming.api.graph.StreamGraphGenerator;
 import org.apache.flink.streaming.api.operators.StoppableStreamSource;
@@ -79,15 +69,9 @@ import org.apache.flink.streaming.api.transformations.StreamTransformation;
 import org.apache.flink.util.Preconditions;
 import org.apache.flink.util.SplittableIterator;
 
-import com.esotericsoftware.kryo.Serializer;
-
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
@@ -136,6 +120,13 @@ public abstract class StreamExecutionEnvironment {
 
 	protected boolean isChainingEnabled = true;
 
+	protected OclContext mOclContext;
+	public OclContext getOclContext()
+	{
+		return mOclContext;
+	}
+	
+	
 	/** The state backend used for storing k/v state and state snapshots. */
 	private StateBackend defaultStateBackend;
 
@@ -148,7 +139,13 @@ public abstract class StreamExecutionEnvironment {
 	// --------------------------------------------------------------------------------------------
 	// Constructor and Properties
 	// --------------------------------------------------------------------------------------------
-
+	
+	public StreamExecutionEnvironment(OclContext pOclContext)
+	{
+		mOclContext = pOclContext;
+	}
+	
+	
 	/**
 	 * Gets the config object.
 	 */
@@ -1582,17 +1579,22 @@ public abstract class StreamExecutionEnvironment {
 	// --------------------------------------------------------------------------------------------
 	//  Factory methods for ExecutionEnvironments
 	// --------------------------------------------------------------------------------------------
-
+	
+	public static StreamExecutionEnvironment getExecutionEnvironment()
+	{
+		return getExecutionEnvironment(null);
+	}
+	
 	/**
 	 * Creates an execution environment that represents the context in which the
 	 * program is currently executed. If the program is invoked standalone, this
 	 * method returns a local execution environment, as returned by
-	 * {@link #createLocalEnvironment()}.
+	 * {@link #createLocalEnvironment(OclContext)}.
 	 *
 	 * @return The execution environment of the context in which the program is
 	 * executed.
 	 */
-	public static StreamExecutionEnvironment getExecutionEnvironment() {
+	public static StreamExecutionEnvironment getExecutionEnvironment(OclContext pOclContext) {
 		if (contextEnvironmentFactory != null) {
 			return contextEnvironmentFactory.createExecutionEnvironment();
 		}
@@ -1603,14 +1605,14 @@ public abstract class StreamExecutionEnvironment {
 
 		ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 		if (env instanceof ContextEnvironment) {
-			return new StreamContextEnvironment((ContextEnvironment) env);
+			return new StreamContextEnvironment(pOclContext, (ContextEnvironment) env);
 		} else if (env instanceof OptimizerPlanEnvironment || env instanceof PreviewPlanEnvironment) {
-			return new StreamPlanEnvironment(env);
+			return new StreamPlanEnvironment(pOclContext, env);
 		} else {
-			return createLocalEnvironment();
+			return createLocalEnvironment(pOclContext);
 		}
 	}
-
+	
 	/**
 	 * Creates a {@link LocalStreamEnvironment}. The local execution environment
 	 * will run the program in a multi-threaded fashion in the same JVM as the
@@ -1621,7 +1623,11 @@ public abstract class StreamExecutionEnvironment {
 	 * @return A local execution environment.
 	 */
 	public static LocalStreamEnvironment createLocalEnvironment() {
-		return createLocalEnvironment(defaultLocalParallelism);
+		return createLocalEnvironment(null);
+	}
+	
+	public static LocalStreamEnvironment createLocalEnvironment(OclContext pOclContext) {
+		return createLocalEnvironment(pOclContext, defaultLocalParallelism);
 	}
 
 	/**
@@ -1634,8 +1640,8 @@ public abstract class StreamExecutionEnvironment {
 	 * 		The parallelism for the local environment.
 	 * @return A local execution environment with the specified parallelism.
 	 */
-	public static LocalStreamEnvironment createLocalEnvironment(int parallelism) {
-		return createLocalEnvironment(parallelism, new Configuration());
+	public static LocalStreamEnvironment createLocalEnvironment(OclContext pOclContext, int parallelism) {
+		return createLocalEnvironment(pOclContext, parallelism, new Configuration());
 	}
 
 	/**
@@ -1650,13 +1656,16 @@ public abstract class StreamExecutionEnvironment {
 	 * 		Pass a custom configuration into the cluster
 	 * @return A local execution environment with the specified parallelism.
 	 */
-	public static LocalStreamEnvironment createLocalEnvironment(int parallelism, Configuration configuration) {
+	public static LocalStreamEnvironment createLocalEnvironment(
+		OclContext pOclContext,
+		int parallelism,
+		Configuration configuration) {
 		final LocalStreamEnvironment currentEnvironment;
 
 		if (CoreOptions.NEW_MODE.equals(configuration.getString(CoreOptions.MODE))) {
-			currentEnvironment = new LocalStreamEnvironment(configuration);
+			currentEnvironment = new LocalStreamEnvironment(pOclContext, configuration);
 		} else {
-			currentEnvironment = new LegacyLocalStreamEnvironment(configuration);
+			currentEnvironment = new LegacyLocalStreamEnvironment(pOclContext, configuration);
 		}
 
 		currentEnvironment.setParallelism(parallelism);
@@ -1675,7 +1684,7 @@ public abstract class StreamExecutionEnvironment {
 	 * port will be used for the web UI. Otherwise, the default port (8081) will be used.
 	 */
 	@PublicEvolving
-	public static StreamExecutionEnvironment createLocalEnvironmentWithWebUI(Configuration conf) {
+	public static StreamExecutionEnvironment createLocalEnvironmentWithWebUI(OclContext pOclContext, Configuration conf) {
 		checkNotNull(conf, "conf");
 
 		conf.setBoolean(ConfigConstants.LOCAL_START_WEBSERVER, true);
@@ -1685,7 +1694,7 @@ public abstract class StreamExecutionEnvironment {
 			conf.setInteger(RestOptions.PORT, RestOptions.PORT.defaultValue());
 		}
 
-		return createLocalEnvironment(defaultLocalParallelism, conf);
+		return createLocalEnvironment(pOclContext, defaultLocalParallelism, conf);
 	}
 
 	/**
@@ -1709,8 +1718,9 @@ public abstract class StreamExecutionEnvironment {
 	 * @return A remote environment that executes the program on a cluster.
 	 */
 	public static StreamExecutionEnvironment createRemoteEnvironment(
+		OclContext pOclContext,
 			String host, int port, String... jarFiles) {
-		return new RemoteStreamEnvironment(host, port, jarFiles);
+		return new RemoteStreamEnvironment(pOclContext, host, port, jarFiles);
 	}
 
 	/**
@@ -1735,8 +1745,9 @@ public abstract class StreamExecutionEnvironment {
 	 * @return A remote environment that executes the program on a cluster.
 	 */
 	public static StreamExecutionEnvironment createRemoteEnvironment(
+		OclContext pOclContext,
 			String host, int port, int parallelism, String... jarFiles) {
-		RemoteStreamEnvironment env = new RemoteStreamEnvironment(host, port, jarFiles);
+		RemoteStreamEnvironment env = new RemoteStreamEnvironment(pOclContext, host, port, jarFiles);
 		env.setParallelism(parallelism);
 		return env;
 	}
@@ -1763,13 +1774,14 @@ public abstract class StreamExecutionEnvironment {
 	 * @return A remote environment that executes the program on a cluster.
 	 */
 	public static StreamExecutionEnvironment createRemoteEnvironment(
+		OclContext pOclContext,
 			String host, int port, Configuration clientConfig, String... jarFiles) {
-		return new RemoteStreamEnvironment(host, port, clientConfig, jarFiles);
+		return new RemoteStreamEnvironment(pOclContext, host, port, clientConfig, jarFiles);
 	}
 
 	/**
 	 * Gets the default parallelism that will be used for the local execution environment created by
-	 * {@link #createLocalEnvironment()}.
+	 * {@link #createLocalEnvironment(OclContext)}.
 	 *
 	 * @return The default local parallelism
 	 */
@@ -1780,7 +1792,7 @@ public abstract class StreamExecutionEnvironment {
 
 	/**
 	 * Sets the default parallelism that will be used for the local execution
-	 * environment created by {@link #createLocalEnvironment()}.
+	 * environment created by {@link #createLocalEnvironment(OclContext)}.
 	 *
 	 * @param parallelism The parallelism to use as the default local parallelism.
 	 */

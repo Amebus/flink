@@ -1,7 +1,7 @@
 package org.apache.flink.api.configuration;
 
-import org.apache.flink.streaming.configuration.ITupleDefinition;
-import org.apache.flink.streaming.configuration.TType;
+import org.apache.flink.configuration.ITupleDefinition;
+import org.apache.flink.configuration.TType;
 import org.apache.flink.streaming.helpers.Constants;
 import org.junit.Test;
 

@@ -18,6 +18,7 @@
 package org.apache.flink.streaming.api.environment;
 
 import org.apache.flink.annotation.Public;
+import org.apache.flink.api.bridge.OclContext;
 import org.apache.flink.api.common.InvalidProgramException;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -28,7 +29,6 @@ import org.apache.flink.runtime.jobgraph.JobGraph;
 import org.apache.flink.runtime.minicluster.MiniCluster;
 import org.apache.flink.runtime.minicluster.MiniClusterConfiguration;
 import org.apache.flink.streaming.api.graph.StreamGraph;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,11 @@ public class LocalStreamEnvironment extends StreamExecutionEnvironment {
 	 * Creates a new mini cluster stream environment that uses the default configuration.
 	 */
 	public LocalStreamEnvironment() {
-		this(new Configuration());
+		this(null);
+	}
+	
+	public LocalStreamEnvironment(OclContext pOclContext) {
+		this(pOclContext, new Configuration());
 	}
 
 	/**
@@ -61,7 +65,8 @@ public class LocalStreamEnvironment extends StreamExecutionEnvironment {
 	 *
 	 * @param configuration The configuration used to configure the local executor.
 	 */
-	public LocalStreamEnvironment(@Nonnull Configuration configuration) {
+	public LocalStreamEnvironment(OclContext pOclContext, @Nonnull Configuration configuration) {
+		super(pOclContext);
 		if (!ExecutionEnvironment.areExplicitEnvironmentsAllowed()) {
 			throw new InvalidProgramException(
 				"The LocalStreamEnvironment cannot be used when submitting a program through a client, " +

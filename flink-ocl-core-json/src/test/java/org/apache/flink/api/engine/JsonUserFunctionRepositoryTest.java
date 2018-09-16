@@ -1,6 +1,5 @@
 package org.apache.flink.api.engine;
 
-import org.apache.flink.streaming.api.engine.IUserFunction;
 import org.apache.flink.streaming.helpers.Constants;
 import org.junit.Test;
 

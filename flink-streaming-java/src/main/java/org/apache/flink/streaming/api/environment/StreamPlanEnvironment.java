@@ -18,6 +18,7 @@
 package org.apache.flink.streaming.api.environment;
 
 import org.apache.flink.annotation.PublicEvolving;
+import org.apache.flink.api.bridge.OclContext;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.client.program.OptimizerPlanEnvironment;
@@ -35,8 +36,8 @@ public class StreamPlanEnvironment extends StreamExecutionEnvironment {
 
 	private ExecutionEnvironment env;
 
-	protected StreamPlanEnvironment(ExecutionEnvironment env) {
-		super();
+	protected StreamPlanEnvironment(OclContext pOclContext, ExecutionEnvironment env) {
+		super(pOclContext);
 		this.env = env;
 
 		int parallelism = env.getParallelism();

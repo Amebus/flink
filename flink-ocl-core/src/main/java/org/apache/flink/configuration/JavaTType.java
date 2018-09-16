@@ -5,9 +5,9 @@ public class JavaTType extends TType
 	
 	public static class JavaTypes
 	{
-		static final String INTEGER = "Integer";
-		static final String DOUBLE = "Double";
-		static final String STRING = "String";
+		public static final String INTEGER = "Integer";
+		public static final String DOUBLE = "Double";
+		public static final String STRING = "String";
 	}
 	
 	private JavaTType(String pType, int pByteDimension, int pMaxByteDimension)

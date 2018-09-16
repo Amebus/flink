@@ -1,10 +1,11 @@
 package org.apache.flink.streaming.api.serialization;
 
-import org.apache.flink.streaming.api.tuple.Tuple1Ocl;
-import org.apache.flink.streaming.api.tuple.Tuple2Ocl;
+import org.apache.flink.api.serialization.StreamReader;
+import org.apache.flink.api.tuple.Tuple1Ocl;
+import org.apache.flink.api.tuple.Tuple2Ocl;
 import org.junit.Test;
 
-import static org.apache.flink.streaming.api.serialization.StreamReader.IStreamReaderIterator;
+import static org.apache.flink.api.serialization.StreamReader.IStreamReaderIterator;
 import static org.apache.flink.streaming.helpers.Constants.*;
 import static org.apache.flink.streaming.helpers.StreamsGetter.getStreamReaderFrom;
 import static org.junit.Assert.assertEquals;
@@ -19,7 +20,7 @@ public class StreamReaderTest
 		
 		try
 		{
-			StreamReader.getStreamReader().setStream(new byte[] { 100 }).getTupleList();
+			StreamReader.getStreamReader().setStream(new byte[] {100 }).getTupleList();
 		}
 		catch (IllegalArgumentException ex)
 		{

@@ -2,7 +2,7 @@ package org.apache.flink.api.configuration;
 
 import org.apache.flink.api.common.JsonLoader;
 import org.apache.flink.api.common.JsonLoaderOptions;
-import org.apache.flink.streaming.configuration.ITupleDefinitionsRepository;
+import org.apache.flink.configuration.ITupleDefinitionsRepository;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;

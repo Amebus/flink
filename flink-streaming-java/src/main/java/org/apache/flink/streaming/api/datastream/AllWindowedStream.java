@@ -20,6 +20,7 @@ package org.apache.flink.streaming.api.datastream;
 
 import org.apache.flink.annotation.Public;
 import org.apache.flink.annotation.PublicEvolving;
+import org.apache.flink.api.bridge.OclContext;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.FoldFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
@@ -33,22 +34,17 @@ import org.apache.flink.api.common.typeutils.TypeSerializer;
 import org.apache.flink.api.java.Utils;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.functions.NullByteKeySelector;
+import org.apache.flink.api.java.typeutils.PojoTypeInfo;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.apache.flink.api.tuple.IOclTuple;
+import org.apache.flink.api.typeutils.OclTupleTypeInfo;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.aggregation.AggregationFunction;
 import org.apache.flink.streaming.api.functions.aggregation.ComparableAggregator;
 import org.apache.flink.streaming.api.functions.aggregation.SumAggregator;
-import org.apache.flink.streaming.api.functions.windowing.AggregateApplyAllWindowFunction;
-import org.apache.flink.streaming.api.functions.windowing.AllWindowFunction;
-import org.apache.flink.streaming.api.functions.windowing.FoldApplyAllWindowFunction;
-import org.apache.flink.streaming.api.functions.windowing.FoldApplyProcessAllWindowFunction;
-import org.apache.flink.streaming.api.functions.windowing.PassThroughAllWindowFunction;
-import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
-import org.apache.flink.streaming.api.functions.windowing.ReduceApplyAllWindowFunction;
-import org.apache.flink.streaming.api.functions.windowing.ReduceApplyProcessAllWindowFunction;
+import org.apache.flink.streaming.api.functions.windowing.*;
 import org.apache.flink.streaming.api.operators.OneInputStreamOperator;
-import org.apache.flink.streaming.api.tuple.IOclTuple;
-import org.apache.flink.streaming.api.tuple.Tuple1Ocl;
 import org.apache.flink.streaming.api.windowing.assigners.BaseAlignedWindowAssigner;
 import org.apache.flink.streaming.api.windowing.assigners.MergingWindowAssigner;
 import org.apache.flink.streaming.api.windowing.assigners.WindowAssigner;
@@ -59,20 +55,12 @@ import org.apache.flink.streaming.api.windowing.windows.GlobalWindow;
 import org.apache.flink.streaming.api.windowing.windows.Window;
 import org.apache.flink.streaming.runtime.operators.windowing.EvictingWindowOperator;
 import org.apache.flink.streaming.runtime.operators.windowing.WindowOperator;
-import org.apache.flink.streaming.runtime.operators.windowing.functions.InternalAggregateProcessAllWindowFunction;
-import org.apache.flink.streaming.runtime.operators.windowing.functions.InternalIterableAllWindowFunction;
-import org.apache.flink.streaming.runtime.operators.windowing.functions.InternalIterableProcessAllWindowFunction;
-import org.apache.flink.streaming.runtime.operators.windowing.functions.InternalSingleValueAllWindowFunction;
-import org.apache.flink.streaming.runtime.operators.windowing.functions.InternalSingleValueProcessAllWindowFunction;
-import org.apache.flink.streaming.runtime.operators.windowing.functions.InternalWindowFunction;
+import org.apache.flink.streaming.runtime.operators.windowing.functions.*;
 import org.apache.flink.streaming.runtime.streamrecord.StreamElementSerializer;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
 import org.apache.flink.util.Preconditions;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.apache.flink.util.Preconditions.checkArgument;
 import static org.apache.flink.util.Preconditions.checkNotNull;
@@ -100,7 +88,7 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 public class AllWindowedStream<T, W extends Window> {
 
 	/** The keyed data stream that is windowed by this stream. */
-	protected final KeyedStream<T, Byte> input;
+	private final KeyedStream<T, Byte> input;
 
 	/** The window assigner. */
 	private final WindowAssigner<? super T, W> windowAssigner;
@@ -1568,6 +1556,87 @@ public class AllWindowedStream<T, W extends Window> {
 		return reduce(aggregator);
 	}
 
+	
+	public <R extends IOclTuple>SingleOutputStreamOperator<R> oclFilter(String pUserFunctionName, OclTupleTypeInfo pResultType)
+	{
+		return this.<R>baseOclFilter(pUserFunctionName, pResultType).mSingleOutputStreamOperator;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <R extends IOclTuple> OclFunctionResult<R> baseOclFilter(String pUserFunctionName, OclTupleTypeInfo pResultType)
+	{
+		OclContext vOclContext = getExecutionEnvironment().getOclContext();
+		if(vOclContext == null)
+		{
+			throw new NullPointerException("the OclContext can't be null to use the oclFilter function.");
+		}
+		OclFunctionResult<R> vResult = new OclFunctionResult<>();
+		final Integer[] vTuplesCount = {0};
+		
+		vResult.mSingleOutputStreamOperator =
+			process(new ProcessAllWindowFunction<T, R, W>()
+			{
+				@Override
+				public void process(Context context, Iterable<T> elements, Collector<R> out)
+				{
+					for (T vElement : elements)
+					{
+						vTuplesCount[0]++;
+					}
+					
+					Iterable<R> vResult = (Iterable<R>)
+						vOclContext.filter(pUserFunctionName, (Iterable<? extends IOclTuple>) elements, vTuplesCount[0]);
+					
+					for (R vOclTuple : vResult)
+					{
+						out.collect(vOclTuple);
+					}
+				}
+			}, pResultType);
+		
+		vResult.mTuplesCount = vTuplesCount;
+		
+		return vResult;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <R extends IOclTuple> SingleOutputStreamOperator<R> oclMap(String pUserFunctionName, OclTupleTypeInfo pTupleTypeInfo)
+	{
+		OclContext vOclContext = getExecutionEnvironment().getOclContext();
+		if(vOclContext == null)
+		{
+			throw new NullPointerException("the OclContext can't be null to use the oclMap function.");
+		}
+		
+		OclFunctionResult<R> vResult = new OclFunctionResult<>();
+		final Integer[] vTuplesCount = {0};
+		
+		vResult.mSingleOutputStreamOperator =
+			process(new ProcessAllWindowFunction<T, R, W>()
+			{
+				@Override
+				public void process(Context context, Iterable<T> elements, Collector<R> out)
+				{
+					for (T vElement : elements)
+					{
+						vTuplesCount[0]++;
+					}
+					
+					Iterable<R> vResult = (Iterable<R>)
+						vOclContext.map(pUserFunctionName, (Iterable<? extends IOclTuple>) elements, vTuplesCount[0]);
+					
+					for (R vOclTuple : vResult)
+					{
+						out.collect(vOclTuple);
+					}
+				}
+			}, pTupleTypeInfo);
+		
+		vResult.mTuplesCount = vTuplesCount;
+		
+		return vResult.mSingleOutputStreamOperator;
+	}
+	
 	// ------------------------------------------------------------------------
 	//  Utilities
 	// ------------------------------------------------------------------------
@@ -1579,4 +1648,15 @@ public class AllWindowedStream<T, W extends Window> {
 	public TypeInformation<T> getInputType() {
 		return input.getType();
 	}
+	
+}
+
+class OclFunctionResult<T>
+{
+	Integer[] mTuplesCount;
+	
+	SingleOutputStreamOperator<T> mSingleOutputStreamOperator;
+	
+	AllWindowedStream<T, GlobalWindow> mAllWindowedStream;
+	
 }

@@ -18,6 +18,7 @@
 package org.apache.flink.streaming.api.environment;
 
 import org.apache.flink.annotation.Public;
+import org.apache.flink.api.bridge.OclContext;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
@@ -37,8 +38,8 @@ import org.slf4j.LoggerFactory;
  * <p>When this environment is instantiated, it uses a default parallelism of {@code 1}. The default
  * parallelism can be set via {@link #setParallelism(int)}.
  *
- * <p>Local environments can also be instantiated through {@link StreamExecutionEnvironment#createLocalEnvironment()}
- * and {@link StreamExecutionEnvironment#createLocalEnvironment(int)}. The former version will pick a
+ * <p>Local environments can also be instantiated through {@link StreamExecutionEnvironment#createLocalEnvironment(org.apache.flink.api.bridge.OclContext)}
+ * and {@link StreamExecutionEnvironment#createLocalEnvironment(org.apache.flink.api.bridge.OclContext, int)}. The former version will pick a
  * default parallelism equal to the number of hardware contexts in the local machine.
  */
 @Public
@@ -46,8 +47,8 @@ public class LegacyLocalStreamEnvironment extends LocalStreamEnvironment {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LocalStreamEnvironment.class);
 
-	public LegacyLocalStreamEnvironment() {
-		this(new Configuration());
+	public LegacyLocalStreamEnvironment(OclContext pOclContext) {
+		this(pOclContext, new Configuration());
 	}
 
 	/**
@@ -55,8 +56,8 @@ public class LegacyLocalStreamEnvironment extends LocalStreamEnvironment {
 	 *
 	 * @param config The configuration used to configure the local executor.
 	 */
-	public LegacyLocalStreamEnvironment(Configuration config) {
-		super(config);
+	public LegacyLocalStreamEnvironment(OclContext pOclContext, Configuration config) {
+		super(pOclContext, config);
 	}
 
 	/**

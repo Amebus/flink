@@ -1,0 +1,14 @@
+{
+  "functions": [
+    {
+      "type":"filter",
+      "name":"filterFunction",
+      "input":"tupleOne",
+      "function": [
+        "_r0 = 5",
+        "_r0 = 2",
+        "_r0 = 9"
+      ]
+    }
+  ]
+}

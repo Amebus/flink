@@ -2,7 +2,6 @@ package org.apache.flink.api.engine;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import org.apache.flink.streaming.api.engine.IUserFunctionCollection;
 
 import java.util.Iterator;
 import java.util.List;

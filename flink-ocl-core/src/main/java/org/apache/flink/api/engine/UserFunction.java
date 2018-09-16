@@ -1,6 +1,7 @@
 package org.apache.flink.api.engine;
 
-import org.apache.flink.utility.StringHelper;
+
+import org.apache.flink.api.common.utility.StringHelper;
 
 public abstract class UserFunction implements IUserFunction
 {

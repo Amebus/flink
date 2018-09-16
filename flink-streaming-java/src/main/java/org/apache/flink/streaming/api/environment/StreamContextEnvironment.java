@@ -18,6 +18,7 @@
 package org.apache.flink.streaming.api.environment;
 
 import org.apache.flink.annotation.PublicEvolving;
+import org.apache.flink.api.bridge.OclContext;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.client.program.ContextEnvironment;
 import org.apache.flink.client.program.DetachedEnvironment;
@@ -30,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Special {@link StreamExecutionEnvironment} that will be used in cases where the CLI client or
  * testing utilities create a {@link StreamExecutionEnvironment} that should be used when
- * {@link StreamExecutionEnvironment#getExecutionEnvironment()} is called.
+ * {@link StreamExecutionEnvironment#getExecutionEnvironment(org.apache.flink.api.bridge.OclContext)} is called.
  */
 @PublicEvolving
 public class StreamContextEnvironment extends StreamExecutionEnvironment {
@@ -39,7 +40,8 @@ public class StreamContextEnvironment extends StreamExecutionEnvironment {
 
 	private final ContextEnvironment ctx;
 
-	protected StreamContextEnvironment(ContextEnvironment ctx) {
+	protected StreamContextEnvironment(OclContext pOclContext, ContextEnvironment ctx) {
+		super(pOclContext);
 		this.ctx = ctx;
 		if (ctx.getParallelism() > 0) {
 			setParallelism(ctx.getParallelism());

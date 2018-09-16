@@ -1,9 +1,9 @@
 package org.apache.flink.streaming.helpers;
 
-import org.apache.flink.streaming.api.serialization.StreamReader;
-import org.apache.flink.streaming.api.serialization.StreamWriter;
-import org.apache.flink.streaming.api.serialization.StreamWriterResult;
-import org.apache.flink.streaming.api.tuple.IOclTuple;
+import org.apache.flink.api.serialization.StreamReader;
+import org.apache.flink.api.serialization.StreamWriter;
+import org.apache.flink.api.serialization.StreamWriterResult;
+import org.apache.flink.api.tuple.IOclTuple;
 
 import java.util.LinkedList;
 import java.util.List;
