@@ -1,5 +1,6 @@
 package org.apache.flink.api.bridge;
 
+import org.apache.flink.api.common.IBuilder;
 import org.apache.flink.api.engine.BuildEngine;
 import org.apache.flink.api.engine.CppLibraryInfo;
 import org.apache.flink.api.engine.IUserFunctionsRepository;
@@ -106,35 +107,52 @@ public class OclContext implements Serializable
 		String vOutputTupleName = mFunctionRepository.getUserFunctionByName(pUserFunctionName).getOutputTupleName();
 		ITupleDefinition vOutputTuple = mTupleDefinitionsRepository.getTupleDefinition(vOutputTupleName);
 		int vTupleDim = vOutputTuple.getMaxDimension();
-		byte vOutputArity = vOutputTuple.getArity();
+		OutputTupleInfo vOutputTupleInfo = getOutputTupleInfo(vOutputTuple);
 		
-		OutputTupleInfo.OutputTupleInfoBuilder vInfoBuilder =
-			new OutputTupleInfo.OutputTupleInfoBuilder()
-				.setArity(vOutputArity);
-		
-		vOutputTuple.cIterator()
-					.forEachRemaining(x ->
-									  {
-									  	byte vType;
-									  	if(x.isInteger())
-										{
-											vType = Types.INT;
-										}
-										else if (x.isDouble())
-										{
-											vType = Types.DOUBLE;
-										}
-										else
-										{
-											vType = Types.STRING;
-										}
-										vInfoBuilder.setTType(vType);
-									  });
-		
-		
-		byte[] vStream = mOclBridgeContext.map(pUserFunctionName, pTuples, vTupleDim, vInfoBuilder.build(), pInputTuplesCount);
+		byte[] vStream = mOclBridgeContext.map(pUserFunctionName, pTuples, vTupleDim, vOutputTupleInfo, pInputTuplesCount);
 		return StreamReader.getStreamReader().setStream(vStream);
-		//return new ArrayList<>();
 	}
 	
+	@SuppressWarnings("unchecked")
+	public <R extends IOclTuple> R reduce(
+		String pUserFunctionName,
+		Iterable< ? extends IOclTuple> pTuples,
+		int pInputTuplesCount)
+	{
+		String vOutputTupleName = mFunctionRepository.getUserFunctionByName(pUserFunctionName).getOutputTupleName();
+		ITupleDefinition vOutputTuple = mTupleDefinitionsRepository.getTupleDefinition(vOutputTupleName);
+		int vTupleDim = vOutputTuple.getMaxDimension();
+		OutputTupleInfo vOutputTupleInfo = getOutputTupleInfo(vOutputTuple);
+		
+		byte[] vStream = mOclBridgeContext.reduce(pUserFunctionName, pTuples, vTupleDim, vOutputTupleInfo, pInputTuplesCount);
+		return (R)StreamReader.getStreamReader().setStream(vStream).iterator().next();
+	}
+	
+	private OutputTupleInfo getOutputTupleInfo(ITupleDefinition pOutputTuple)
+	{
+		OutputTupleInfo.OutputTupleInfoBuilder vInfoBuilder =
+			new OutputTupleInfo.OutputTupleInfoBuilder()
+				.setArity(pOutputTuple.getArity());
+		
+		pOutputTuple.cIterator()
+					.forEachRemaining(x ->
+									  {
+										  byte vType;
+										  if(x.isInteger())
+										  {
+											  vType = Types.INT;
+										  }
+										  else if (x.isDouble())
+										  {
+											  vType = Types.DOUBLE;
+										  }
+										  else
+										  {
+											  vType = Types.STRING;
+										  }
+										  vInfoBuilder.setTType(vType);
+									  });
+		
+		return vInfoBuilder.build();
+	}
 }

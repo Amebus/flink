@@ -233,7 +233,7 @@ class OclKernelExecutionInfo
 
             SetUpIndexes(pIndexes);
 
-            SetUpResult();
+            this->SetUpResult();
         }
 
         virtual ~OclKernelExecutionInfo ()
@@ -303,6 +303,7 @@ class OclFilterExecutionInfo : public OclKernelExecutionInfo
         OclFilterExecutionInfo (JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes)
             : OclKernelExecutionInfo (pEnv, pObj, pKernelName, pStream, pIndexes)
         {
+            
         }
 };
 
@@ -314,7 +315,9 @@ class OclMapExecutionInfo : public OclKernelExecutionInfo
         unsigned char* mInfo;
         void SetUpResult()
         {
-
+            mResultLength = mInfoLength + mIndexesLegth * mOutputTupleDimension;
+            mResultSize = sizeof(unsigned char) * mResultLength;
+            mResult = new unsigned char[mResultLength];
         }
     public:
         OclMapExecutionInfo (JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, 
@@ -326,9 +329,9 @@ class OclMapExecutionInfo : public OclKernelExecutionInfo
             mInfoLength = mEnv->GetArrayLength(pOutputTupleInfo);
             mInfo = (unsigned char *)mEnv->GetByteArrayElements(pOutputTupleInfo, 0);
 
-            mResultLength = mInfoLength + mIndexesLegth * mOutputTupleDimension;
-            mResultSize = sizeof(unsigned char) * mResultLength;
-            mResult = new unsigned char[mResultLength];
+            // mResultLength = mInfoLength + mIndexesLegth * mOutputTupleDimension;
+            // mResultSize = sizeof(unsigned char) * mResultLength;
+            // mResult = new unsigned char[mResultLength];
         }
         int GetOutputTupleDimension()
         {
@@ -566,62 +569,20 @@ Java_org_apache_flink_api_bridge_AbstractOclBridge_OclFilter(
     size_t vStreamSize, vIndexesSize, vResultSize;
     OclFilterExecutionInfo *vKernelInfo = new OclFilterExecutionInfo(pEnv, pObj, pKernelName, pStream, pIndexes);
 
-    vStreamLength = pEnv->GetArrayLength(pStream);
-    vStream = (unsigned char *)pEnv->GetByteArrayElements(pStream, 0);
-    vStreamSize = sizeof(unsigned char) * vStreamLength;
+    RunKernel(vKernelInfo);
 
-    vIndexesLegth = pEnv->GetArrayLength(pIndexes);
-    vIndexes = pEnv->GetIntArrayElements(pIndexes, 0);
-    vIndexesSize = sizeof(int) * vIndexesLegth;
-
-    vResultLength = vIndexesLegth;
-    vResultSize = sizeof(unsigned char) * vResultLength;
-    unsigned char* vResult = new unsigned char[vResultLength];
-
-    try
-    {
-        cl::Kernel vKernel = cl::Kernel(gProgrmasList[vKernelName], vKernelName.c_str());
-
-        cl::Buffer vStreamBuffer(gContext, CL_MEM_READ_ONLY, vStreamSize);
-        cl::Buffer vIndexesBuffer(gContext, CL_MEM_READ_ONLY, vIndexesSize);
-        cl::Buffer vResultBuffer(gContext, CL_MEM_WRITE_ONLY, vResultSize);
-
-        gCommandQueue.enqueueWriteBuffer(vStreamBuffer, CL_TRUE, 0, vStreamSize, vStream);
-        gCommandQueue.enqueueWriteBuffer(vIndexesBuffer, CL_TRUE, 0, vIndexesSize, vIndexes);
-
-        vKernel.setArg(0, vStreamBuffer);
-        vKernel.setArg(1, vIndexesBuffer);
-        vKernel.setArg(2, vResultBuffer);
-
-        // int vIntValue = 0;
-        // long vLongValue = 0;
-        // gStatus = clSetKernelArg(vKernel, 3, sizeof(int), &vIntValue);
-        // printStatus();
-        // gStatus = clSetKernelArg(vKernel, 4, sizeof(long), &vLongValue);
-        // printStatus();
-
-        cl::NDRange global(vIndexesLegth);
-
-        gCommandQueue.enqueueNDRangeKernel(vKernel, cl::NullRange, global, cl::NullRange);
-
-        gCommandQueue.enqueueReadBuffer(vResultBuffer, CL_TRUE, 0, vResultSize, vResult);
-    }
-    catch(cl::Error *vError)
-    {
-        PrintClError(vError);
-        exit(1);
-    }
-
-    //for(int i = 0; i < vResultLength; i++)
-    //{
-        //std::cout << i << ": ";
-        //printf("%d\n", vResult[i]);
-    //}
-
-    jbooleanArray vRet = pEnv->NewBooleanArray(vResultLength);
-	pEnv->SetBooleanArrayRegion(vRet, 0, vResultLength, vResult);
+    jbooleanArray vRet = pEnv->NewBooleanArray(vKernelInfo->GetResultLength());
+	pEnv->SetBooleanArrayRegion(vRet, 0, vKernelInfo->GetResultLength(), vKernelInfo->GetResult());
 
     return vRet;
+}
+
+JNIEXPORT jbyteArray JNICALL 
+Java_org_apache_flink_api_bridge_AbstractOclBridge_OclReduce(
+    JNIEnv *pEnv, jobject, jstring, jbyteArray, jintArray, jint, jbyteArray)
+{
+
+    return pEnv->NewByteArray(30);
 }
 
 #pragma endregion

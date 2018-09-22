@@ -1607,23 +1607,20 @@ public class AllWindowedStream<T, W extends Window> {
 		{
 			throw new NullPointerException("the OclContext can't be null to use the oclMap function.");
 		}
-		
-		OclFunctionResult<R> vResult = new OclFunctionResult<>();
-		final Integer[] vTuplesCount = {0};
-		
-		vResult.mSingleOutputStreamOperator =
+		return
 			process(new ProcessAllWindowFunction<T, R, W>()
 			{
 				@Override
 				public void process(Context context, Iterable<T> elements, Collector<R> out)
 				{
+					int vTuplesCount = 0;
 					for (T vElement : elements)
 					{
-						vTuplesCount[0]++;
+						vTuplesCount++;
 					}
 					
 					Iterable<R> vResult = (Iterable<R>)
-						vOclContext.map(pUserFunctionName, (Iterable<? extends IOclTuple>) elements, vTuplesCount[0]);
+						vOclContext.map(pUserFunctionName, (Iterable<? extends IOclTuple>) elements, vTuplesCount);
 					
 					for (R vOclTuple : vResult)
 					{
@@ -1631,10 +1628,6 @@ public class AllWindowedStream<T, W extends Window> {
 					}
 				}
 			}, pTupleTypeInfo);
-		
-		vResult.mTuplesCount = vTuplesCount;
-		
-		return vResult.mSingleOutputStreamOperator;
 	}
 	
 	// ------------------------------------------------------------------------

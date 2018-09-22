@@ -58,7 +58,8 @@ public class OclContextTest
 		vTuples.add(new Tuple1Ocl<>(-78));
 		vTuples.add(new Tuple1Ocl<>(3));
 		
-		Iterable<? extends IOclTuple> vResult;
+//		Iterable<? extends IOclTuple> vResult;
+		IOclTuple vResult;
 		
 //		vResult = vContext.filter("filterFunction", vTuples);
 //		vResult.forEach(x ->
@@ -67,14 +68,14 @@ public class OclContextTest
 //							System.out.println(vT.<Integer>getField(0));
 //						});
 		
-		vResult = vContext.map("mapFunction", vTuples, vTuples.size());
-		vResult.forEach(x ->
-						{
-//							Tuple1Ocl<String> vT = (Tuple1Ocl<String>)x;
-//							System.out.println(vT.<String>getField(0));
-							System.out.println(x.<String>getField(0));
-						});
-		
+		vResult = vContext.reduce("mapFunction", vTuples, vTuples.size());
+//		vResult.forEach(x ->
+//						{
+////							Tuple1Ocl<String> vT = (Tuple1Ocl<String>)x;
+////							System.out.println(vT.<String>getField(0));
+//							System.out.println(x.<String>getField(0));
+//						});
+
 		
 		vContext.close();
 	}

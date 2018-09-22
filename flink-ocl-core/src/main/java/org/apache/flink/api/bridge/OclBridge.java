@@ -52,4 +52,23 @@ public class OclBridge extends AbstractOclBridge
 							pOutputTupleDimension,
 							pOutputTupleInfo.toJniCompatibleFormat());
 	}
+	
+	public byte[] reduce(String pUserFunctionName,
+						 Iterable< ? extends IOclTuple> pTuples,
+						 int pOutputTupleDimension,
+						 OutputTupleInfo pOutputTupleInfo,
+						 int pInputTuplesCount)
+	{
+		StreamWriterResult vWriterResult =
+			StreamWriter.getStreamWriter()
+						.setTupleList(pTuples)
+						.setTupleListSize(pInputTuplesCount)
+						.writeStream();
+		
+		return super.OclReduce(pUserFunctionName,
+							   vWriterResult.getStream(),
+							   vWriterResult.getPositions(),
+							   pOutputTupleDimension,
+							   pOutputTupleInfo.toJniCompatibleFormat());
+	}
 }
