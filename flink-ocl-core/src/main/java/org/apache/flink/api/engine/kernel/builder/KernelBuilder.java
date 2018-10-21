@@ -273,12 +273,6 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 								 (r, t, i) -> r.add(new InputVarDefinition(t, i)));
 	}
 	
-	protected Iterable<VarDefinition> getInputTupleVariablesForResult()
-	{
-		return getTupleVariables(getInputTuple(),
-								 (r, t, i) -> r.add(new OutputVarDefinition(t, i)));
-	}
-	
 	protected Iterable<VarDefinition> getTupleVariables(ITupleDefinition pTuple,
 														ITupleVariableAdder pResultAdder)
 	{

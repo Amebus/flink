@@ -190,6 +190,37 @@ void DisposeContext();
 
 #pragma region Classes
 
+class OclKernelAdditionalArgument
+{
+    private:
+        unsigned char* mValue;
+        int mLength;
+        size_t mSize;
+    public:
+        OclKernelAdditionalArgument(unsigned char* pValue, int pLength)
+        {
+            mValue = pValue;
+            mLength = pLength;
+            mSize = sizeof(unsigned char) * mLength;
+        }
+        virtual ~OclKernelAdditionalArgument()
+        {
+
+        }
+        unsigned char* GetValue()
+        {
+            return mValue;
+        }
+        int GetLength()
+        {
+            return mLength;
+        }
+        size_t GetSize()
+        {
+            return mSize;
+        }
+};
+
 class OclKernelExecutionInfo
 {
     protected:
@@ -198,25 +229,14 @@ class OclKernelExecutionInfo
         jobject mObj;
         std::string mKernelName;
 
+
         unsigned char *mStream, *mResult;
         int* mIndexes;
 
+        std::vector<OclKernelAdditionalArgument*> mAdditionalArguments;
+
         int mStreamLength, mIndexesLegth, mResultLength;
         size_t mStreamSize, mIndexesSize, mResultSize;
-
-        void SetUpStream(jbyteArray pStream)
-        {
-            mStreamLength = mEnv->GetArrayLength(pStream);
-            mStream = (unsigned char *)mEnv->GetByteArrayElements(pStream, 0);
-            mStreamSize = sizeof(unsigned char) * mStreamLength;
-        }
-
-        void SetUpIndexes(jintArray pIndexes)
-        {
-            mIndexesLegth = mEnv->GetArrayLength(pIndexes);
-            mIndexes = mEnv->GetIntArrayElements(pIndexes, 0);
-            mIndexesSize = sizeof(int) * mIndexesLegth;
-        }
 
         virtual void SetUpResult()
         {
@@ -229,17 +249,14 @@ class OclKernelExecutionInfo
             mObj = pObj;
             mKernelName = GetStringFromJavaString(mEnv, pKernelName);
 
-            SetUpStream(pStream);
-
-            SetUpIndexes(pIndexes);
-
-            this->SetUpResult();
+            this->SetUpStream(pStream)->SetUpIndexes(pIndexes)->SetUpResult();
         }
 
         virtual ~OclKernelExecutionInfo ()
         {
         }
 
+        #pragma region getters
         std::string GetKernelName()
         {
             return mKernelName;
@@ -286,6 +303,49 @@ class OclKernelExecutionInfo
             return mResultLength;
         }
 
+        int GetAdditionalArgumentsCount()
+        {
+            return mAdditionalArguments.size();
+        }
+
+        OclKernelAdditionalArgument* GetAdditionalArgument(int pIndex)
+        {
+            return mAdditionalArguments.at(pIndex);
+        }
+
+        #pragma endregion
+
+        #pragma region setters
+        virtual OclKernelExecutionInfo* SetUpStream(jbyteArray pStream)
+        {
+            mStreamLength = mEnv->GetArrayLength(pStream);
+            mStream = (unsigned char *)mEnv->GetByteArrayElements(pStream, 0);
+            mStreamSize = sizeof(unsigned char) * mStreamLength;
+            return this;
+        }
+
+        virtual OclKernelExecutionInfo* SetUpIndexes(jintArray pIndexes)
+        {
+            mIndexesLegth = mEnv->GetArrayLength(pIndexes);
+            mIndexes = mEnv->GetIntArrayElements(pIndexes, 0);
+            mIndexesSize = sizeof(int) * mIndexesLegth;
+            return this;
+        }
+
+        virtual OclKernelExecutionInfo* AddAdditionalArgument(jbyteArray pAdditionalArgument)
+        {
+            int vLength = mEnv->GetArrayLength(pAdditionalArgument);
+            unsigned char * vValue = (unsigned char *)mEnv->GetByteArrayElements(pAdditionalArgument, 0);
+            return this->AddAdditionalArgument(vValue, vLength);
+        }
+        virtual OclKernelExecutionInfo* AddAdditionalArgument(unsigned char* pValue, int pLength)
+        {
+            mAdditionalArguments.push_back(new OclKernelAdditionalArgument(pValue, pLength));
+            return this;
+        }
+
+        #pragma endregion
+
         jbooleanArray ToJBooleanArray();
         jbyteArray ToJbyteArray();
 };
@@ -303,24 +363,18 @@ class OclFilterExecutionInfo : public OclKernelExecutionInfo
         OclFilterExecutionInfo (JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes)
             : OclKernelExecutionInfo (pEnv, pObj, pKernelName, pStream, pIndexes)
         {
-            
+            this->SetUpResult();
         }
 };
 
-class OclMapExecutionInfo : public OclKernelExecutionInfo
+class OclKernelExecutionInfoForOutputTuple : public OclKernelExecutionInfo
 {
     protected:
         int mOutputTupleDimension;
         int mInfoLength;
         unsigned char* mInfo;
-        void SetUpResult()
-        {
-            mResultLength = mInfoLength + mIndexesLegth * mOutputTupleDimension;
-            mResultSize = sizeof(unsigned char) * mResultLength;
-            mResult = new unsigned char[mResultLength];
-        }
     public:
-        OclMapExecutionInfo (JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, 
+        OclKernelExecutionInfoForOutputTuple (JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, 
                                 jint pOutputTupleDimension, jbyteArray pOutputTupleInfo)
             : OclKernelExecutionInfo (pEnv, pObj, pKernelName, pStream, pIndexes)
         {
@@ -328,10 +382,6 @@ class OclMapExecutionInfo : public OclKernelExecutionInfo
             
             mInfoLength = mEnv->GetArrayLength(pOutputTupleInfo);
             mInfo = (unsigned char *)mEnv->GetByteArrayElements(pOutputTupleInfo, 0);
-
-            // mResultLength = mInfoLength + mIndexesLegth * mOutputTupleDimension;
-            // mResultSize = sizeof(unsigned char) * mResultLength;
-            // mResult = new unsigned char[mResultLength];
         }
         int GetOutputTupleDimension()
         {
@@ -347,18 +397,57 @@ class OclMapExecutionInfo : public OclKernelExecutionInfo
         }
 };
 
+class OclMapExecutionInfo : public OclKernelExecutionInfoForOutputTuple
+{
+    protected:
+        void SetUpResult()
+        {
+            mResultLength = mInfoLength + mIndexesLegth * mOutputTupleDimension;
+            mResultSize = sizeof(unsigned char) * mResultLength;
+            mResult = new unsigned char[mResultLength];
+        }
+    public:
+        OclMapExecutionInfo (JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, 
+                                jint pOutputTupleDimension, jbyteArray pOutputTupleInfo)
+            : OclKernelExecutionInfoForOutputTuple (pEnv, pObj, pKernelName, pStream, pIndexes, 
+                pOutputTupleDimension, pOutputTupleInfo)
+        {
+            this->SetUpResult();
+        }
+};
+
+class OclReduceExecutionInfo : public OclKernelExecutionInfoForOutputTuple
+{
+    protected:
+        void SetUpResult()
+        {
+            mResultLength = mInfoLength + mOutputTupleDimension;
+            mResultSize = sizeof(unsigned char) * mResultLength;
+            mResult = new unsigned char[mResultLength];
+        }
+    public:
+        OclReduceExecutionInfo (JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, 
+                                jint pOutputTupleDimension, jbyteArray pOutputTupleInfo)
+            : OclKernelExecutionInfoForOutputTuple (pEnv, pObj, pKernelName, pStream, pIndexes, pOutputTupleDimension, pOutputTupleInfo)
+        {
+            this->SetUpResult();
+        }
+};
+
 #pragma endregion
 
 #pragma region Java native implementation
 
 void RunKernel(OclKernelExecutionInfo* pKernelInfo)
 {
-    size_t vStreamSize, vIndexesSize, vResultSize;
+    size_t vStreamSize, vIndexesSize, vResultSize, vArgSize;
     vStreamSize = pKernelInfo->GetStreamSize();
     vIndexesSize = pKernelInfo->GetIndexesSize();
     vResultSize = pKernelInfo->GetResultSize();
+    std::vector<cl::Buffer> vBuffers;
     try
     {
+        int vArgIndex = 0;
         cl::Kernel vKernel = cl::Kernel(gProgrmasList[pKernelInfo->GetKernelName()], pKernelInfo->GetCharKernelName());
 
         cl::Buffer vStreamBuffer(gContext, CL_MEM_READ_ONLY, vStreamSize);
@@ -368,9 +457,23 @@ void RunKernel(OclKernelExecutionInfo* pKernelInfo)
         gCommandQueue.enqueueWriteBuffer(vStreamBuffer, CL_TRUE, 0, vStreamSize, pKernelInfo->GetStream());
         gCommandQueue.enqueueWriteBuffer(vIndexesBuffer, CL_TRUE, 0, vIndexesSize, pKernelInfo->GetIndexes());
 
-        vKernel.setArg(0, vStreamBuffer);
-        vKernel.setArg(1, vIndexesBuffer);
-        vKernel.setArg(2, vResultBuffer);
+        vKernel.setArg(vArgIndex++, vStreamBuffer);
+        vKernel.setArg(vArgIndex++, vIndexesBuffer);
+        vKernel.setArg(vArgIndex++, vResultBuffer);
+
+        int vAdditionalArgumentsCount = pKernelInfo->GetAdditionalArgumentsCount();
+        OclKernelAdditionalArgument* vArg;
+        if( vAdditionalArgumentsCount > 0)
+        {
+            for(int vI = 0; vI < vAdditionalArgumentsCount; vI++, vArgIndex++)
+            {
+                vArg = pKernelInfo->GetAdditionalArgument(vI);
+                vArgSize = vArg->GetSize();
+                cl::Buffer vBuffer(gContext, CL_MEM_READ_ONLY, vArgSize);
+                gCommandQueue.enqueueWriteBuffer(vBuffer, CL_TRUE, 0, vArgSize, vArg->GetValue());
+                vKernel.setArg(vArgIndex, vBuffer);
+            }
+        }
 
         cl::NDRange global(pKernelInfo->GetIndexesLength());
 
@@ -544,7 +647,8 @@ JNIEXPORT void Java_org_apache_flink_api_bridge_AbstractOclBridge_Dispose(JNIEnv
 }
 
 JNIEXPORT jbyteArray JNICALL Java_org_apache_flink_api_bridge_AbstractOclBridge_OclMap(
-    JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, jint pOutputTupleDimension, jbyteArray pOutputTupleInfo)
+    JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, 
+    jint pOutputTupleDimension, jbyteArray pOutputTupleInfo)
 {
     OclKernelExecutionInfo *vKernelInfo = new OclMapExecutionInfo(pEnv, pObj, pKernelName, pStream, pIndexes, pOutputTupleDimension, pOutputTupleInfo);
     
@@ -579,10 +683,18 @@ Java_org_apache_flink_api_bridge_AbstractOclBridge_OclFilter(
 
 JNIEXPORT jbyteArray JNICALL 
 Java_org_apache_flink_api_bridge_AbstractOclBridge_OclReduce(
-    JNIEnv *pEnv, jobject, jstring, jbyteArray, jintArray, jint, jbyteArray)
+    JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, 
+    jint pOutputTupleDimension, jbyteArray pOutputTupleInfo)
 {
 
-    return pEnv->NewByteArray(30);
+    OclKernelExecutionInfo *vKernelInfo = new OclReduceExecutionInfo(pEnv, pObj, pKernelName, pStream, pIndexes, pOutputTupleDimension, pOutputTupleInfo);
+
+    RunKernel(vKernelInfo);
+
+    jbyteArray vRet = pEnv->NewByteArray(vKernelInfo->GetResultLength());
+	pEnv->SetByteArrayRegion(vRet, 0, vKernelInfo->GetResultLength(), (signed char *)vKernelInfo->GetResult());
+
+    return vRet;
 }
 
 #pragma endregion
@@ -669,7 +781,7 @@ std::vector<std::string> GetKernelsSourceFiles(std::string pKernelsFolder)
         {
             if (vDot.compare(vFile->d_name) != 0 && vDotDot.compare(vFile->d_name) != 0)
             {
-                printf ("%s\n", vFile->d_name);
+                //printf ("%s\n", vFile->d_name);
                 vFiles.push_back(vFile->d_name);          
             }
         }
@@ -685,7 +797,7 @@ std::string GetKernelSourceCode(std::string pFile)
 
     std::string vSourceCode(std::istreambuf_iterator<char>(vSourceFile),(std::istreambuf_iterator<char>()));
 
-    std::cout << vSourceCode << "\n";
+    //std::cout << vSourceCode << "\n";
 
     return vSourceCode;
 }

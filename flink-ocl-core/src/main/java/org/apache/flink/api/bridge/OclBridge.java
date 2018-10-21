@@ -1,11 +1,8 @@
 package org.apache.flink.api.bridge;
 
-import org.apache.flink.api.bridge.AbstractOclBridge;
 import org.apache.flink.api.serialization.StreamWriter;
 import org.apache.flink.api.serialization.StreamWriterResult;
 import org.apache.flink.api.tuple.IOclTuple;
-
-import java.util.List;
 
 public class OclBridge extends AbstractOclBridge
 {

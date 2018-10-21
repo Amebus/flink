@@ -14,7 +14,7 @@ public class StreamReader implements Iterable<IOclTuple>
 {
 	public static final String DIMENSION_ERROR = "Tuple dimension not supported";
 	public static final String DESERIALIZATION_ERROR = "Object type not recognized, unable to deserialize it";
-	
+	public static final char STRING_END = '\u0000';
 	
 	private byte mArity;
 	private byte[] mStream;
@@ -169,7 +169,14 @@ public class StreamReader implements Iterable<IOclTuple>
 		private void stringFromByteArray()
 		{
 			stringLengthFromByteArray();
-			mResult[mResultIndex] = new String(mStream, mIndex, mStringLength);
+			int vStringLength = mStringLength;
+			int vIndex = mIndex + mStringLength - 1;
+			while (mStream[vIndex] == STRING_END && vStringLength >= 0)
+			{
+				vIndex--;
+				vStringLength--;
+			}
+			mResult[mResultIndex] = new String(mStream, mIndex, vStringLength);
 			mIndex+=mStringLength;
 		}
 		

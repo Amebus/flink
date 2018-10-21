@@ -14,7 +14,7 @@ public class MapBuilder extends KernelWithOutputTupleBuilder
 //	protected String getOutputSection()
 //	{
 //		StringBuilder vBuilder = new StringBuilder();
-//		Iterable<VarDefinition> vDefinitions = getOutputTupleVariablesAsResult();
+//		Iterable<VarDefinition> vDefinitions = getOutputTupleVariablesForResult();
 //
 //		vDefinitions.forEach(x ->
 //							 {

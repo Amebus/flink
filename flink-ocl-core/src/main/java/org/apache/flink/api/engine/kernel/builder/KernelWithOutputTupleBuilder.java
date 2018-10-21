@@ -17,7 +17,7 @@ public abstract class KernelWithOutputTupleBuilder extends KernelBuilder
 	public final static String OUT_TUPLE_DIM = "_otd";
 	public final static String RESULT_INDEX = "_ri";
 	
-	private Iterable<VarDefinition> mOutputTupleVariablesAsResult;
+	private Iterable<VarDefinition> mOutputTupleVariablesForResult;
 	
 	public KernelWithOutputTupleBuilder(KernelBuilderOptions pKernelBuilderOptions)
 	{
@@ -29,22 +29,22 @@ public abstract class KernelWithOutputTupleBuilder extends KernelBuilder
 		return getTupleDefinitions().getTupleDefinition(getUserFunction().getOutputTupleName());
 	}
 	
-	protected Iterable<VarDefinition> getOutputTupleVariablesAsResult()
+	protected Iterable<VarDefinition> getOutputTupleVariablesForResult()
 	{
-		if(mOutputTupleVariablesAsResult == null)
+		if(mOutputTupleVariablesForResult == null)
 		{
-			mOutputTupleVariablesAsResult =
+			mOutputTupleVariablesForResult =
 				getTupleVariables(
 					getOutputTuple(),
 					(r, t, i) -> r.add(new OutputVarDefinition(t, i)));
 		}
-		return mOutputTupleVariablesAsResult;
+		return mOutputTupleVariablesForResult;
 	}
 	
 	@Override
 	protected String getOutputVarDeclaration()
 	{
-		Iterable<VarDefinition> vDefinitions = getOutputTupleVariablesAsResult();
+		Iterable<VarDefinition> vDefinitions = getOutputTupleVariablesForResult();
 		
 		return getOutputUtilityVars() +
 			   getDeclarationLineForInteger(vDefinitions) +
@@ -74,7 +74,7 @@ public abstract class KernelWithOutputTupleBuilder extends KernelBuilder
 	private String getTailResultIndexes()
 	{
 		StringBuilder vBuilder = new StringBuilder();
-		Iterable<VarDefinition> vIterable = getOutputTupleVariablesAsResult();
+		Iterable<VarDefinition> vIterable = getOutputTupleVariablesForResult();
 		Iterator<VarDefinition> vCurrentDefinitionIterator = vIterable.iterator();
 		Iterator<VarDefinition> vPreviousDefinitionIterator = vIterable.iterator();
 		
@@ -124,7 +124,7 @@ public abstract class KernelWithOutputTupleBuilder extends KernelBuilder
 		StringBuilder vBuilder = new StringBuilder();
 		
 		VarDefinitionHelper
-			.getStringLengthVarDefinitions(getOutputTupleVariablesAsResult())
+			.getStringLengthVarDefinitions(getOutputTupleVariablesForResult())
 			.forEach(x ->	vBuilder.append(x.getName())
 									 .append(" = ")
 									 .append(x.getLength())
@@ -138,7 +138,7 @@ public abstract class KernelWithOutputTupleBuilder extends KernelBuilder
 	{
 		StringBuilder vBuilder = new StringBuilder();
 		
-		getOutputTupleVariablesAsResult()
+		getOutputTupleVariablesForResult()
 			.forEach(pVD ->
 					 {
 						 if(pVD.getCType().isInteger())

@@ -1,12 +1,12 @@
 package org.apache.flink.api.bridge;
 
-import org.apache.flink.api.common.IBuilder;
 import org.apache.flink.api.engine.BuildEngine;
 import org.apache.flink.api.engine.CppLibraryInfo;
 import org.apache.flink.api.engine.IUserFunctionsRepository;
 import org.apache.flink.api.serialization.StreamReader;
 import org.apache.flink.api.serialization.Types;
 import org.apache.flink.api.tuple.IOclTuple;
+import org.apache.flink.api.tuple.Tuple1Ocl;
 import org.apache.flink.configuration.ISettingsRepository;
 import org.apache.flink.configuration.ITupleDefinition;
 import org.apache.flink.configuration.ITupleDefinitionsRepository;
@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -116,7 +115,7 @@ public class OclContext implements Serializable
 	@SuppressWarnings("unchecked")
 	public <R extends IOclTuple> R reduce(
 		String pUserFunctionName,
-		Iterable< ? extends IOclTuple> pTuples,
+		Iterable<R> pTuples,
 		int pInputTuplesCount)
 	{
 		String vOutputTupleName = mFunctionRepository.getUserFunctionByName(pUserFunctionName).getOutputTupleName();
@@ -124,8 +123,9 @@ public class OclContext implements Serializable
 		int vTupleDim = vOutputTuple.getMaxDimension();
 		OutputTupleInfo vOutputTupleInfo = getOutputTupleInfo(vOutputTuple);
 		
-		byte[] vStream = mOclBridgeContext.reduce(pUserFunctionName, pTuples, vTupleDim, vOutputTupleInfo, pInputTuplesCount);
-		return (R)StreamReader.getStreamReader().setStream(vStream).iterator().next();
+//		byte[] vStream = mOclBridgeContext.reduce(pUserFunctionName, pTuples, vTupleDim, vOutputTupleInfo, pInputTuplesCount);
+//		return (R)StreamReader.getStreamReader().setStream(vStream).iterator().next();
+		return (R)new Tuple1Ocl<>();
 	}
 	
 	private OutputTupleInfo getOutputTupleInfo(ITupleDefinition pOutputTuple)
