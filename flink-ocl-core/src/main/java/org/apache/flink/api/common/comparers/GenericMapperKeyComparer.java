@@ -14,6 +14,12 @@ public abstract class GenericMapperKeyComparer<K> implements IMapperKeyComparerW
 	}
 	
 	@Override
+	public K getValueForComparison()
+	{
+		return getValue();
+	}
+	
+	@Override
 	public K getValue()
 	{
 		return mValue;
@@ -80,7 +86,7 @@ public abstract class GenericMapperKeyComparer<K> implements IMapperKeyComparerW
 		if(obj instanceof IMapperKeyComparerWrapper)
 		{
 			IMapperKeyComparerWrapper vOther = (IMapperKeyComparerWrapper) obj;
-			return mValue.equals(vOther.getValue());
+			return getValueForComparison().equals(vOther.getValueForComparison());
 		}
 		return false;
 	}
@@ -124,6 +130,6 @@ public abstract class GenericMapperKeyComparer<K> implements IMapperKeyComparerW
 	@Override
 	public int hashCode()
 	{
-		return mValue.hashCode();
+		return getValueForComparison().hashCode();
 	}
 }

@@ -6,13 +6,19 @@ public class StringKeyCaseInsenstiveComparer extends GenericMapperKeyComparer<St
 {
 	public StringKeyCaseInsenstiveComparer(String pValue)
 	{
-		super(pValue.toLowerCase());
+		super(pValue);
 	}
 	
 	@Override
 	public IMapperKeyComparerWrapper<String> getNew(String pValue)
 	{
 		return new StringKeyCaseInsenstiveComparer(pValue);
+	}
+	
+	@Override
+	public String getValueForComparison()
+	{
+		return getValue().toLowerCase();
 	}
 }
 

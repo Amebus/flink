@@ -6,6 +6,7 @@ import org.apache.flink.api.common.JsonLoaderOptions;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,6 @@ public class JsonUserFunctionRepository implements IUserFunctionsRepository
 {
 	public static final String FUNCTIONS_FILE_NAME = "functions.json";
 	
-	private IUserFunctionCollection<? extends IUserFunction> mUserFunctions;
 	private Map<String, IUserFunction> mUserFunctionMap;
 	
 	private String mFilePath;
@@ -50,6 +50,12 @@ public class JsonUserFunctionRepository implements IUserFunctionsRepository
 		return mUserFunctionMap.values();
 	}
 	
+	@Override
+	public Iterable<String> getFunctionEngineTypes()
+	{
+		return new ArrayList<>();
+	}
+	
 	private void checkIfFileExists()
 	{
 		if(Files.notExists(Paths.get(mFilePath).normalize().resolve(mFileName).toAbsolutePath()))
@@ -58,17 +64,18 @@ public class JsonUserFunctionRepository implements IUserFunctionsRepository
 	
 	private void loadFunctions()
 	{
-	
-			mUserFunctions = JsonLoader.loadJsonObject(new JsonLoaderOptions
-															.JsonLoaderOptionsBuilder<JsonUserFunctionCollection>()
-															.setSource(mFilePath, mFileName)
-															.setBeanClass(JsonUserFunctionCollection.class)
-															.shouldHookClass(JsonUserFunction.class)
-															.build()
-													  );
+		
+		IUserFunctionCollection<? extends IUserFunction> vUserFunctions
+			= JsonLoader.loadJsonObject(new JsonLoaderOptions
+											.JsonLoaderOptionsBuilder<JsonUserFunctionCollection>()
+											.setSource(mFilePath, mFileName)
+											.setBeanClass(JsonUserFunctionCollection.class)
+											.shouldHookClass(JsonUserFunction.class)
+											.build()
+									   );
 
-			mUserFunctions.forEach(x -> mUserFunctionMap.put(x.getName(), x));
-			mAreFunctionsNotLoadedYet = false;
+		vUserFunctions.forEach(x -> mUserFunctionMap.put(x.getName(), x));
+		mAreFunctionsNotLoadedYet = false;
 	
 	}
 }

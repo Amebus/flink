@@ -8,4 +8,6 @@ public interface IUserFunctionsRepository extends Serializable
 	IUserFunction getUserFunctionByName(String pUserFunctionName);
 	
 	Collection<IUserFunction> getUserFunctions();
+	
+	Iterable<String> getFunctionEngineTypes();
 }

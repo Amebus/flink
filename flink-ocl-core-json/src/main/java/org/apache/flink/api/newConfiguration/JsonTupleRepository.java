@@ -205,6 +205,12 @@ public class JsonTupleRepository implements ItupleDefinitionRepository
 			mTupleVarOptionsSeparatorSequence = getDefaultTupleVarOptionsSeparatorSequence();
 		}
 		
+		public Builder setFileDirectory(String pFileDirectory)
+		{
+			mFileDirectory = pFileDirectory;
+			return this;
+		}
+		
 		public Builder setFileName(String pFileName)
 		{
 			mFileName = pFileName;
