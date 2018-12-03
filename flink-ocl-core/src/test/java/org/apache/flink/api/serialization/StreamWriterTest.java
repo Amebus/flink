@@ -30,7 +30,7 @@ public class StreamWriterTest
 	@Test
 	public void Writer_EmptyStreamFormEmptyList_Ok()
 	{
-		StreamWriter vWriter = StreamWriter.getStreamWriter().setTupleList(getEmptyTupleList());
+		StreamWriter vWriter = StreamWriter.getStreamWriter().setTupleList(getEmptyTupleList()).setTupleListSize(0);
 		StreamWriterResult vResult = vWriter.writeStream();
 		
 		assertEquals(0, vResult.getStream().length);
@@ -40,7 +40,7 @@ public class StreamWriterTest
 	@Test
 	public void Writer_StreamFormUnsupportedTuple_Error()
 	{
-		StreamWriter vWriter = StreamWriter.getStreamWriter().setTupleList(getListWithUnsupportedT());
+		StreamWriter vWriter = StreamWriter.getStreamWriter().setTupleList(getListWithUnsupportedT()).setTupleListSize(1);
 		boolean vError = false;
 		
 		try
@@ -88,14 +88,14 @@ public class StreamWriterTest
 		
 		byte[] vStream = getStreamFrom(vTuple);
 		
-		assertEquals(2 + 4 + STV_0.length(), vStream.length);
+		assertEquals(2 + 4 + STV_0.length() + 1, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
 		assertEquals(Types.STRING, vStream[1]);
 		
 		byte[] vStringLength = Arrays.copyOfRange(vStream, 2, 6);
 		
-		assertEquals(STV_0.length(), ByteBuffer.wrap(vStringLength).getInt());
+		assertEquals(STV_0.length() + 1, ByteBuffer.wrap(vStringLength).getInt());
 	}
 	
 	@Test
@@ -131,7 +131,7 @@ public class StreamWriterTest
 		Tuple2Ocl<Integer, String> vTuple = new Tuple2Ocl<>(ITV_1, STV_2);
 		byte[] vStream = getStreamFrom(vTuple);
 		
-		assertEquals(11 + STV_2.length(), vStream.length);
+		assertEquals(11 + STV_2.length() + 1, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
 		assertEquals(Types.INT, vStream[1]);
@@ -170,7 +170,7 @@ public class StreamWriterTest
 		Tuple2Ocl<Double, String> vTuple = new Tuple2Ocl<>(DTV_1, STV_2);
 		byte[] vStream = getStreamFrom(vTuple);
 		
-		assertEquals(15 + STV_2.length(), vStream.length);
+		assertEquals(15 + STV_2.length() + 1, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
 		assertEquals(Types.DOUBLE, vStream[1]);
@@ -183,7 +183,7 @@ public class StreamWriterTest
 		Tuple2Ocl<String, String> vTuple = new Tuple2Ocl<>(STV_1, STV_2);
 		byte[] vStream = getStreamFrom(vTuple);
 		
-		assertEquals(1 + 10 + STV_1.length() + STV_2.length(), vStream.length);
+		assertEquals(1 + 10 + STV_1.length() + STV_2.length() + 2, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
 		assertEquals(Types.STRING, vStream[1]);
@@ -196,7 +196,7 @@ public class StreamWriterTest
 		Tuple2Ocl<String, Integer> vTuple = new Tuple2Ocl<>(STV_1, ITV_2);
 		byte[] vStream = getStreamFrom(vTuple);
 		
-		assertEquals(1 + 10 + STV_1.length(), vStream.length);
+		assertEquals(1 + 10 + STV_1.length() + 1, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
 		assertEquals(Types.STRING, vStream[1]);
@@ -209,7 +209,7 @@ public class StreamWriterTest
 		Tuple2Ocl<String, Double> vTuple = new Tuple2Ocl<>(STV_1, DTV_2);
 		byte[] vStream = getStreamFrom(vTuple);
 		
-		assertEquals(1 + 14 + STV_1.length(), vStream.length);
+		assertEquals(1 + 14 + STV_1.length() + 1, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
 		assertEquals(Types.STRING, vStream[1]);

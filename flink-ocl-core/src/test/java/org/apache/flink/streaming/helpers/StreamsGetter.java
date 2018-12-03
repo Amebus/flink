@@ -45,7 +45,7 @@ public class StreamsGetter
 	
 	public static StreamWriter getStreamWriterFrom(List<? extends IOclTuple> pTupleList)
 	{
-		return StreamWriter.getStreamWriter().setTupleList(pTupleList);
+		return StreamWriter.getStreamWriter().setTupleList(pTupleList).setTupleListSize(pTupleList.size());
 	}
 	
 	public static StreamReader getStreamReaderFrom(IOclTuple pTuple)

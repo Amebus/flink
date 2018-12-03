@@ -1,9 +1,9 @@
 {
   "tupleOne": {
-    "t0": "int",
-    "t1": "string",
-    "t2": "double",
-    "t3": "int"
+    "t0": "int::I10",
+    "t1": "string::Iabc::D70",
+    "t2": "double::I4",
+    "t3": "int::I5"
   },
   "tupleTwo": {
     "t0": "double"

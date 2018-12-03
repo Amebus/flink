@@ -160,10 +160,10 @@ void printStatus(const cl_int status, const int line)
     }
 }
 
-void PrintClError(cl::Error* error)
-{
+void PrintClError(cl::Error& error, const int line)
+{   
 	std::cout << "Error" << std::endl;
-	std::cout << error->what() << "(" << error->err() << ")" << std::endl;
+	std::cout << error.what() << "(" << error.err() << ")" << " - line: " << line << std::endl;
 }
 
 std::unordered_map<std::string, cl::Program> gProgrmasList;
@@ -179,6 +179,8 @@ cl_int gStatus;
 
 #define printStatus() printStatus(gStatus, __LINE__)
 
+#define printError(error) PrintClError(error, __LINE__)
+
 #pragma region dispose definition
 
 void DisposePrograms();
@@ -190,37 +192,6 @@ void DisposeContext();
 
 #pragma region Classes
 
-class OclKernelAdditionalArgument
-{
-    private:
-        unsigned char* mValue;
-        int mLength;
-        size_t mSize;
-    public:
-        OclKernelAdditionalArgument(unsigned char* pValue, int pLength)
-        {
-            mValue = pValue;
-            mLength = pLength;
-            mSize = sizeof(unsigned char) * mLength;
-        }
-        virtual ~OclKernelAdditionalArgument()
-        {
-
-        }
-        unsigned char* GetValue()
-        {
-            return mValue;
-        }
-        int GetLength()
-        {
-            return mLength;
-        }
-        size_t GetSize()
-        {
-            return mSize;
-        }
-};
-
 class OclKernelExecutionInfo
 {
     protected:
@@ -229,11 +200,8 @@ class OclKernelExecutionInfo
         jobject mObj;
         std::string mKernelName;
 
-
         unsigned char *mStream, *mResult;
         int* mIndexes;
-
-        std::vector<OclKernelAdditionalArgument*> mAdditionalArguments;
 
         int mStreamLength, mIndexesLegth, mResultLength;
         size_t mStreamSize, mIndexesSize, mResultSize;
@@ -303,16 +271,6 @@ class OclKernelExecutionInfo
             return mResultLength;
         }
 
-        int GetAdditionalArgumentsCount()
-        {
-            return mAdditionalArguments.size();
-        }
-
-        OclKernelAdditionalArgument* GetAdditionalArgument(int pIndex)
-        {
-            return mAdditionalArguments.at(pIndex);
-        }
-
         #pragma endregion
 
         #pragma region setters
@@ -329,18 +287,6 @@ class OclKernelExecutionInfo
             mIndexesLegth = mEnv->GetArrayLength(pIndexes);
             mIndexes = mEnv->GetIntArrayElements(pIndexes, 0);
             mIndexesSize = sizeof(int) * mIndexesLegth;
-            return this;
-        }
-
-        virtual OclKernelExecutionInfo* AddAdditionalArgument(jbyteArray pAdditionalArgument)
-        {
-            int vLength = mEnv->GetArrayLength(pAdditionalArgument);
-            unsigned char * vValue = (unsigned char *)mEnv->GetByteArrayElements(pAdditionalArgument, 0);
-            return this->AddAdditionalArgument(vValue, vLength);
-        }
-        virtual OclKernelExecutionInfo* AddAdditionalArgument(unsigned char* pValue, int pLength)
-        {
-            mAdditionalArguments.push_back(new OclKernelAdditionalArgument(pValue, pLength));
             return this;
         }
 
@@ -418,6 +364,10 @@ class OclMapExecutionInfo : public OclKernelExecutionInfoForOutputTuple
 
 class OclReduceExecutionInfo : public OclKernelExecutionInfoForOutputTuple
 {
+    private: 
+        int mLocalCacheLength;
+        unsigned char *mLocalCache;
+        size_t mLocalCacheSize;
     protected:
         void SetUpResult()
         {
@@ -425,13 +375,39 @@ class OclReduceExecutionInfo : public OclKernelExecutionInfoForOutputTuple
             mResultSize = sizeof(unsigned char) * mResultLength;
             mResult = new unsigned char[mResultLength];
         }
+        OclReduceExecutionInfo* SetUpLocalCache()
+        {
+            mLocalCacheLength = 0;
+            mLocalCacheSize = sizeof(unsigned char) * mLocalCacheLength;
+            mLocalCache = new unsigned char[mLocalCacheLength];
+            return this;
+        }
     public:
         OclReduceExecutionInfo (JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, 
                                 jint pOutputTupleDimension, jbyteArray pOutputTupleInfo)
             : OclKernelExecutionInfoForOutputTuple (pEnv, pObj, pKernelName, pStream, pIndexes, pOutputTupleDimension, pOutputTupleInfo)
         {
-            this->SetUpResult();
+            this->SetUpLocalCache()->SetUpResult();
         }
+
+        #pragma region getters
+
+        unsigned char* GetLocalCache()
+        {
+            return mLocalCache;
+        }
+
+        size_t GetLocalCacheSize()
+        {
+            return mLocalCacheSize;
+        }
+
+        int GetLocalCacheLength()
+        {
+            return mLocalCacheLength;
+        }
+
+        #pragma endregion
 };
 
 #pragma endregion
@@ -457,23 +433,12 @@ void RunKernel(OclKernelExecutionInfo* pKernelInfo)
         gCommandQueue.enqueueWriteBuffer(vStreamBuffer, CL_TRUE, 0, vStreamSize, pKernelInfo->GetStream());
         gCommandQueue.enqueueWriteBuffer(vIndexesBuffer, CL_TRUE, 0, vIndexesSize, pKernelInfo->GetIndexes());
 
+        // std::cout << "Set arg: StreamBuffer" << std::endl;
         vKernel.setArg(vArgIndex++, vStreamBuffer);
+        // std::cout << "Set arg: IndexesBuffer" << std::endl;
         vKernel.setArg(vArgIndex++, vIndexesBuffer);
+        // std::cout << "Set arg: ResultBuffer" << std::endl;
         vKernel.setArg(vArgIndex++, vResultBuffer);
-
-        int vAdditionalArgumentsCount = pKernelInfo->GetAdditionalArgumentsCount();
-        OclKernelAdditionalArgument* vArg;
-        if( vAdditionalArgumentsCount > 0)
-        {
-            for(int vI = 0; vI < vAdditionalArgumentsCount; vI++, vArgIndex++)
-            {
-                vArg = pKernelInfo->GetAdditionalArgument(vI);
-                vArgSize = vArg->GetSize();
-                cl::Buffer vBuffer(gContext, CL_MEM_READ_ONLY, vArgSize);
-                gCommandQueue.enqueueWriteBuffer(vBuffer, CL_TRUE, 0, vArgSize, vArg->GetValue());
-                vKernel.setArg(vArgIndex, vBuffer);
-            }
-        }
 
         cl::NDRange global(pKernelInfo->GetIndexesLength());
 
@@ -481,12 +446,55 @@ void RunKernel(OclKernelExecutionInfo* pKernelInfo)
 
         gCommandQueue.enqueueReadBuffer(vResultBuffer, CL_TRUE, 0, vResultSize, pKernelInfo->GetResult());
     }
-    catch(cl::Error *vError)
+    catch(cl::Error& vError)
     {
-        PrintClError(vError);
+        printError(vError);
         exit(1);
     }
 }
+
+void RunKernel(OclReduceExecutionInfo* pKernelInfo)
+{
+    size_t vStreamSize, vIndexesSize, vResultSize, vLocalCacheSize, vArgSize;
+    vStreamSize = pKernelInfo->GetStreamSize();
+    vIndexesSize = pKernelInfo->GetIndexesSize();
+    vResultSize = pKernelInfo->GetResultSize();
+    vLocalCacheSize = pKernelInfo->GetLocalCacheSize();
+    std::vector<cl::Buffer> vBuffers;
+    try
+    {
+        int vArgIndex = 0;
+        cl::Kernel vKernel = cl::Kernel(gProgrmasList[pKernelInfo->GetKernelName()], pKernelInfo->GetCharKernelName());
+
+        cl::Buffer vStreamBuffer(gContext, CL_MEM_READ_ONLY, vStreamSize);
+        cl::Buffer vIndexesBuffer(gContext, CL_MEM_READ_ONLY, vIndexesSize);
+        cl::Buffer vResultBuffer(gContext, CL_MEM_WRITE_ONLY, vResultSize);
+        cl::Buffer vLocalCacheBuffer(gContext, CL_MEM_READ_WRITE, vLocalCacheSize);
+
+        gCommandQueue.enqueueWriteBuffer(vStreamBuffer, CL_TRUE, 0, vStreamSize, pKernelInfo->GetStream());
+        gCommandQueue.enqueueWriteBuffer(vIndexesBuffer, CL_TRUE, 0, vIndexesSize, pKernelInfo->GetIndexes());
+        gCommandQueue.enqueueWriteBuffer(vLocalCacheBuffer, CL_TRUE, 0, vLocalCacheSize, pKernelInfo->GetLocalCache());
+
+        // std::cout << "Set arg: StreamBuffer" << std::endl;
+        vKernel.setArg(vArgIndex++, vStreamBuffer);
+        // std::cout << "Set arg: IndexesBuffer" << std::endl;
+        vKernel.setArg(vArgIndex++, vIndexesBuffer);
+        // std::cout << "Set arg: ResultBuffer" << std::endl;
+        vKernel.setArg(vArgIndex++, vResultBuffer);
+
+        cl::NDRange global(pKernelInfo->GetIndexesLength());
+
+        gCommandQueue.enqueueNDRangeKernel(vKernel, cl::NullRange, global, cl::NullRange);
+
+        gCommandQueue.enqueueReadBuffer(vResultBuffer, CL_TRUE, 0, vResultSize, pKernelInfo->GetResult());
+    }
+    catch(cl::Error& vError)
+    {
+        printError(vError);
+        exit(1);
+    }
+}
+
 
 JNIEXPORT void Java_org_apache_flink_api_bridge_AbstractOclBridge_ListDevices(JNIEnv *pEnv, jobject pObj)
 {
@@ -630,9 +638,9 @@ JNIEXPORT void Java_org_apache_flink_api_bridge_AbstractOclBridge_Initialize(JNI
 	    gCommandQueue = cl::CommandQueue(gContext, gDefaultDevice);
         CompileAndStoreOclKernels(vKernelsFolder, vKernelsfiles);
     }
-    catch(cl::Error* vError)
+    catch(cl::Error& vError)
     {
-        PrintClError(vError);
+        printError(vError);
         exit(1);
     }
 }
@@ -666,11 +674,11 @@ Java_org_apache_flink_api_bridge_AbstractOclBridge_OclFilter(
 {
     std::string vKernelName = GetStringFromJavaString(pEnv, pKernelName);
 
-    unsigned char* vStream;
-    int* vIndexes;
+    // unsigned char* vStream;
+    // int* vIndexes;
 
-    int vStreamLength, vIndexesLegth, vResultLength;
-    size_t vStreamSize, vIndexesSize, vResultSize;
+    // int vStreamLength, vIndexesLegth, vResultLength;
+    // size_t vStreamSize, vIndexesSize, vResultSize;
     OclFilterExecutionInfo *vKernelInfo = new OclFilterExecutionInfo(pEnv, pObj, pKernelName, pStream, pIndexes);
 
     RunKernel(vKernelInfo);
@@ -708,7 +716,7 @@ void DisposePrograms()
     //     clReleaseProgram(vEntry.second);
     //     vEntry.second.
     // }
-    // gProgrmasList.clear();
+    gProgrmasList.clear();
 }
 
 void DisposeDevices()
@@ -750,6 +758,8 @@ void CompileAndStoreOclKernel(std::string pKernelsFolder, std::string pKernelNam
     std::string vKernelName = GetKernelNameFromKernelFileName(pKernelName);
 
     std::string vSourceCode = GetKernelSourceCode(vFullName);
+
+    std::cout << "compiling kernel: " << vFullName << std::endl;
 
     cl::Program vProgram = CompileKernelProgram(vSourceCode);
 
@@ -809,8 +819,37 @@ cl::Program CompileKernelProgram(std::string pSourceCode)
     cl::Program::Sources vSources(1, std::make_pair( vSourceCode, pSourceCode.length()+1));
 	cl::Program vProgram(gContext, vSources);
 
-	vProgram.build(gDevices);
+    try
+    {
+	    vProgram.build(gDevices);
+    }
+    catch(cl::Error& vError)
+    {
+        std::cout << "build error" << std::endl;
+        std::cout << "devices: " << gDevices.size() << std::endl;
+        // if (vError->err() == CL_BUILD_PROGRAM_FAILURE || strcmp(vError->what(),"clBuildProgram"))
+        // {
+        for (cl::Device vDevice : gDevices)
+        {
+            std::cout << "device" << vDevice.getInfo<CL_DEVICE_NAME>() << std::endl;
+            // Check the build status
+            cl_build_status vStatus = vProgram.getBuildInfo<CL_PROGRAM_BUILD_STATUS>(vDevice);
+            if (vStatus != CL_BUILD_ERROR)
+                continue;
 
+            // Get the build log
+            std::string vName     = vDevice.getInfo<CL_DEVICE_NAME>();
+            std::string vBuildlog = vProgram.getBuildInfo<CL_PROGRAM_BUILD_LOG>(vDevice);
+            std::cout << "Build log for " << vName << ":" << std::endl
+                        << vBuildlog << std::endl;
+        }
+        throw vError;
+        // }
+        // else
+        // {
+        //     throw vError;
+        // }
+    }
     return vProgram;
 }
 

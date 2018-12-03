@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.apache.flink.api</OriginalElement>
+  <nodes>
+    <node x="638.0" y="880.0">org.apache.flink.api.engine.kernel.builder.ReduceBuilder</node>
+    <node x="910.0" y="1342.0">org.apache.flink.api.configuration.OclContextOptions</node>
+    <node x="1178.3512820512822" y="177.0">org.apache.flink.api.engine.kernel.builder.KernelBuilderOptions.KernelOptionsBuilder</node>
+    <node x="229.5" y="956.0">org.apache.flink.api.engine.kernel.line.VarDefinitionKernelLine</node>
+    <node x="1183.0" y="1342.0">org.apache.flink.api.engine.CppLibraryInfo</node>
+    <node x="605.0" y="1342.0">org.apache.flink.api.engine.BuildEngine</node>
+    <node x="29.5" y="1266.0">org.apache.flink.api.bridge.OclBridge</node>
+    <node x="221.0" y="1185.0">org.apache.flink.api.serialization.StreamWriter</node>
+    <node x="321.0" y="1466.0">org.apache.flink.api.engine.kernel.KernelCodeBuilderEngine</node>
+    <node x="687.4666666666667" y="153.0">org.apache.flink.api.serialization.StreamReader.IStreamReaderIterator</node>
+    <node x="181.0" y="1342.0">org.apache.flink.api.configuration.JsonTupleDefinitionsRepository</node>
+    <node x="1349.0" y="956.0">org.apache.flink.api.configuration.JsonTupleDefinition</node>
+    <node x="241.0" y="1109.0">org.apache.flink.api.engine.kernel.line.StringVarDefinitionLine</node>
+    <node x="584.0" y="1185.0">org.apache.flink.api.configuration.OclSettings</node>
+    <node x="249.66666666666669" y="546.0">org.apache.flink.api.engine.JsonUserFunctionCollection</node>
+    <node x="0.0" y="1466.0">org.apache.flink.api.engine.JsonUserFunctionRepositoryTest</node>
+    <node x="1178.3512820512822" y="0.0">org.apache.flink.api.engine.kernel.builder.KernelBuilderOptions</node>
+    <node x="45.41666666666666" y="0.0">org.apache.flink.api.engine.IUserFunction</node>
+    <node x="1114.0" y="956.0">org.apache.flink.api.bridge.OutputTupleInfo</node>
+    <node x="939.0" y="1185.0">org.apache.flink.api.configuration.JsonSettingsRepository</node>
+    <node x="1287.0" y="1185.0">org.apache.flink.api.serialization.StreamWriterResult</node>
+    <node x="816.4666666666667" y="0.0">org.apache.flink.api.serialization.StreamReader</node>
+    <node x="819.3512820512822" y="315.0">org.apache.flink.api.serialization.StreamReader.Tuple3Iterator</node>
+    <node x="0.0" y="405.0">org.apache.flink.api.engine.UserFunction</node>
+    <node x="1088.0" y="1466.0">org.apache.flink.api.configuration.OclKernelsOptions</node>
+    <node x="876.0" y="799.0">org.apache.flink.api.engine.kernel.builder.KernelBuilder.UTILITY_FUNCTIONS</node>
+    <node x="447.0" y="799.0">org.apache.flink.api.engine.kernel.builder.KernelBuilder.MACRO</node>
+    <node x="394.5" y="694.0">org.apache.flink.api.engine.kernel.builder.KernelBuilder</node>
+    <node x="163.0" y="799.0">org.apache.flink.api.engine.kernel.builder.KernelWithOutputTupleBuilder</node>
+    <node x="568.0" y="799.0">org.apache.flink.api.engine.kernel.builder.KernelWithoutOutputTupleBuilder</node>
+    <node x="5.666666666666657" y="498.0">org.apache.flink.api.engine.JsonUserFunction</node>
+    <node x="474.0" y="1109.0">org.apache.flink.api.engine.kernel.line.IntVarDefinitionLine</node>
+    <node x="155.5" y="880.0">org.apache.flink.api.engine.kernel.builder.MapBuilder</node>
+    <node x="1311.0" y="1466.0">org.apache.flink.api.serialization.StreamReaderTest</node>
+    <node x="0.0" y="799.0">org.apache.flink.api.engine.kernel.builder.KernelBuilder.MACRO_CALL</node>
+    <node x="308.1666666666667" y="393.0">org.apache.flink.api.engine.IUserFunctionCollection</node>
+    <node x="303.5" y="880.0">org.apache.flink.api.engine.kernel.builder.FilterBuilder</node>
+    <node x="709.0" y="956.0">org.apache.flink.api.engine.IUserFunctionsRepository</node>
+    <node x="986.3512820512822" y="315.0">org.apache.flink.api.serialization.StreamReader.Tuple1Iterator</node>
+    <node x="1089.0" y="1037.0">org.apache.flink.api.bridge.OutputTupleInfo.OutputTupleInfoBuilder</node>
+    <node x="709.0" y="1061.0">org.apache.flink.api.engine.JsonUserFunctionRepository</node>
+    <node x="0.0" y="1342.0">org.apache.flink.api.engine.kernel.OclKernel</node>
+    <node x="769.2166666666667" y="234.0">org.apache.flink.api.serialization.StreamReader.StreamIterator</node>
+    <node x="854.0" y="1466.0">org.apache.flink.api.engine.ITupleVariableAdder</node>
+    <node x="591.0" y="1466.0">org.apache.flink.api.configuration.JsonTupleDefinitionTest</node>
+    <node x="0.0" y="1185.0">org.apache.flink.api.bridge.AbstractOclBridge</node>
+    <node x="215.0" y="1542.0">org.apache.flink.api.engine.tuple.variable</node>
+    <node x="1404.0" y="1085.0">org.apache.flink.api.configuration.JsonTupleDefinition.Keys</node>
+    <node x="0.0" y="1542.0">org.apache.flink.api.serialization.StreamWriterTest</node>
+    <node x="581.0" y="1542.0">org.apache.flink.api.bridge.OclContext</node>
+    <node x="642.6666666666667" y="315.0">org.apache.flink.api.serialization.StreamReader.Tuple2Iterator</node>
+    <node x="752.0" y="1542.0">org.apache.flink.api.serialization.Types</node>
+    <node x="407.0" y="1542.0">org.apache.flink.api.serialization.Dimensions</node>
+    <node x="0.0" y="1109.0">org.apache.flink.api.engine.kernel.line.DoubleVarDefinitionLine</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.apache.flink.api.serialization.StreamReader.Tuple2Iterator" target="org.apache.flink.api.serialization.StreamReader">
+      <point x="-36.75" y="-15.5" />
+      <point x="679.4166666666667" y="295.0" />
+      <point x="667.9666666666667" y="295.0" />
+      <point x="667.9666666666667" y="123.0" />
+      <point x="833.1666666666667" y="123.0" />
+      <point x="-66.79999999999995" y="51.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.JsonUserFunctionCollection" target="org.apache.flink.api.engine.IUserFunctionCollection">
+      <point x="0.0" y="-27.5" />
+      <point x="0.0" y="27.5" />
+    </edge>
+    <edge source="org.apache.flink.api.configuration.JsonTupleDefinition.Keys" target="org.apache.flink.api.configuration.JsonTupleDefinition">
+      <point x="0.0" y="-15.5" />
+      <point x="0.0" y="39.5" />
+    </edge>
+    <edge source="org.apache.flink.api.serialization.StreamReader.Tuple2Iterator" target="org.apache.flink.api.serialization.StreamReader.StreamIterator">
+      <point x="36.75" y="-15.5" />
+      <point x="752.9166666666667" y="295.0" />
+      <point x="794.2166666666667" y="295.0" />
+      <point x="-50.0" y="15.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.kernel.line.StringVarDefinitionLine" target="org.apache.flink.api.engine.kernel.line.VarDefinitionKernelLine">
+      <point x="0.0" y="-15.5" />
+      <point x="0.0" y="51.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.kernel.builder.ReduceBuilder" target="org.apache.flink.api.engine.kernel.builder.KernelWithoutOutputTupleBuilder">
+      <point x="0.0" y="-15.5" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.kernel.line.DoubleVarDefinitionLine" target="org.apache.flink.api.engine.kernel.line.VarDefinitionKernelLine">
+      <point x="0.0" y="-15.5" />
+      <point x="110.5" y="1084.0" />
+      <point x="268.8333333333333" y="1084.0" />
+      <point x="-78.66666666666669" y="51.5" />
+    </edge>
+    <edge source="org.apache.flink.api.serialization.StreamReader.StreamIterator" target="org.apache.flink.api.serialization.StreamReader.IStreamReaderIterator">
+      <point x="-37.5" y="-15.5" />
+      <point x="806.7166666666667" y="209.0" />
+      <point x="788.4666666666667" y="209.0" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.kernel.builder.MapBuilder" target="org.apache.flink.api.engine.kernel.builder.KernelWithOutputTupleBuilder">
+      <point x="0.0" y="-15.5" />
+      <point x="219.5" y="855.0" />
+      <point x="229.0" y="855.0" />
+      <point x="-66.0" y="15.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.UserFunction" target="org.apache.flink.api.engine.IUserFunction">
+      <point x="5.6843418860808015E-14" y="-15.5" />
+      <point x="70.00000000000006" y="368.0" />
+      <point x="82.91666666666666" y="368.0" />
+      <point x="-75.0" y="171.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.kernel.builder.KernelBuilderOptions.KernelOptionsBuilder" target="org.apache.flink.api.engine.kernel.builder.KernelBuilderOptions">
+      <point x="0.0" y="-63.5" />
+      <point x="0.0" y="63.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.kernel.line.IntVarDefinitionLine" target="org.apache.flink.api.engine.kernel.line.VarDefinitionKernelLine">
+      <point x="0.0" y="-15.5" />
+      <point x="569.0" y="1084.0" />
+      <point x="426.1666666666667" y="1084.0" />
+      <point x="78.66666666666669" y="51.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.kernel.builder.KernelWithoutOutputTupleBuilder" target="org.apache.flink.api.engine.kernel.builder.KernelBuilder">
+      <point x="0.0" y="-15.5" />
+      <point x="712.0" y="779.0" />
+      <point x="538.7" y="779.0" />
+      <point x="41.200000000000045" y="27.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.kernel.builder.KernelBuilder.MACRO_CALL" target="org.apache.flink.api.engine.kernel.builder.KernelBuilder">
+      <point x="0.0" y="-15.5" />
+      <point x="71.5" y="769.0" />
+      <point x="415.1" y="769.0" />
+      <point x="-82.39999999999998" y="27.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.IUserFunctionCollection" target="org.apache.flink.api.engine.IUserFunction">
+      <point x="0.0" y="-27.5" />
+      <point x="423.6666666666667" y="368.0" />
+      <point x="232.91666666666666" y="368.0" />
+      <point x="75.0" y="171.5" />
+    </edge>
+    <edge source="org.apache.flink.api.serialization.StreamReader.Tuple3Iterator" target="org.apache.flink.api.serialization.StreamReader.StreamIterator">
+      <point x="-36.75" y="-15.5" />
+      <point x="856.1012820512822" y="295.0" />
+      <point x="844.2166666666667" y="295.0" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="org.apache.flink.api.serialization.StreamReader.Tuple1Iterator" target="org.apache.flink.api.serialization.StreamReader">
+      <point x="36.75" y="-15.5" />
+      <point x="1096.6012820512822" y="133.0" />
+      <point x="966.7666666666667" y="133.0" />
+      <point x="66.79999999999995" y="51.5" />
+    </edge>
+    <edge source="org.apache.flink.api.serialization.StreamReader.IStreamReaderIterator" target="org.apache.flink.api.serialization.StreamReader">
+      <point x="0.0" y="-15.5" />
+      <point x="788.4666666666667" y="133.0" />
+      <point x="866.5666666666668" y="133.0" />
+      <point x="-33.39999999999998" y="51.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.JsonUserFunction" target="org.apache.flink.api.engine.IUserFunction">
+      <point x="56.0" y="-75.5" />
+      <point x="173.66666666666666" y="473.0" />
+      <point x="150.5" y="473.0" />
+      <point x="150.5" y="368.0" />
+      <point x="157.91666666666666" y="368.0" />
+      <point x="0.0" y="171.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.JsonUserFunction" target="org.apache.flink.api.engine.UserFunction">
+      <point x="-56.0" y="-75.5" />
+      <point x="61.66666666666666" y="473.0" />
+      <point x="70.0" y="473.0" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.kernel.builder.KernelBuilder.MACRO" target="org.apache.flink.api.engine.kernel.builder.KernelBuilder">
+      <point x="0.0" y="-15.5" />
+      <point x="0.0" y="27.5" />
+    </edge>
+    <edge source="org.apache.flink.api.serialization.StreamReader.StreamIterator" target="org.apache.flink.api.serialization.StreamReader">
+      <point x="37.5" y="-15.5" />
+      <point x="881.7166666666667" y="209.0" />
+      <point x="899.9666666666667" y="209.0" />
+      <point x="0.0" y="51.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.kernel.builder.KernelWithOutputTupleBuilder" target="org.apache.flink.api.engine.kernel.builder.KernelBuilder">
+      <point x="0.0" y="-15.5" />
+      <point x="295.0" y="779.0" />
+      <point x="456.29999999999995" y="779.0" />
+      <point x="-41.200000000000045" y="27.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.JsonUserFunctionRepository" target="org.apache.flink.api.engine.IUserFunctionsRepository">
+      <point x="0.0" y="-27.5" />
+      <point x="0.0" y="27.5" />
+    </edge>
+    <edge source="org.apache.flink.api.bridge.OclBridge" target="org.apache.flink.api.bridge.AbstractOclBridge">
+      <point x="0.0" y="-15.5" />
+      <point x="0.0" y="15.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.kernel.builder.FilterBuilder" target="org.apache.flink.api.engine.kernel.builder.KernelWithOutputTupleBuilder">
+      <point x="0.0" y="-15.5" />
+      <point x="370.5" y="855.0" />
+      <point x="361.0" y="855.0" />
+      <point x="66.0" y="15.5" />
+    </edge>
+    <edge source="org.apache.flink.api.engine.kernel.builder.KernelBuilder.UTILITY_FUNCTIONS" target="org.apache.flink.api.engine.kernel.builder.KernelBuilder">
+      <point x="0.0" y="-15.5" />
+      <point x="969.5" y="769.0" />
+      <point x="579.9" y="769.0" />
+      <point x="82.39999999999998" y="27.5" />
+    </edge>
+    <edge source="org.apache.flink.api.serialization.StreamReader.Tuple3Iterator" target="org.apache.flink.api.serialization.StreamReader">
+      <point x="36.75" y="-15.5" />
+      <point x="929.6012820512822" y="295.0" />
+      <point x="933.4012820512821" y="295.0" />
+      <point x="33.39999999999998" y="51.5" />
+    </edge>
+    <edge source="org.apache.flink.api.serialization.StreamReader.Tuple1Iterator" target="org.apache.flink.api.serialization.StreamReader.StreamIterator">
+      <point x="-36.75" y="-15.5" />
+      <point x="1023.1012820512822" y="285.0" />
+      <point x="894.2166666666667" y="285.0" />
+      <point x="50.0" y="15.5" />
+    </edge>
+    <edge source="org.apache.flink.api.bridge.OutputTupleInfo.OutputTupleInfoBuilder" target="org.apache.flink.api.bridge.OutputTupleInfo">
+      <point x="0.0" y="-39.5" />
+      <point x="0.0" y="15.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="642.5" y="419.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Inner Classes</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

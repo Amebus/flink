@@ -42,6 +42,8 @@ public interface ITupleDefinition extends Iterable<TType>, Serializable
 	
 	Iterator<TType> cIterator();
 	
+	Iterator<TupleVarDefinition> tupleVarIterator();
+	
 	boolean equals(Object obj);
 	
 	default int getMaxDimension()

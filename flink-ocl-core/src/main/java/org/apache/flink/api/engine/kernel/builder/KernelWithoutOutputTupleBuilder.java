@@ -26,7 +26,7 @@ public abstract class KernelWithoutOutputTupleBuilder extends KernelBuilder
 			   getDeclarationLineForInteger(vDefinitions) +
 			   getDeclarationLineForDouble(vDefinitions) +
 			   getDeclarationLineForString(vDefinitions) +
-			   //getStringResultLengths() +
+//			   getStringResultLengths() +
 			   "\n";
 	}
 	

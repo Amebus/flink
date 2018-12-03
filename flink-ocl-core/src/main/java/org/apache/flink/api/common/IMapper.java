@@ -1,10 +1,10 @@
 package org.apache.flink.api.common;
 
-public interface IMapper<K, V, O>
+public interface IMapper<K, V, F>
 {
 	
-	V resolve(K pKey, O pOptions);
+	V resolve(K pKey);
 	
-	void register(K pKey, OnDemandLoader<V, O> pOnDemandLoaderContainer);
+	void register(K pKey, F pSupplier);
 	
 }

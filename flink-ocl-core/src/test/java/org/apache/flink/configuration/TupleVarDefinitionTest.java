@@ -2,9 +2,7 @@ package org.apache.flink.configuration;
 
 import org.junit.Test;
 
-import static org.apache.flink.streaming.helpers.TTypesGetter.getCTDouble;
-import static org.apache.flink.streaming.helpers.TTypesGetter.getCTString;
-import static org.apache.flink.streaming.helpers.TTypesGetter.getJavaTString;
+import static org.apache.flink.streaming.helpers.TTypesGetter.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -53,6 +51,81 @@ public class TupleVarDefinitionTest
 	{
 		TupleVarDefinition vDefinition1 = new TupleVarDefinition(getJavaTString().getT());
 		TupleVarDefinition vDefinition2 = new TupleVarDefinition(vDefinition1);
+		
+		assertEquals(vDefinition1, vDefinition2);
+		assertEquals(vDefinition2, vDefinition1);
+		
+		assertTrue(vDefinition1 != vDefinition2);
+		
+		assertEquals(vDefinition1.hashCode(), vDefinition2.hashCode());
+	}
+	
+	
+	@Test
+	public void TupleDefinition_WithIntegerIdentityValue_Ok()
+	{
+		String vIdentityValue = "10";
+		Integer vValue = Integer.valueOf(vIdentityValue);
+		TupleVarDefinition vDefinition1 = new TupleVarDefinition(getJavaTInteger().getT(), vIdentityValue);
+		TupleVarDefinition vDefinition2 = new TupleVarDefinition(vDefinition1);
+		
+		assertTrue(vDefinition1.isWithIdentityValue());
+		assertTrue(vDefinition2.isWithIdentityValue());
+		
+		assertEquals(vValue, vDefinition1.getIdentityValue());
+		assertEquals(vValue, vDefinition2.getIdentityValue());
+		
+		assertEquals(vValue, TupleIdentityHelper.getIntegerValue(vDefinition1));
+		assertEquals(vValue, TupleIdentityHelper.getIntegerValue(vDefinition2));
+		
+		assertEquals(vDefinition1, vDefinition2);
+		assertEquals(vDefinition2, vDefinition1);
+		
+		assertTrue(vDefinition1 != vDefinition2);
+		
+		assertEquals(vDefinition1.hashCode(), vDefinition2.hashCode());
+	}
+	
+	@Test
+	public void TupleDefinition_WithDoubleIdentityValue_Ok()
+	{
+		String vIdentityValue = "10.8";
+		Double vValue = Double.valueOf(vIdentityValue);
+		TupleVarDefinition vDefinition1 = new TupleVarDefinition(getJavaTDouble().getT(), vIdentityValue);
+		TupleVarDefinition vDefinition2 = new TupleVarDefinition(vDefinition1);
+		
+		assertTrue(vDefinition1.isWithIdentityValue());
+		assertTrue(vDefinition2.isWithIdentityValue());
+		
+		assertEquals(vValue, vDefinition1.getIdentityValue());
+		assertEquals(vValue, vDefinition2.getIdentityValue());
+		
+		assertEquals(vValue, TupleIdentityHelper.getDoubleValue(vDefinition1));
+		assertEquals(vValue, TupleIdentityHelper.getDoubleValue(vDefinition2));
+		
+		assertEquals(vDefinition1, vDefinition2);
+		assertEquals(vDefinition2, vDefinition1);
+		
+		assertTrue(vDefinition1 != vDefinition2);
+		
+		assertEquals(vDefinition1.hashCode(), vDefinition2.hashCode());
+	}
+	
+	@Test
+	public void TupleDefinition_WithStringIdentityValue_Ok()
+	{
+		String vIdentityValue = "ciccia";
+		TupleVarDefinition vDefinition1 = new TupleVarDefinition(getJavaTString().getT(), vIdentityValue);
+		TupleVarDefinition vDefinition2 = new TupleVarDefinition(vDefinition1);
+		
+		assertTrue(vDefinition1.isWithIdentityValue());
+		assertTrue(vDefinition2.isWithIdentityValue());
+		
+		assertEquals(vIdentityValue, vDefinition1.getIdentityValue());
+		assertEquals(vIdentityValue, vDefinition2.getIdentityValue());
+		
+		assertEquals(vIdentityValue, TupleIdentityHelper.getStringValue(vDefinition1));
+		assertEquals(vIdentityValue, TupleIdentityHelper.getStringValue(vDefinition2));
 		
 		assertEquals(vDefinition1, vDefinition2);
 		assertEquals(vDefinition2, vDefinition1);

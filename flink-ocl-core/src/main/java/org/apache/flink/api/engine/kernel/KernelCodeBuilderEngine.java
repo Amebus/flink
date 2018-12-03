@@ -1,10 +1,8 @@
 package org.apache.flink.api.engine.kernel;
 
-import org.apache.flink.api.common.OnDemandLoader;
-import org.apache.flink.api.common.mappers.StringKeyMapper;
+import org.apache.flink.api.common.mappers.StringKeyOnDemandLoadMapper;
 import org.apache.flink.api.engine.CppLibraryInfo;
 import org.apache.flink.api.engine.IUserFunction;
-import org.apache.flink.api.engine.kernel.OclKernel;
 import org.apache.flink.api.engine.kernel.builder.*;
 import org.apache.flink.configuration.ISettingsRepository;
 import org.apache.flink.configuration.ITupleDefinitionsRepository;
@@ -23,7 +21,7 @@ public class KernelCodeBuilderEngine
 	private ITupleDefinitionsRepository mTupleDefinitionsRepository;
 	private Iterable<? extends IUserFunction> mUserFunctions;
 	private KernelBuilderOptions.KernelOptionsBuilder mKernelBuilderOptionsBuilder;
-	private StringKeyMapper<KernelBuilder, KernelBuilderOptions> mTypeKernelBuilderMapper;
+	private StringKeyOnDemandLoadMapper<KernelBuilder, KernelBuilderOptions> mTypeKernelBuilderMapper;
 	
 	
 	public KernelCodeBuilderEngine(ISettingsRepository pSettingsRepository, ITupleDefinitionsRepository pTupleDefinitionsRepository, Iterable<? extends IUserFunction> pUserFunctions)
@@ -42,15 +40,15 @@ public class KernelCodeBuilderEngine
 	
 	private void setUpMapper()
 	{
-		mTypeKernelBuilderMapper = new StringKeyMapper<>();
+		mTypeKernelBuilderMapper = new StringKeyOnDemandLoadMapper<>();
 		
 		//Transformations
-		mTypeKernelBuilderMapper.register(IUserFunction.MAP, new OnDemandLoader<>(MapBuilder::new));
-		//mTypeKernelBuilderMapper.register(IUserFunction.FLAT_MAP, new OnDemandLoader<>(FlatMapBuilder::new));
-		mTypeKernelBuilderMapper.register(IUserFunction.FILTER, new OnDemandLoader<>(FilterBuilder::new));
+		mTypeKernelBuilderMapper.register(IUserFunction.MAP, MapBuilder::new);
+		//mTypeKernelBuilderMapper.register(IUserFunction.FLAT_MAP, FlatMapBuilder::new);
+		mTypeKernelBuilderMapper.register(IUserFunction.FILTER, FilterBuilder::new);
 		
 		//Actions
-		mTypeKernelBuilderMapper.register(IUserFunction.REDUCE, new OnDemandLoader<>(ReduceBuilder::new));
+		mTypeKernelBuilderMapper.register(IUserFunction.REDUCE, ReduceBuilder::new);
 	}
 	
 	public CppLibraryInfo generateKernels()
@@ -85,7 +83,7 @@ public class KernelCodeBuilderEngine
 							  Path vFile = pKernelsFolder.resolve(k.getName() + ".knl");
 							  List<String> lines = new ArrayList<>(1);
 							  lines.add(k.getCode());
-							  System.out.println(vFile.toAbsolutePath().toString());
+//							  System.out.println(vFile.toAbsolutePath().toString());
 							  try
 							  {
 								  if(Files.exists(vFile))

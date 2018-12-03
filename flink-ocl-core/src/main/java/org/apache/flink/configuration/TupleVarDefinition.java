@@ -6,16 +6,27 @@ public class TupleVarDefinition implements Serializable
 {
 	private JavaTType mJavaTType;
 	private CTType mCTType;
+	private Object mIdentityValue;
 	private transient int mHashCode;
 	
 	public TupleVarDefinition(String pVarType)
 	{
-		setInternalValues(pVarType);
+		setInternalValues(pVarType, null);
+	}
+	
+	public TupleVarDefinition(String pVarType, String pIdentityValue)
+	{
+		setInternalValues(pVarType, pIdentityValue);
 	}
 	
 	public TupleVarDefinition(TupleVarDefinition pVarDefinition)
 	{
-		setInternalValues(pVarDefinition.getJavaT());
+		Object vIdentityValue = pVarDefinition.getIdentityValue();
+		
+		if (vIdentityValue == null)
+			setInternalValues(pVarDefinition.getJavaT(), null);
+		else
+			setInternalValues(pVarDefinition.getJavaT(), vIdentityValue.toString());
 	}
 	
 	/**
@@ -36,16 +47,46 @@ public class TupleVarDefinition implements Serializable
 		return mCTType;
 	}
 	
-	private void setInternalValues(String pVarType)
+	public Object getIdentityValue()
 	{
-		setInternalValues(new CTType.Builder(pVarType).build());
+		return mIdentityValue;
 	}
 	
-	private void setInternalValues (TType pType)
+	public boolean isWithIdentityValue()
+	{
+		return mIdentityValue != null;
+	}
+	
+	private void setInternalValues(String pVarType, String pIdentityValue)
+	{
+		setInternalValues(new CTType.Builder(pVarType).build(), pIdentityValue);
+	}
+	
+	private void setInternalValues (TType pType, String pIdentityValue)
 	{
 		mCTType = new CTType.Builder(pType).build();
 		mJavaTType = new JavaTType.Builder(pType).build();
 		mHashCode = getJavaT().hashCode();
+		setIdentityValue(pIdentityValue);
+	}
+	
+	private void setIdentityValue(String pIdentityValue)
+	{
+		if (pIdentityValue == null)
+			return;
+		
+		if(mCTType.isString())
+		{
+			mIdentityValue = pIdentityValue;
+		}
+		else if(mCTType.isInteger())
+		{
+			mIdentityValue = Integer.valueOf(pIdentityValue);
+		}
+		else if (mCTType.isDouble())
+		{
+			mIdentityValue = Double.valueOf(pIdentityValue);
+		}
 	}
 	
 	@Override
@@ -71,6 +112,13 @@ public class TupleVarDefinition implements Serializable
 		}
 		TupleVarDefinition rhs = ((TupleVarDefinition) pOther);
 		
-		return getJavaT().equals(rhs.getJavaT());
+		boolean vResult = getJavaT().equals(rhs.getJavaT()) &&
+						  isWithIdentityValue() == rhs.isWithIdentityValue();
+		
+		if(vResult && isWithIdentityValue())
+		{
+			vResult = (getIdentityValue().equals(rhs.getIdentityValue()));
+		}
+		return vResult;
 	}
 }

@@ -58,9 +58,19 @@ public class JsonTupleDefinition extends AbstractTupleDefinition
 	{
 		mVarDefinitionMap = new HashMap<>();
 		int vI = 0;
-		for (TType vT : pDefinition)
+		Iterator<TupleVarDefinition> vIterator = pDefinition.tupleVarIterator();
+		while ( vIterator.hasNext())
 		{
-			mVarDefinitionMap.put(getKey(vI), new TupleVarDefinition(vT.getT()));
+			TupleVarDefinition vT = vIterator.next();
+			TupleVarDefinition vTToInsert;
+			
+			if(vT.getIdentityValue() == null)
+				vTToInsert = new TupleVarDefinition(vT.getCT().getT(), null);
+			else
+				vTToInsert = new TupleVarDefinition(vT.getCT().getT(), vT.getIdentityValue().toString());
+			
+			
+			mVarDefinitionMap.put(getKey(vI), vTToInsert);
 			vI++;
 		}
 	}
@@ -85,9 +95,20 @@ public class JsonTupleDefinition extends AbstractTupleDefinition
 		
 		mArity = (byte)pTypesMap.size();
 		
-		pTypesMap.forEach( (k,v) -> mVarDefinitionMap.put(k, new TupleVarDefinition(v)));
+		pTypesMap.forEach( (k,v) -> mVarDefinitionMap.put(k, getTupleVarDefinitionFromString(v)));
 		
 		computeHashCode();
+	}
+	
+	private TupleVarDefinition getTupleVarDefinitionFromString(String pString)
+	{
+		if(pString.contains("-"))
+		{
+			String[] vChunks = pString.split("-");
+			return new TupleVarDefinition(vChunks[0], vChunks[1]);
+		}
+		
+		return new TupleVarDefinition(pString);
 	}
 	
 	private void computeHashCode()
@@ -107,6 +128,12 @@ public class JsonTupleDefinition extends AbstractTupleDefinition
 	public Byte getArity()
 	{
 		return mArity;
+	}
+	
+	@Override
+	public Iterator<TupleVarDefinition> tupleVarIterator()
+	{
+		return mVarDefinitionMap.values().iterator();
 	}
 	
 	@Override

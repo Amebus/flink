@@ -126,7 +126,7 @@ public class StreamWriter
 					vDim += Dimensions.DOUBLE;
 					break;
 				case Types.STRING:
-					vDim += ((String)vT).length();
+					vDim += (((String)vT).length() + 1);
 				case Types.INT:
 					vDim += Dimensions.INT;
 			}
@@ -186,12 +186,12 @@ public class StreamWriter
 	private void insertString(byte[] pStream)
 	{
 		byte[] vStream = mTempString.getBytes();
-		insertStringLength(pStream, vStream.length);
+		insertStringLength(pStream, vStream.length + 1);
 		for (int i = 0; i < vStream.length && mIndex < pStream.length; i++, mIndex++)
 		{
 			pStream[mIndex] = vStream[i];
 		}
-		
+		pStream[mIndex++] = '\u0000';
 		// int vLength = pValue.length();
 		// insertStringLength(pStream, vLength);
 		// for (int i = 0; i < vLength && mIndex < pStream.length; i++, mIndex++)

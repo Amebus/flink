@@ -105,11 +105,11 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 												  "            t |= d[si];             \\\n" +
 												  "            r = (double)t;          \\\n";
 		
-		public static final String DESER_STRING = "#define DESER_STRING(d, si, rs, ri) \\\n" +
-												  "            DESER_INT(d, si, ri);   \\\n" +
-												  "            si++;                   \\\n" +
-												  "            rs = &d[si];            \\\n" +
-												  "            si+=ri;                 \\\n";
+		public static final String DESER_STRING = "#define DESER_STRING(d, si, rs, ri) 			\\\n" +
+												  "            DESER_INT(d, si, ri);   			\\\n" +
+												  "            si++;                   			\\\n" +
+												  "            rs = (__global unsigned char *)&d[si]; 	\\\n" +
+												  "            si+=ri;                 			\\\n";
 	}
 	
 	public static final class MACRO_CALL
@@ -199,6 +199,27 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 													   "    }\n" +
 													   "    return r;\n" +
 													   "}\n";
+		
+		public static final String GLOABL_STRING_TO_INTEGER = "int globalStringToInteger(__global char *s)\n" +
+															  "{\n" +
+															  "    const char z = '0';\n" +
+															  "    int r = 0, st = 0, p = 1;\n" +
+															  "    \n" +
+															  "    while(s[st] != '\\0')\n" +
+															  "    {\n" +
+															  "        st++;\n" +
+															  "    }\n" +
+															  "    for(int i = st-1; i >= 0 && s[i] != '-' ; i--)\n" +
+															  "    {\n" +
+															  "        r+=((s[i]-z)*p);\n" +
+															  "        p*=10;\n" +
+															  "    }\n" +
+															  "    if(s[0]=='-')\n" +
+															  "    {\n" +
+															  "        r*=-1;\n" +
+															  "    }\n" +
+															  "    return r;\n" +
+															  "}\n";
 		
 		public static final String FILL_STRING_WITH = "void fillStringWith(int si,int sl, char c, char *s)\n" +
 													  "{\n" +
@@ -318,7 +339,8 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 	{
 		return UTILITY_FUNCTIONS.FILL_STRING_WITH + "\n" +
 			   UTILITY_FUNCTIONS.INTEGER_TO_STRING + "\n" +
-			   UTILITY_FUNCTIONS.STRING_TO_INTEGER + "\n";
+			   UTILITY_FUNCTIONS.STRING_TO_INTEGER + "\n" +
+			   UTILITY_FUNCTIONS.GLOABL_STRING_TO_INTEGER + "\n";
 	}
 	
 	protected String getDeserializationMacroForInt()
@@ -380,6 +402,7 @@ public abstract class KernelBuilder implements IBuilder<OclKernel>
 		return "int " + G_ID + " = get_global_id(0);\n" +
 			   "unsigned char " + ARITY + " = " + dataOf(0) + ";\n" +
 			   "int " + INDEX + " = " + dataIndexOf(G_ID) + ";\n" +
+			   "int _userIndex = " + INDEX + ";\n" +
 			   "long " + LONG_TEMP + " = 0;" +
 			   "\n";
 	}

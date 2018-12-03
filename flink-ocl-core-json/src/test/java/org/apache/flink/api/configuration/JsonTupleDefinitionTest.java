@@ -2,6 +2,7 @@ package org.apache.flink.api.configuration;
 
 import org.apache.flink.configuration.ITupleDefinition;
 import org.apache.flink.configuration.TType;
+import org.apache.flink.configuration.TupleVarDefinition;
 import org.apache.flink.streaming.helpers.Constants;
 import org.junit.Test;
 
@@ -116,6 +117,13 @@ public class JsonTupleDefinitionTest
 								  });
 		
 		assertEquals(expectedCount, actualCount[0]);
+		
+		Iterator<TupleVarDefinition> vIterator = vTupleDefinition.tupleVarIterator();
+		
+		while (vIterator.hasNext())
+		{
+			assertTrue(vIterator.next().isWithIdentityValue());
+		}
 		
 		expectedCount = 1;
 		actualCount[0] = 0;

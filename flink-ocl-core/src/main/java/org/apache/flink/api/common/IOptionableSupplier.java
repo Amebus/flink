@@ -1,7 +1,7 @@
 package org.apache.flink.api.common;
 
 @FunctionalInterface
-public interface ISupplier<T>
+public interface IOptionableSupplier<T, O>
 {
-	T get();
+	T get(O pOptions);
 }
