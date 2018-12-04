@@ -125,13 +125,6 @@ public class KernelBuilder implements IBuilder<OclKernel>
 	
 	protected String getKernelCode()
 	{
-//		mVarTypes =
-//			StreamUtility
-//				.streamFrom(vKernelLogicalVariables)
-//				.map(KernelLogicalVariable::getVarType)
-//				.distinct()
-//				.collect(Collectors.toList());
-		
 		HashMap<String, Iterable<KernelLogicalVariable>> vKernelLogicalVariables
 			= translateVariablesToKernelLogicalVariables();
 		
