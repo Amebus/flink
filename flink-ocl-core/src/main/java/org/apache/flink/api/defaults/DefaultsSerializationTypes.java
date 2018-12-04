@@ -1,8 +1,8 @@
-package org.apache.flink.api.serialization;
+package org.apache.flink.api.defaults;
 
-public final class Types
+public final class DefaultsSerializationTypes
 {
-	private Types()
+	private DefaultsSerializationTypes()
 	{
 	
 	}

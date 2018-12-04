@@ -1,15 +1,21 @@
 package org.apache.flink.api.bridge;
 
+import org.apache.flink.api.serialization.StreamReader;
 import org.apache.flink.api.serialization.StreamWriter;
 import org.apache.flink.api.serialization.StreamWriterResult;
 import org.apache.flink.api.tuple.IOclTuple;
 
 public class OclBridge extends AbstractOclBridge
 {
+	private StreamReader mStreamReader;
+	private StreamWriter mStreamWriter;
 	
-	public OclBridge()
+	
+	public OclBridge(StreamWriter pStreamWriter, StreamReader pStreamReader)
 	{
 		super("OclBridge");
+		mStreamReader = pStreamReader;
+		mStreamWriter = pStreamWriter;
 	}
 	
 	public void initialize(String pKernelsFolders) { super.Initialize(pKernelsFolders); }
@@ -23,10 +29,10 @@ public class OclBridge extends AbstractOclBridge
 	public boolean[] filter(String pUserFunctionName, Iterable< ? extends IOclTuple> pTuples, int pTuplesCount)
 	{
 		StreamWriterResult vWriterResult =
-			StreamWriter.getStreamWriter()
-						.setTupleList(pTuples)
-						.setTupleListSize(pTuplesCount)
-						.writeStream();
+			mStreamWriter
+				.setTupleList(pTuples)
+				.setTupleListSize(pTuplesCount)
+				.writeStream();
 		
 		return super.OclFilter(pUserFunctionName, vWriterResult.getStream(), vWriterResult.getPositions());
 	}
@@ -38,10 +44,10 @@ public class OclBridge extends AbstractOclBridge
 					  int pInputTuplesCount)
 	{
 		StreamWriterResult vWriterResult =
-			StreamWriter.getStreamWriter()
-						.setTupleList(pTuples)
-						.setTupleListSize(pInputTuplesCount)
-						.writeStream();
+			mStreamWriter
+				.setTupleList(pTuples)
+				.setTupleListSize(pInputTuplesCount)
+				.writeStream();
 		
 		return super.OclMap(pUserFunctionName,
 							vWriterResult.getStream(),
@@ -57,10 +63,10 @@ public class OclBridge extends AbstractOclBridge
 						 int pInputTuplesCount)
 	{
 		StreamWriterResult vWriterResult =
-			StreamWriter.getStreamWriter()
-						.setTupleList(pTuples)
-						.setTupleListSize(pInputTuplesCount)
-						.writeStream();
+			mStreamWriter
+				.setTupleList(pTuples)
+				.setTupleListSize(pInputTuplesCount)
+				.writeStream();
 		
 		return super.OclReduce(pUserFunctionName,
 							   vWriterResult.getStream(),

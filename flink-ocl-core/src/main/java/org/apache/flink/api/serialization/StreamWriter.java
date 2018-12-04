@@ -1,6 +1,7 @@
 package org.apache.flink.api.serialization;
 
 
+import org.apache.flink.api.defaults.DefaultsSerializationTypes;
 import org.apache.flink.api.tuple.IOclTuple;
 
 public class StreamWriter
@@ -95,13 +96,13 @@ public class StreamWriter
 			switch (vT.getClass().getName())
 			{
 				case "java.lang.Integer":
-					vResult[vI++] = Types.INT;
+					vResult[vI++] = DefaultsSerializationTypes.INT;
 					break;
 				case "java.lang.Double":
-					vResult[vI++] = Types.DOUBLE;
+					vResult[vI++] = DefaultsSerializationTypes.DOUBLE;
 					break;
 				case "java.lang.String":
-					vResult[vI++] = Types.STRING;
+					vResult[vI++] = DefaultsSerializationTypes.STRING;
 					break;
 				default:
 					throw new IllegalArgumentException("Object type not recognized, unable to serialize it");
@@ -122,12 +123,12 @@ public class StreamWriter
 			vT = pTuple.getFieldOcl(i);
 			switch (mVarTypes[vIndex++])
 			{
-				case Types.DOUBLE:
+				case DefaultsSerializationTypes.DOUBLE:
 					vDim += Dimensions.DOUBLE;
 					break;
-				case Types.STRING:
+				case DefaultsSerializationTypes.STRING:
 					vDim += (((String)vT).length() + 1);
-				case Types.INT:
+				case DefaultsSerializationTypes.INT:
 					vDim += Dimensions.INT;
 			}
 		}
@@ -144,15 +145,15 @@ public class StreamWriter
 		{
 			switch (mVarTypes[i])
 			{
-				case Types.INT:
+				case DefaultsSerializationTypes.INT:
 					mTempInteger = pTuple.getField(i);
 					insertInt(pStream);
 					break;
-				case Types.DOUBLE:
+				case DefaultsSerializationTypes.DOUBLE:
 					mTempDouble = pTuple.getField(i);
 					insertDouble(pStream);
 					break;
-				case Types.STRING:
+				case DefaultsSerializationTypes.STRING:
 					mTempString = pTuple.getField(i);
 					insertString(pStream);
 					break;

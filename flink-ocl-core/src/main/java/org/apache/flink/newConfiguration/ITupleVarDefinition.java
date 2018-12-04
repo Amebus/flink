@@ -1,4 +1,4 @@
-package org.apache.flink.api.newConfiguration;
+package org.apache.flink.newConfiguration;
 
 public interface ITupleVarDefinition
 {
@@ -9,4 +9,6 @@ public interface ITupleVarDefinition
 	<T> T getIdentityValue();
 	
 	boolean hasIdentityValue();
+	
+	int getIndex();
 }

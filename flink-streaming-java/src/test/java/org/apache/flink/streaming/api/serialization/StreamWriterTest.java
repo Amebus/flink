@@ -1,9 +1,9 @@
 package org.apache.flink.streaming.api.serialization;
 
+import org.apache.flink.api.defaults.DefaultsSerializationTypes;
 import org.apache.flink.api.serialization.Dimensions;
 import org.apache.flink.api.serialization.StreamWriter;
 import org.apache.flink.api.serialization.StreamWriterResult;
-import org.apache.flink.api.serialization.Types;
 import org.apache.flink.api.tuple.Tuple1Ocl;
 import org.apache.flink.api.tuple.Tuple2Ocl;
 import org.junit.Test;
@@ -71,7 +71,7 @@ public class StreamWriterTest
 		assertEquals(6, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
-		assertEquals(Types.INT, vStream[1]);
+		assertEquals(DefaultsSerializationTypes.INT, vStream[1]);
 	}
 	
 	
@@ -85,7 +85,7 @@ public class StreamWriterTest
 		assertEquals(10, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
-		assertEquals(Types.DOUBLE, vStream[1]);
+		assertEquals(DefaultsSerializationTypes.DOUBLE, vStream[1]);
 	}
 	
 	@Test
@@ -98,7 +98,7 @@ public class StreamWriterTest
 		assertEquals(2 + 4 + STV_0.length() + 1, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
-		assertEquals(Types.STRING, vStream[1]);
+		assertEquals(DefaultsSerializationTypes.STRING, vStream[1]);
 		
 		byte[] vStringLength = Arrays.copyOfRange(vStream, 2, 6);
 		
@@ -115,8 +115,8 @@ public class StreamWriterTest
 		assertEquals(11, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
-		assertEquals(Types.INT, vStream[1]);
-		assertEquals(Types.INT, vStream[2]);
+		assertEquals(DefaultsSerializationTypes.INT, vStream[1]);
+		assertEquals(DefaultsSerializationTypes.INT, vStream[2]);
 	}
 	
 	@Test
@@ -128,8 +128,8 @@ public class StreamWriterTest
 		assertEquals(15, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
-		assertEquals(Types.INT, vStream[1]);
-		assertEquals(Types.DOUBLE, vStream[2]);
+		assertEquals(DefaultsSerializationTypes.INT, vStream[1]);
+		assertEquals(DefaultsSerializationTypes.DOUBLE, vStream[2]);
 	}
 	
 	@Test
@@ -141,8 +141,8 @@ public class StreamWriterTest
 		assertEquals(11 + STV_2.length() + 1, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
-		assertEquals(Types.INT, vStream[1]);
-		assertEquals(Types.STRING, vStream[2]);
+		assertEquals(DefaultsSerializationTypes.INT, vStream[1]);
+		assertEquals(DefaultsSerializationTypes.STRING, vStream[2]);
 	}
 	
 	@Test
@@ -154,8 +154,8 @@ public class StreamWriterTest
 		assertEquals(15, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
-		assertEquals(Types.DOUBLE, vStream[1]);
-		assertEquals(Types.INT, vStream[2]);
+		assertEquals(DefaultsSerializationTypes.DOUBLE, vStream[1]);
+		assertEquals(DefaultsSerializationTypes.INT, vStream[2]);
 	}
 	
 	@Test
@@ -167,8 +167,8 @@ public class StreamWriterTest
 		assertEquals(19, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
-		assertEquals(Types.DOUBLE, vStream[1]);
-		assertEquals(Types.DOUBLE, vStream[2]);
+		assertEquals(DefaultsSerializationTypes.DOUBLE, vStream[1]);
+		assertEquals(DefaultsSerializationTypes.DOUBLE, vStream[2]);
 	}
 	
 	@Test
@@ -180,8 +180,8 @@ public class StreamWriterTest
 		assertEquals(15 + STV_2.length() + 1, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
-		assertEquals(Types.DOUBLE, vStream[1]);
-		assertEquals(Types.STRING, vStream[2]);
+		assertEquals(DefaultsSerializationTypes.DOUBLE, vStream[1]);
+		assertEquals(DefaultsSerializationTypes.STRING, vStream[2]);
 	}
 	
 	@Test
@@ -193,8 +193,8 @@ public class StreamWriterTest
 		assertEquals(1 + 10 + STV_1.length() + STV_2.length() + 2, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
-		assertEquals(Types.STRING, vStream[1]);
-		assertEquals(Types.STRING, vStream[2]);
+		assertEquals(DefaultsSerializationTypes.STRING, vStream[1]);
+		assertEquals(DefaultsSerializationTypes.STRING, vStream[2]);
 	}
 	
 	@Test
@@ -206,8 +206,8 @@ public class StreamWriterTest
 		assertEquals(1 + 10 + STV_1.length() + 1, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
-		assertEquals(Types.STRING, vStream[1]);
-		assertEquals(Types.INT, vStream[2]);
+		assertEquals(DefaultsSerializationTypes.STRING, vStream[1]);
+		assertEquals(DefaultsSerializationTypes.INT, vStream[2]);
 	}
 	
 	@Test
@@ -219,8 +219,8 @@ public class StreamWriterTest
 		assertEquals(1 + 14 + STV_1.length() + 1, vStream.length);
 		
 		assertEquals(vTuple.getArityOcl(), vStream[0]);
-		assertEquals(Types.STRING, vStream[1]);
-		assertEquals(Types.DOUBLE, vStream[2]);
+		assertEquals(DefaultsSerializationTypes.STRING, vStream[1]);
+		assertEquals(DefaultsSerializationTypes.DOUBLE, vStream[2]);
 	}
 	
 	@Test
@@ -240,6 +240,6 @@ public class StreamWriterTest
 		assertEquals( vList.size() , vTupleIndexes.length);
 		
 		assertEquals( 1, vStream[0]);
-		assertEquals( Types.INT, vStream[1]);
+		assertEquals(DefaultsSerializationTypes.INT, vStream[1]);
 	}
 }

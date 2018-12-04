@@ -4,8 +4,11 @@ import com.sun.org.apache.xerces.internal.impl.xpath.regex.RegularExpression;
 import org.apache.flink.api.common.*;
 import org.apache.flink.api.common.comparers.StringKeyCaseInsenstiveComparer;
 import org.apache.flink.api.common.mappers.StringKeyMapper;
-import org.apache.flink.api.newConfiguration.tuple.TupleDefinition;
-import org.apache.flink.api.newConfiguration.tuple.TupleVarDefinition;
+import org.apache.flink.newConfiguration.ITupleDefinition;
+import org.apache.flink.newConfiguration.ITupleDefinitionRepository;
+import org.apache.flink.newConfiguration.ITupleVarDefinition;
+import org.apache.flink.newConfiguration.tuple.TupleDefinition;
+import org.apache.flink.newConfiguration.tuple.TupleVarDefinition;
 
 import java.util.*;
 
@@ -131,13 +134,15 @@ public class JsonTupleRepository implements ITupleDefinitionRepository
 		
 		pTupleVarDefinitions = new ArrayList<>(pTypesMap.size());
 		
+		final int[] vIndex = {0};
 		pTypesMap.forEach( (k,v) ->
 						   {
 							   String[] vChunks = v.split(mTupleVarOptionsSeparatorSequenceRegex);
 							   ITupleVariableExtractor vExtractor = mTupleVariableExtractors
 								   .resolve(vChunks[0]);
 							   pTupleVarDefinitions.add(vExtractor
-															.getTupleVarDefinition(vChunks));
+															.getTupleVarDefinition(vChunks, vIndex[0]));
+							   vIndex[0]++;
 						   });
 		
 		return new TupleDefinition(pName, pTupleVarDefinitions);
@@ -232,7 +237,7 @@ public class JsonTupleRepository implements ITupleDefinitionRepository
 	
 	public interface ITupleVariableExtractor
 	{
-		ITupleVarDefinition getTupleVarDefinition(String[] pVarDefinitionChunks);
+		ITupleVarDefinition getTupleVarDefinition(String[] pVarDefinitionChunks, int pIndex);
 		
 		Iterable<String> getRecognizedNameTypes();
 		
@@ -277,7 +282,7 @@ public class JsonTupleRepository implements ITupleDefinitionRepository
 		}
 		
 		@Override
-		public ITupleVarDefinition getTupleVarDefinition(String[] pVarDefinitionChunks)
+		public ITupleVarDefinition getTupleVarDefinition(String[] pVarDefinitionChunks, int pIndex)
 		{
 			Integer vIdentityValue = null;
 			
@@ -286,7 +291,11 @@ public class JsonTupleRepository implements ITupleDefinitionRepository
 				vIdentityValue = Integer.valueOf(pVarDefinitionChunks[1].substring(1));
 			}
 			
-			return new TupleVarDefinition(getTupleEngineType(), getDefaultMaxReservedBytes(), vIdentityValue);
+			return new TupleVarDefinition(
+				getTupleEngineType(),
+				getDefaultMaxReservedBytes(),
+				vIdentityValue,
+				pIndex);
 		}
 		
 		@Override
@@ -315,7 +324,7 @@ public class JsonTupleRepository implements ITupleDefinitionRepository
 		}
 		
 		@Override
-		public ITupleVarDefinition getTupleVarDefinition(String[] pVarDefinitionChunks)
+		public ITupleVarDefinition getTupleVarDefinition(String[] pVarDefinitionChunks, int pIndex)
 		{
 			Double vIdentityValue = null;
 			
@@ -324,7 +333,11 @@ public class JsonTupleRepository implements ITupleDefinitionRepository
 				vIdentityValue = Double.valueOf(pVarDefinitionChunks[1].substring(1));
 			}
 			
-			return new TupleVarDefinition(getTupleEngineType(), getDefaultMaxReservedBytes(), vIdentityValue);
+			return new TupleVarDefinition(
+				getTupleEngineType(),
+				getDefaultMaxReservedBytes(),
+				vIdentityValue,
+				pIndex);
 		}
 		
 		@Override
@@ -360,7 +373,7 @@ public class JsonTupleRepository implements ITupleDefinitionRepository
 		}
 		
 		@Override
-		public ITupleVarDefinition getTupleVarDefinition(String[] pVarDefinitionChunks)
+		public ITupleVarDefinition getTupleVarDefinition(String[] pVarDefinitionChunks, int pIndex)
 		{
 			String vOpt;
 			String vIdentityValue = null;
@@ -380,7 +393,11 @@ public class JsonTupleRepository implements ITupleDefinitionRepository
 				}
 			}
 			
-			return new TupleVarDefinition(getTupleEngineType(), vMaxReservedBytes, vIdentityValue);
+			return new TupleVarDefinition(
+				getTupleEngineType(),
+				vMaxReservedBytes,
+				vIdentityValue,
+				pIndex);
 		}
 		
 		@Override

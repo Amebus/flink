@@ -21,7 +21,7 @@ package org.apache.flink.api.java.summarize;
 import org.apache.flink.annotation.PublicEvolving;
 
 /**
- * Generic Column Summary for Numeric Types.
+ * Generic Column Summary for Numeric DefaultsSerializationTypes.
  *
  * <p>Some values are considered "missing" where "missing" is defined as null, NaN, or Infinity.
  * These values are ignored in some calculations like mean, variance, and standardDeviation.

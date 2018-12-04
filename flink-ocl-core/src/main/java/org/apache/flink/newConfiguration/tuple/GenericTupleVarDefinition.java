@@ -1,18 +1,24 @@
-package org.apache.flink.api.newConfiguration.tuple;
+package org.apache.flink.newConfiguration.tuple;
 
-import org.apache.flink.api.newConfiguration.ITupleVarDefinition;
+import org.apache.flink.newConfiguration.ITupleVarDefinition;
 
 public abstract class GenericTupleVarDefinition implements ITupleVarDefinition
 {
 	private String mType;
 	private int mMaxReservedBytes;
 	private Object mIdentityValue;
+	private int mIndex;
 	
-	protected GenericTupleVarDefinition(String pType, int pMaxReservedBytes, Object pIdentityValue)
+	protected GenericTupleVarDefinition(
+		String pType,
+		int pMaxReservedBytes,
+		Object pIdentityValue,
+		int pIndex)
 	{
 		setType(pType);
 		setMaxReservedBytes(pMaxReservedBytes);
 		setIdentityValue(pIdentityValue);
+		setIndex(pIndex);
 	}
 	
 	protected void setType(String pType)
@@ -27,7 +33,10 @@ public abstract class GenericTupleVarDefinition implements ITupleVarDefinition
 	{
 		mIdentityValue = pIdentityValue;
 	}
-	
+	protected void setIndex(int pIndex)
+	{
+		mIndex = pIndex;
+	}
 	
 	@Override
 	public String getType()
@@ -52,5 +61,11 @@ public abstract class GenericTupleVarDefinition implements ITupleVarDefinition
 	public boolean hasIdentityValue()
 	{
 		return mIdentityValue != null;
+	}
+	
+	@Override
+	public int getIndex()
+	{
+		return 0;
 	}
 }

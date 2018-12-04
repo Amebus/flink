@@ -1,5 +1,7 @@
 package org.apache.flink.api.newConfiguration;
 
+import org.apache.flink.newConfiguration.ITupleDefinition;
+import org.apache.flink.newConfiguration.ITupleDefinitionRepository;
 import org.apache.flink.streaming.helpers.Constants;
 import org.junit.Test;
 

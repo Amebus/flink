@@ -21,7 +21,7 @@ package org.apache.flink.api.java.utils;
 import org.apache.flink.annotation.PublicEvolving;
 
 /**
- * Types the parameters of managed with {@link RequiredParameters} can take.
+ * DefaultsSerializationTypes the parameters of managed with {@link RequiredParameters} can take.
  *
  * <p>Name maps directly to the corresponding Java type.
  */

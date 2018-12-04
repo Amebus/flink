@@ -36,7 +36,7 @@ public class SelectByMaxFunction<T extends Tuple> implements ReduceFunction<T> {
 
 	/**
 	 * Constructor which is overwriting the default constructor.
-	 * @param type Types of tuple whether to check if given fields are key types.
+	 * @param type DefaultsSerializationTypes of tuple whether to check if given fields are key types.
 	 * @param fields Array of integers which are used as key for comparison. The order of indexes
 	 * is regarded in the reduce function. First index has highest priority and last index has
 	 * least priority.

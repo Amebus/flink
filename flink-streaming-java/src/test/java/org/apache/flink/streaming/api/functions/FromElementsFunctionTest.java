@@ -214,7 +214,7 @@ public class FromElementsFunctionTest {
 
 
 	// ------------------------------------------------------------------------
-	//  Test Types
+	//  Test DefaultsSerializationTypes
 	// ------------------------------------------------------------------------
 
 	private static class MyPojo {

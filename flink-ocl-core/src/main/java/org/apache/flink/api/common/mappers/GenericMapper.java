@@ -35,4 +35,14 @@ public abstract class GenericMapper<K, V, F> implements IMapper<K, V, F>
 		mMap.put(mComparer.getNew(pKey), pGetValueFunction);
 	}
 	
+	@Override
+	public boolean containsKey(K pKey)
+	{
+		return mMap.containsKey(mComparer.setValue(pKey));
+	}
+	
+	public IMapperKeyComparerWrapper<K> getComparer()
+	{
+		return mComparer;
+	}
 }

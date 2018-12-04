@@ -35,6 +35,12 @@ public abstract class AbstractOptionableMapper<K, V, F, O>
 		mMap.put(mComparer.getNew(pKey), pGetValueFunction);
 	}
 	
+	@Override
+	public boolean containsKey(K pKey)
+	{
+		return mMap.containsKey(mComparer.setValue(pKey));
+	}
+	
 	public IMapperKeyComparerWrapper<K> getComparer()
 	{
 		return mComparer;

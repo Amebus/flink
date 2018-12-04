@@ -1,4 +1,4 @@
-package org.apache.flink.api.newConfiguration;
+package org.apache.flink.newConfiguration;
 
 public interface ITupleDefinition extends Iterable<ITupleVarDefinition>
 {
