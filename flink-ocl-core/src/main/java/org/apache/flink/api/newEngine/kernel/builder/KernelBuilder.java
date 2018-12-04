@@ -5,6 +5,7 @@ import org.apache.flink.api.common.mappers.StringKeyMapper;
 import org.apache.flink.api.common.utility.StreamUtility;
 import org.apache.flink.api.engine.IUserFunction;
 import org.apache.flink.api.engine.kernel.OclKernel;
+import org.apache.flink.api.newEngine.kernel.builder.mappers.*;
 import org.apache.flink.configuration.IOclContextOptions;
 import org.apache.flink.configuration.IOclKernelsOptions;
 import org.apache.flink.newConfiguration.ITupleDefinitionRepository;
@@ -25,20 +26,20 @@ public class KernelBuilder implements IBuilder<OclKernel>
 	private IUtilityVariablesGetter mUtilityVariablesGetter;
 	
 	//Key -> tupleKinds
-	private StringKeyMapper<IKernelVariablesGenerator> mTupleKindsToVriablesGeneratorMapping;
+	private TupleKindsToVariablesGeneratorMapper mTupleKindsToVariablesGeneratorMapping;
 	private Iterable<String> mTupleKinds;
 	
 	//Key -> varTypes
-	private StringKeyMapper<IKernelVariablesLineGenerator> mVarTypeToKernelVariablesLineMapping;
+	private TypeToKernelVariablesLineMapper mVarTypeToKernelVariablesLineMapping;
 	private Iterable<String> mVarTypes;
 	
 	//Key -> tupleKinds + varTypes generated with ITupleKindVariableTypeKeyCalculator
 	private ITupleKindVariableTypeKeyCalculator mVariableSerDeserKeyCalculator;
-	private StringKeyMapper<IVariableDeserialization> mTupleKindsVarTypesToVariableDeserializationMapping;
-	private StringKeyMapper<IVariableSerialization>  mTupleKindsVarTypesToVariableSerializationMapping;
+	private TupleKindsVarTypesToVariableDeserializationMapper mTupleKindsVarTypesToVariableDeserializationMapping;
+	private TupleKindsVarTypesToVariableSerializationMapper mTupleKindsVarTypesToVariableSerializationMapping;
 	
 	//
-	private StringKeyMapper<String> mTupleKindVarTypeToKernelTypeMapping;
+	private TupleKindVarTypeToKernelTypeMapper mTupleKindVarTypeToKernelTypeMapping;
 	
 	public KernelBuilder(KernelBuilderOptions pKernelBuilderOptions)
 	{
@@ -71,9 +72,9 @@ public class KernelBuilder implements IBuilder<OclKernel>
 		return mOclKernelOptions;
 	}
 	
-	public StringKeyMapper<IKernelVariablesGenerator> getTupleKindsToVriablesGeneratorMapping()
+	public TupleKindsToVariablesGeneratorMapper getTupleKindsToVariablesGeneratorMapping()
 	{
-		return mTupleKindsToVriablesGeneratorMapping;
+		return mTupleKindsToVariablesGeneratorMapping;
 	}
 	
 	public Iterable<String> getTupleKinds()
@@ -81,7 +82,7 @@ public class KernelBuilder implements IBuilder<OclKernel>
 		return mTupleKinds;
 	}
 	
-	public StringKeyMapper<IKernelVariablesLineGenerator> getVarTypeToKernelVariablesLineMapping()
+	public TypeToKernelVariablesLineMapper getVarTypeToKernelVariablesLineMapping()
 	{
 		return mVarTypeToKernelVariablesLineMapping;
 	}
@@ -96,17 +97,17 @@ public class KernelBuilder implements IBuilder<OclKernel>
 		return mVariableSerDeserKeyCalculator;
 	}
 	
-	public StringKeyMapper<IVariableDeserialization> getTupleKindsVarTypesToVariableDeserializationMapping()
+	public TupleKindsVarTypesToVariableDeserializationMapper getTupleKindsVarTypesToVariableDeserializationMapping()
 	{
 		return mTupleKindsVarTypesToVariableDeserializationMapping;
 	}
 	
-	public StringKeyMapper<IVariableSerialization> getTupleKindsVarTypesToVariableSerializationMapping()
+	public TupleKindsVarTypesToVariableSerializationMapper getTupleKindsVarTypesToVariableSerializationMapping()
 	{
 		return mTupleKindsVarTypesToVariableSerializationMapping;
 	}
 	
-	public StringKeyMapper<String> getTupleKindVarTypeToKernelTypeMapping()
+	public TupleKindVarTypeToKernelTypeMapper getTupleKindVarTypeToKernelTypeMapping()
 	{
 		return mTupleKindVarTypeToKernelTypeMapping;
 	}
@@ -258,7 +259,7 @@ public class KernelBuilder implements IBuilder<OclKernel>
 		forEachTupleKind(pTupleKind ->
 						 {
 							 Iterable<KernelLogicalVariable> vVariables =
-								 mTupleKindsToVriablesGeneratorMapping
+								 mTupleKindsToVariablesGeneratorMapping
 									 .resolve(pTupleKind)
 									 .getKernelLogicalVariables(vUserFunction, vRepository);
 			
