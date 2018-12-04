@@ -1,12 +1,13 @@
 package org.apache.flink.api.newEngine;
 
+import org.apache.flink.api.engine.IUserFunction;
 import org.apache.flink.api.engine.JsonUserFunction;
+import org.apache.flink.api.engine.JsonUserFunctionRepository;
 import org.apache.flink.streaming.helpers.Constants;
 import org.junit.Test;
 
 import java.util.Collection;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

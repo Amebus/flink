@@ -1,9 +1,9 @@
 package org.apache.flink.api.engine.kernel;
 
-import org.apache.flink.api.common.mappers.StringKeyOnDemandLoadMapper;
 import org.apache.flink.api.engine.CppLibraryInfo;
 import org.apache.flink.api.engine.IUserFunction;
-import org.apache.flink.api.engine.kernel.builder.*;
+import org.apache.flink.api.engine.kernel.builder.KernelBuilderOptions;
+import org.apache.flink.api.engine.mappings.FunctionKernelBuilderMapping;
 import org.apache.flink.configuration.ISettingsRepository;
 import org.apache.flink.configuration.ITupleDefinitionsRepository;
 
@@ -21,34 +21,24 @@ public class KernelCodeBuilderEngine
 	private ITupleDefinitionsRepository mTupleDefinitionsRepository;
 	private Iterable<? extends IUserFunction> mUserFunctions;
 	private KernelBuilderOptions.KernelOptionsBuilder mKernelBuilderOptionsBuilder;
-	private StringKeyOnDemandLoadMapper<KernelBuilder, KernelBuilderOptions> mTypeKernelBuilderMapper;
+	private FunctionKernelBuilderMapping mTypeKernelBuilderMapper;
 	
 	
-	public KernelCodeBuilderEngine(ISettingsRepository pSettingsRepository, ITupleDefinitionsRepository pTupleDefinitionsRepository, Iterable<? extends IUserFunction> pUserFunctions)
+	public KernelCodeBuilderEngine(
+		ISettingsRepository pSettingsRepository,
+		ITupleDefinitionsRepository pTupleDefinitionsRepository,
+		Iterable<? extends IUserFunction> pUserFunctions,
+		FunctionKernelBuilderMapping pFunctionKernelBuilderMapping)
 	{
 		mSettingsRepository = pSettingsRepository;
 		mTupleDefinitionsRepository = pTupleDefinitionsRepository;
 		mUserFunctions = pUserFunctions;
+		mTypeKernelBuilderMapper = pFunctionKernelBuilderMapping;
 		
 		mKernelBuilderOptionsBuilder = new KernelBuilderOptions.KernelOptionsBuilder()
 			.setTupleDefinitionsRepository(mTupleDefinitionsRepository)
 			.setContextOptions(mSettingsRepository.getContextOptions())
 			.setKernelOptions(mSettingsRepository.getKernelsOptions());
-		
-		setUpMapper();
-	}
-	
-	private void setUpMapper()
-	{
-		mTypeKernelBuilderMapper = new StringKeyOnDemandLoadMapper<>();
-		
-		//Transformations
-		mTypeKernelBuilderMapper.register(IUserFunction.MAP, MapBuilder::new);
-		//mTypeKernelBuilderMapper.register(IUserFunction.FLAT_MAP, FlatMapBuilder::new);
-		mTypeKernelBuilderMapper.register(IUserFunction.FILTER, FilterBuilder::new);
-		
-		//Actions
-		mTypeKernelBuilderMapper.register(IUserFunction.REDUCE, ReduceBuilder::new);
 	}
 	
 	public CppLibraryInfo generateKernels()

@@ -34,4 +34,9 @@ public abstract class AbstractOptionableMapper<K, V, F, O>
 	{
 		mMap.put(mComparer.getNew(pKey), pGetValueFunction);
 	}
+	
+	public IMapperKeyComparerWrapper<K> getComparer()
+	{
+		return mComparer;
+	}
 }

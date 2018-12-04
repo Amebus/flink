@@ -1,6 +1,6 @@
 package org.apache.flink.api.newConfiguration;
 
-public interface ItupleDefinitionRepository
+public interface ITupleDefinitionRepository
 {
 	int getTupleSupportedMaxArity();
 	int getTupleSupportedMinArity();

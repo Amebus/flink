@@ -1,6 +1,6 @@
-package org.apache.flink.api.newEngine.user.functions;
+package org.apache.flink.api.engine.functions;
 
-import org.apache.flink.api.newEngine.IUserFunction;
+import org.apache.flink.api.engine.IUserFunction;
 
 public abstract class GenericUserFunction implements IUserFunction
 {

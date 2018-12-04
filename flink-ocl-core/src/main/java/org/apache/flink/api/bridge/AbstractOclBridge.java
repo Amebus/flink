@@ -33,6 +33,14 @@ public abstract class AbstractOclBridge implements Serializable
 	 */
 	protected final native byte[] OclMap(String pKernelName, byte[] pData, int[] pIndexes,
 										 int pOutputTupleDimension, byte[] pOutputTupleSignature);
+	
+	/**
+	 *
+	 * @param pKernelName
+	 * @param pData
+	 * @param pIndexes
+	 * @return
+	 */
 	protected final native boolean[] OclFilter(String pKernelName, byte[] pData, int[] pIndexes);
 	
 	//Actions

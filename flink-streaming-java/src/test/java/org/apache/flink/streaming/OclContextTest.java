@@ -1,5 +1,6 @@
 package org.apache.flink.streaming;
 
+import org.apache.flink.api.defaults.DefaultOclContextMappings;
 import org.apache.flink.api.bridge.OclContext;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
@@ -31,17 +32,25 @@ import java.util.stream.Collectors;
 
 public class OclContextTest
 {
+	
+	private OclContext getOclContext(String pFileName)
+	{
+		return new OclContext(new JsonSettingsRepository(Constants.RESOURCES_DIR),
+					   new JsonTupleDefinitionsRepository(Constants.RESOURCES_DIR),
+					   new JsonUserFunctionRepository
+						   .Builder(Constants.FUNCTIONS_DIR)
+						   .setFileName(pFileName).build(),
+					   new DefaultOclContextMappings());
+	}
+	
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 	
 	
-	@Test
+//	@Test
 	public void OclReduceSimple()
 	{
-		OclContext vContext = new OclContext(new JsonSettingsRepository(Constants.RESOURCES_DIR),
-											 new JsonTupleDefinitionsRepository(Constants.RESOURCES_DIR),
-											 new JsonUserFunctionRepository(Constants.FUNCTIONS_DIR,
-																			"reduce.json"));
+		OclContext vContext = getOclContext("reduce.json");
 		
 		vContext.open();
 		
@@ -51,10 +60,7 @@ public class OclContextTest
 //	@Test
 	public void OclMapSimple_IntToString()
 	{
-		OclContext vContext = new OclContext(new JsonSettingsRepository(Constants.RESOURCES_DIR),
-											 new JsonTupleDefinitionsRepository(Constants.RESOURCES_DIR),
-											 new JsonUserFunctionRepository(Constants.FUNCTIONS_DIR,
-																			"functions.json"));
+		OclContext vContext = getOclContext("functions.json");
 		
 		vContext.open();
 		
@@ -72,13 +78,10 @@ public class OclContextTest
 						});
 	}
 	
-//	@Test
+	@Test
 	public void OclMapSimple_StringToInt()
 	{
-		OclContext vContext = new OclContext(new JsonSettingsRepository(Constants.RESOURCES_DIR),
-											 new JsonTupleDefinitionsRepository(Constants.RESOURCES_DIR),
-											 new JsonUserFunctionRepository(Constants.FUNCTIONS_DIR,
-																			"functions.json"));
+		OclContext vContext = getOclContext("functions.json");
 		
 		vContext.open();
 		
@@ -103,10 +106,7 @@ public class OclContextTest
 //	@Test
 	public void OclFilterSimple()
 	{
-		OclContext vContext = new OclContext(new JsonSettingsRepository(Constants.RESOURCES_DIR),
-											 new JsonTupleDefinitionsRepository(Constants.RESOURCES_DIR),
-											 new JsonUserFunctionRepository(Constants.FUNCTIONS_DIR,
-																			"filterFunction2.json"));
+		OclContext vContext = getOclContext("filterFunction2.json");
 		vContext.open();
 		
 		List<IOclTuple> vTuples = GetTestTuples();
@@ -142,11 +142,7 @@ public class OclContextTest
 	public void A()
 	{
 		//new OclBridge().listDevices();
-		
-		OclContext vContext = new OclContext(new JsonSettingsRepository(Constants.RESOURCES_DIR),
-											 new JsonTupleDefinitionsRepository(Constants.RESOURCES_DIR),
-											 new JsonUserFunctionRepository(Constants.FUNCTIONS_DIR,
-																			"functions.json"));
+		OclContext vContext = getOclContext("functions.json");
 		vContext.open();
 		
 		
@@ -184,12 +180,13 @@ public class OclContextTest
 //	@Test
 	public void simpleMapTest() throws  Exception
 	{
-		
 		ISettingsRepository a = new JsonSettingsRepository(Constants.RESOURCES_DIR);
 		ITupleDefinitionsRepository b = new JsonTupleDefinitionsRepository(Constants.RESOURCES_DIR);
-		IUserFunctionsRepository c = new JsonUserFunctionRepository(Constants.FUNCTIONS_DIR,
-																	"filterFunction2.json");
-		OclContext vContext = new OclContext(a, b, c);
+		IUserFunctionsRepository c = new JsonUserFunctionRepository
+			.Builder(Constants.FUNCTIONS_DIR)
+			.setFileName("filterFunction2.json").build();
+		
+		OclContext vContext = new OclContext(a, b, c, new DefaultOclContextMappings());
 		StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(vContext);
 		vContext.open();
 		

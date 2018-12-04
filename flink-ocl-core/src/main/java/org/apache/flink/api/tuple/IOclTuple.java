@@ -24,7 +24,7 @@ public interface IOclTuple
 		
 		for (int i = 0; i < getArityOcl() && vResult; i++)
 		{
-			vResult &= getField(i).equals(pOther.getField(i));
+			vResult = getField(i).equals(pOther.getField(i));
 		}
 		
 		return vResult;

@@ -1,81 +1,140 @@
 package org.apache.flink.api.engine;
 
-import io.gsonfire.gson.HookInvocationException;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import org.apache.flink.api.common.IBuilder;
 import org.apache.flink.api.common.JsonLoader;
 import org.apache.flink.api.common.JsonLoaderOptions;
+import org.apache.flink.api.defaults.DefaultFunctionsNames;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class JsonUserFunctionRepository implements IUserFunctionsRepository
 {
-	public static final String FUNCTIONS_FILE_NAME = "functions.json";
-	
 	private Map<String, IUserFunction> mUserFunctionMap;
 	
-	private String mFilePath;
+	private String mFileDirectory;
 	private String mFileName;
 	
 	private boolean mAreFunctionsNotLoadedYet;
 	
-	public JsonUserFunctionRepository(String pFilePath)
-	{
-		this(pFilePath, FUNCTIONS_FILE_NAME);
-	}
+	private Iterable<String> mFunctionEngineTypes;
 	
-	public JsonUserFunctionRepository(String pFilePath, String pFileName)
+	protected JsonUserFunctionRepository(String pFileDirectory, String pFileName)
 	{
 		mAreFunctionsNotLoadedYet = true;
 		mUserFunctionMap = new HashMap<>();
-		mFilePath = pFilePath;
+		mFileDirectory = pFileDirectory;
 		mFileName = pFileName;
-		checkIfFileExists();
+		setFunctionEngineTypes();
 	}
 	
-	@Override
+	protected int getSupportedFunctionTypesCount()
+	{
+		return DefaultFunctionsNames.SUPPORTED_FUNCTION_TYPES_COUNT;
+	}
+	
+	protected void setFunctionEngineTypes()
+	{
+		mFunctionEngineTypes = DefaultFunctionsNames.getDefaultFunctionEngineTypes();
+	}
+	
+	protected void loadFunctions()
+	{
+		JsonUserFunctionCollection vUserFunctions = JsonLoader.loadJsonObject(new JsonLoaderOptions
+													   .JsonLoaderOptionsBuilder<JsonUserFunctionCollection>()
+													   .setSource(mFileDirectory, mFileName)
+													   .setBeanClass(JsonUserFunctionCollection.class)
+													   .shouldHookClass(JsonUserFunction.class)
+													   .build()
+												  );
+		
+		vUserFunctions.forEach(x -> mUserFunctionMap.put(x.getName(), x));
+		mAreFunctionsNotLoadedYet = false;
+	}
+	
+//	@Override
 	public IUserFunction getUserFunctionByName(String pUserFunctionName)
 	{
 		if(mAreFunctionsNotLoadedYet) loadFunctions();
 		return mUserFunctionMap.get(pUserFunctionName);
 	}
 	
-	@Override
+//	@Override
 	public Collection<IUserFunction> getUserFunctions()
 	{
 		if(mAreFunctionsNotLoadedYet) loadFunctions();
 		return mUserFunctionMap.values();
 	}
 	
-	@Override
+//	@Override
 	public Iterable<String> getFunctionEngineTypes()
 	{
-		return new ArrayList<>();
+		return mFunctionEngineTypes;
 	}
 	
-	private void checkIfFileExists()
-	{
-		if(Files.notExists(Paths.get(mFilePath).normalize().resolve(mFileName).toAbsolutePath()))
-			throw new IllegalArgumentException("The file \"" + mFileName + "\" can't be found under the folder \"" + mFilePath + "\".");
-	}
 	
-	private void loadFunctions()
+	public static class Builder implements IBuilder<JsonUserFunctionRepository>
 	{
+		public static final String DEFAULT_FILE_NAME = "functions.json";
 		
-		IUserFunctionCollection<? extends IUserFunction> vUserFunctions
-			= JsonLoader.loadJsonObject(new JsonLoaderOptions
-											.JsonLoaderOptionsBuilder<JsonUserFunctionCollection>()
-											.setSource(mFilePath, mFileName)
-											.setBeanClass(JsonUserFunctionCollection.class)
-											.shouldHookClass(JsonUserFunction.class)
-											.build()
-									   );
-
-		vUserFunctions.forEach(x -> mUserFunctionMap.put(x.getName(), x));
-		mAreFunctionsNotLoadedYet = false;
+		private String mFileDirectory;
+		private String mFileName;
+		
+		protected String getDefaultFileName()
+		{
+			return DEFAULT_FILE_NAME;
+		}
+		
+		public Builder(String pFileDirectory)
+		{
+			mFileDirectory = pFileDirectory;
+			mFileName = getDefaultFileName();
+		}
+		
+		public Builder setFileDirectory(String pFileDirectory)
+		{
+			mFileDirectory = pFileDirectory;
+			return this;
+		}
+		
+		public Builder setFileName(String pFileName)
+		{
+			mFileName = pFileName;
+			return this;
+		}
+		
+		@Override
+		public JsonUserFunctionRepository build()
+		{
+			checkIfFileExists();
+			return new JsonUserFunctionRepository(mFileDirectory, mFileName);
+		}
+		
+		private void checkIfFileExists()
+		{
+			if(Files.notExists(Paths.get(mFileDirectory).normalize().resolve(mFileName).toAbsolutePath()))
+				throw new IllegalArgumentException("The file \"" + mFileName + "\" can't be found under the folder \"" + mFileDirectory + "\".");
+		}
+	}
 	
+	public static class JsonUserFunctionCollection implements Iterable<JsonUserFunction>
+	{
+		@SerializedName("functions")
+		@Expose
+		private List<JsonUserFunction> mUserFunctions;
+		
+		public Iterable<JsonUserFunction> getUserFunctions()
+		{
+			return mUserFunctions;
+		}
+		
+		@Override
+		public Iterator<JsonUserFunction> iterator()
+		{
+			return mUserFunctions.iterator();
+		}
 	}
 }

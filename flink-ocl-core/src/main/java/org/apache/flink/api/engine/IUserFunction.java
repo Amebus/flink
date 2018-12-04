@@ -1,9 +1,12 @@
 package org.apache.flink.api.engine;
 
+import org.apache.flink.api.common.utility.StringHelper;
+
 import java.io.Serializable;
 
 public interface IUserFunction extends Serializable
 {
+	
 	String getType();
 	
 	String getName();
@@ -11,67 +14,14 @@ public interface IUserFunction extends Serializable
 	String getInputTupleName();
 	String getOutputTupleName();
 	
-	
-	//Transformations
-	String MAP = "map";
-	String FLAT_MAP = "flatMap";
-	String FILTER = "filter";
-	
-	default boolean isMap()
+	default boolean isInputTupleSpecified()
 	{
-		return getType().equals(MAP);
-	}
-	default boolean isFlatMap()
-	{
-		return getType().equals(FLAT_MAP);
-	}
-	default boolean isFilter()
-	{
-		return getType().equals(FILTER);
+		return !StringHelper.isNullOrWhiteSpace(getInputTupleName());
 	}
 	
-	//Actions
-	String REDUCE = "reduce";
-	
-	default boolean isReduce()
+	default boolean isOutputTupleSpecified()
 	{
-		return getType().equals(REDUCE);
+		return !StringHelper.isNullOrWhiteSpace(getOutputTupleName());
 	}
 	
-	default boolean hasOutputTuple()
-	{
-		return isMap() || isFlatMap();
-	}
-	
-	default boolean isTransformation()
-	{
-		return isMap() || isFlatMap() || isFilter();
-	}
-	
-	default boolean isAction()
-	{
-		return  isReduce();
-	}
-	
-	default boolean isOfKnownType()
-	{
-		return isTransformation() || isAction();
-	}
-	
-	default boolean isOfUnknownType()
-	{
-		return !isOfKnownType();
-	}
-	
-	default boolean equals(IUserFunction pOther)
-	{
-		if(this == pOther)
-			return true;
-		
-		return getType().equals(pOther.getType()) &&
-			   getName().equals(pOther.getName()) &&
-			   getInputTupleName().equals(pOther.getInputTupleName()) &&
-			   getOutputTupleName().equals(pOther.getOutputTupleName()) &&
-			   getFunction().equals(pOther.getFunction());
-	}
 }

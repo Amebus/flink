@@ -9,7 +9,7 @@ import org.apache.flink.api.newConfiguration.tuple.TupleVarDefinition;
 
 import java.util.*;
 
-public class JsonTupleRepository implements ItupleDefinitionRepository
+public class JsonTupleRepository implements ITupleDefinitionRepository
 {
 	public static final int TUPLE_SUPPORTED_MAX_ARITY = 22;
 	public static final int TUPLE_SUPPORTED_MIN_ARITY = 0;

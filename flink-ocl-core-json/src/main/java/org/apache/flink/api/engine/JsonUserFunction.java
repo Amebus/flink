@@ -3,11 +3,13 @@ package org.apache.flink.api.engine;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import io.gsonfire.annotations.PostDeserialize;
+import org.apache.flink.api.engine.IUserFunction;
+import org.apache.flink.api.engine.functions.GenericUserFunction;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class JsonUserFunction extends UserFunction implements IUserFunction
+public class JsonUserFunction extends GenericUserFunction implements IUserFunction
 {
 	@SerializedName("type")
 	@Expose
@@ -36,9 +38,6 @@ public class JsonUserFunction extends UserFunction implements IUserFunction
 	@PostDeserialize
 	private void postDeserialize()
 	{
-		checkType();
-		checkOutputTuple();
-		
 		if(mFunctionLines.size() == 0)
 		{
 			throw new IllegalArgumentException("The function " + getName() + " has no body.");

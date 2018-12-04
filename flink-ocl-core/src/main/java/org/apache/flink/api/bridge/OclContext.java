@@ -2,6 +2,7 @@ package org.apache.flink.api.bridge;
 
 import org.apache.flink.api.engine.BuildEngine;
 import org.apache.flink.api.engine.CppLibraryInfo;
+import org.apache.flink.api.engine.IOclContextMappings;
 import org.apache.flink.api.engine.IUserFunctionsRepository;
 import org.apache.flink.api.serialization.StreamReader;
 import org.apache.flink.api.serialization.Types;
@@ -24,6 +25,7 @@ public class OclContext implements Serializable
 	transient private ISettingsRepository mSettingsRepository;
 	transient private ITupleDefinitionsRepository mTupleDefinitionsRepository;
 	transient private IUserFunctionsRepository mFunctionRepository;
+	transient private IOclContextMappings mOclContextMappings;
 	
 	transient private CppLibraryInfo mCppLibraryInfo;
 	
@@ -31,11 +33,13 @@ public class OclContext implements Serializable
 	
 	public OclContext(ISettingsRepository pSettingsRepository,
 					  ITupleDefinitionsRepository pTupleDefinitionsRepository,
-					  IUserFunctionsRepository pUserFunctionsRepository)
+					  IUserFunctionsRepository pUserFunctionsRepository,
+					  IOclContextMappings pOclContextMappings)
 	{
 		mSettingsRepository = pSettingsRepository;
 		mTupleDefinitionsRepository = pTupleDefinitionsRepository;
 		mFunctionRepository = pUserFunctionsRepository;
+		mOclContextMappings = pOclContextMappings;
 		mOclBridgeContext = new OclBridge();
 	}
 	
@@ -56,7 +60,7 @@ public class OclContext implements Serializable
 	
 	private void generatesKernels()
 	{
-		mCppLibraryInfo = new BuildEngine(mSettingsRepository)
+		mCppLibraryInfo = new BuildEngine(mSettingsRepository, mOclContextMappings.getFunctionKernelBuilderMapping())
 			.generateKernels(mTupleDefinitionsRepository, mFunctionRepository.getUserFunctions())
 			.getCppLibraryInfo();
 	}
@@ -77,7 +81,14 @@ public class OclContext implements Serializable
 		}
 		
 		if (vAllFilesDeleted)
-			vToFile.delete();
+		{
+			vAllFilesDeleted = vToFile.delete();
+		}
+		
+		if(!vAllFilesDeleted)
+		{
+			System.out.println("Not all the kernel files has been deleted from the folder: " + vKernelsFolder.toString());
+		}
 	}
 	
 	public Iterable< ? extends IOclTuple> filter(String pUserFunctionName,
