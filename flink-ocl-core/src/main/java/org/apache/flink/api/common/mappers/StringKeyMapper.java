@@ -15,6 +15,12 @@ public class StringKeyMapper<V> extends GenericMapper<String, V, V>
 	}
 	
 	@Override
+	public V unregister(String pKey)
+	{
+		return internalUnregister(pKey);
+	}
+	
+	@Override
 	public V resolve(String pKey)
 	{
 		return internalResolve(pKey);

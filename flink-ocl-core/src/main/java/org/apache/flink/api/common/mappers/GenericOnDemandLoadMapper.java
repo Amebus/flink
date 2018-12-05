@@ -16,6 +16,12 @@ public class GenericOnDemandLoadMapper<K, V> extends GenericMapper<K, V, ISuppli
 	}
 	
 	@Override
+	public V unregister(K pKey)
+	{
+		return internalUnregister(pKey).get();
+	}
+	
+	@Override
 	public V resolve(K pKey)
 	{
 		return internalResolve(pKey).get();

@@ -2,7 +2,7 @@ package org.apache.flink.api.common.mappers;
 
 import org.apache.flink.api.common.IMapperKeyComparerWrapper;
 
-public class StringKeyOnDemandLoadMapper<T, O> extends AbstractOptionableOnDemandLoadMapper<String, T, O>
+public class StringKeyOnDemandLoadMapper<T, O> extends GenericOptionableOnDemandLoadMapper<String, T, O>
 {
 	
 	public StringKeyOnDemandLoadMapper()

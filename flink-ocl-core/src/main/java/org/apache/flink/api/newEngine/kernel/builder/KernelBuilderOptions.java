@@ -2,10 +2,8 @@ package org.apache.flink.api.newEngine.kernel.builder;
 
 import org.apache.flink.api.common.IBuilder;
 import org.apache.flink.api.engine.IUserFunction;
-import org.apache.flink.api.newEngine.kernel.builder.mappers.TupleKindsToVariablesGeneratorMapper;
-import org.apache.flink.api.newEngine.kernel.builder.mappers.TupleKindsVarTypesToVariableDeserializationMapper;
-import org.apache.flink.api.newEngine.kernel.builder.mappers.TupleKindsVarTypesToVariableSerializationMapper;
-import org.apache.flink.api.newEngine.kernel.builder.mappers.TypeToKernelVariablesLineMapper;
+import org.apache.flink.api.newEngine.kernel.builder.mappers.*;
+import org.apache.flink.configuration.CTType;
 import org.apache.flink.configuration.IOclContextOptions;
 import org.apache.flink.configuration.IOclKernelsOptions;
 import org.apache.flink.newConfiguration.ITupleDefinitionRepository;
@@ -26,6 +24,7 @@ public class KernelBuilderOptions
 	private TupleKindsVarTypesToVariableDeserializationMapper mTupleKindsVarTypesToVariableDeserializationMapping;
 	private TupleKindsVarTypesToVariableSerializationMapper mTupleKindsVarTypesToVariableSerializationMapping;
 	
+	private TupleKindVarTypeToKernelTypeMapper mTupleKindVarTypeToKernelTypeMapping;
 	
 	private IUserFunction mUserFunction;
 	private ITupleDefinitionRepository mTupleDefinitionsRepository;
@@ -46,7 +45,8 @@ public class KernelBuilderOptions
 		IUserFunction pUserFunction,
 		ITupleDefinitionRepository pTupleDefinitionsRepository,
 		IOclContextOptions pContextOptions,
-		IOclKernelsOptions pKernelOptions)
+		IOclKernelsOptions pKernelOptions,
+		TupleKindVarTypeToKernelTypeMapper pTupleKindVarTypeToKernelTypeMapping)
 	{
 		mUtilityFunctionList = pUtilityFunctionList;
 		mKernelParametersList = pKernelParametersList;
@@ -62,6 +62,7 @@ public class KernelBuilderOptions
 		mTupleDefinitionsRepository = pTupleDefinitionsRepository;
 		mContextOptions = pContextOptions;
 		mKernelOptions = pKernelOptions;
+		mTupleKindVarTypeToKernelTypeMapping = pTupleKindVarTypeToKernelTypeMapping;
 	}
 	
 	public IUserFunction getUserFunction()
@@ -134,8 +135,19 @@ public class KernelBuilderOptions
 		return mTupleKindsVarTypesToVariableSerializationMapping;
 	}
 	
-	public static class KernelOptionsBuilder implements IBuilder<KernelBuilderOptions>
+	public TupleKindVarTypeToKernelTypeMapper getTupleKindVarTypeToKernelTypeMapping()
 	{
+		return mTupleKindVarTypeToKernelTypeMapping;
+	}
+	
+	/*
+	public static class Builder implements IBuilder<KernelBuilderOptions>
+	{
+		private IUserFunction mUserFunction;
+		private ITupleDefinitionRepository mTupleDefinitionsRepository;
+		private IOclContextOptions mContextOptions;
+		private IOclKernelsOptions mKernelOptions;
+		
 		private Iterable<String> mUtilityFunctionList;
 		private Iterable<String> mKernelParametersList;
 		private KernelBuilder.IUtilityVariablesGetter mUtilityVariablesGetter;
@@ -150,98 +162,187 @@ public class KernelBuilderOptions
 		private TupleKindsVarTypesToVariableDeserializationMapper mTupleKindsVarTypesToVariableDeserializationMapping;
 		private TupleKindsVarTypesToVariableSerializationMapper mTupleKindsVarTypesToVariableSerializationMapping;
 		
-		private IUserFunction mUserFunction;
-		private ITupleDefinitionRepository mTupleDefinitionsRepository;
-		private IOclContextOptions mContextOptions;
-		private IOclKernelsOptions mKernelOptions;
+		private TupleKindVarTypeToKernelTypeMapper mTupleKindVarTypeToKernelTypeMapping;
 		
-		public KernelOptionsBuilder setUserFunction(IUserFunction pUserFunction)
+		public Builder(
+			IUserFunction pUserFunction,
+			ITupleDefinitionRepository pTupleDefinitionsRepository,
+			IOclContextOptions pContextOptions,
+			IOclKernelsOptions pKernelOptions)
+		{
+			mUserFunction = pUserFunction;
+			mTupleDefinitionsRepository = pTupleDefinitionsRepository;
+			mContextOptions = pContextOptions;
+			mKernelOptions = pKernelOptions;
+		}
+		
+		public IUserFunction getUserFunction()
+		{
+			return mUserFunction;
+		}
+		
+		public Builder setUserFunction(IUserFunction pUserFunction)
 		{
 			mUserFunction = pUserFunction;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setTupleDefinitionRepository(ITupleDefinitionRepository pTupleDefinitionsRepository)
+		public ITupleDefinitionRepository getTupleDefinitionsRepository()
+		{
+			return mTupleDefinitionsRepository;
+		}
+		
+		public Builder setTupleDefinitionsRepository(ITupleDefinitionRepository pTupleDefinitionsRepository)
 		{
 			mTupleDefinitionsRepository = pTupleDefinitionsRepository;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setContextOptions(IOclContextOptions pContextOptions)
+		public IOclContextOptions getContextOptions()
+		{
+			return mContextOptions;
+		}
+		
+		public Builder setContextOptions(IOclContextOptions pContextOptions)
 		{
 			mContextOptions = pContextOptions;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setKernelOptions(IOclKernelsOptions pKernelOptions)
+		public IOclKernelsOptions getKernelOptions()
+		{
+			return mKernelOptions;
+		}
+		
+		public Builder setKernelOptions(IOclKernelsOptions pKernelOptions)
 		{
 			mKernelOptions = pKernelOptions;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setUtilityFunctionList(Iterable<String> pUtilityFunctionList)
+		public Iterable<String> getUtilityFunctionList()
+		{
+			return mUtilityFunctionList;
+		}
+		
+		public Builder setUtilityFunctionList(Iterable<String> pUtilityFunctionList)
 		{
 			mUtilityFunctionList = pUtilityFunctionList;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setKernelParametersList(Iterable<String> pKernelParametersList)
+		public Iterable<String> getKernelParametersList()
+		{
+			return mKernelParametersList;
+		}
+		
+		public Builder setKernelParametersList(Iterable<String> pKernelParametersList)
 		{
 			mKernelParametersList = pKernelParametersList;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setUtilityVariablesGetter(KernelBuilder.IUtilityVariablesGetter pUtilityVariablesGetter)
+		public KernelBuilder.IUtilityVariablesGetter getUtilityVariablesGetter()
+		{
+			return mUtilityVariablesGetter;
+		}
+		
+		public Builder setUtilityVariablesGetter(KernelBuilder.IUtilityVariablesGetter pUtilityVariablesGetter)
 		{
 			mUtilityVariablesGetter = pUtilityVariablesGetter;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setTupleKindsToVariablesGeneratorMapping(TupleKindsToVariablesGeneratorMapper pTupleKindsToVariablesGeneratorMapping)
+		public TupleKindsToVariablesGeneratorMapper getTupleKindsToVariablesGeneratorMapping()
+		{
+			return mTupleKindsToVariablesGeneratorMapping;
+		}
+		
+		public Builder setTupleKindsToVariablesGeneratorMapping(
+			TupleKindsToVariablesGeneratorMapper pTupleKindsToVariablesGeneratorMapping)
 		{
 			mTupleKindsToVariablesGeneratorMapping = pTupleKindsToVariablesGeneratorMapping;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setTupleKinds(Iterable<String> pTupleKinds)
+		public Iterable<String> getTupleKinds()
+		{
+			return mTupleKinds;
+		}
+		
+		public Builder setTupleKinds(Iterable<String> pTupleKinds)
 		{
 			mTupleKinds = pTupleKinds;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setVarTypeToKernelVariablesLineMapping(TypeToKernelVariablesLineMapper pVarTypeToKernelVariablesLineMapping)
+		public TypeToKernelVariablesLineMapper getVarTypeToKernelVariablesLineMapping()
+		{
+			return mVarTypeToKernelVariablesLineMapping;
+		}
+		
+		public Builder setVarTypeToKernelVariablesLineMapping(
+			TypeToKernelVariablesLineMapper pVarTypeToKernelVariablesLineMapping)
 		{
 			mVarTypeToKernelVariablesLineMapping = pVarTypeToKernelVariablesLineMapping;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setVarTypes(Iterable<String> pVarTypes)
+		public Iterable<String> getVarTypes()
+		{
+			return mVarTypes;
+		}
+		
+		public Builder setVarTypes(Iterable<String> pVarTypes)
 		{
 			mVarTypes = pVarTypes;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setVariableSerDeserKeyCalculator(KernelBuilder.ITupleKindVariableTypeKeyCalculator pVariableSerDeserKeyCalculator)
+		public KernelBuilder.ITupleKindVariableTypeKeyCalculator getTupleKindVariableTypeKeyCalculator()
+		{
+			return mVariableSerDeserKeyCalculator;
+		}
+		
+		public Builder setTupleKindVariableTypeKeyCalculator(
+			KernelBuilder.ITupleKindVariableTypeKeyCalculator pVariableSerDeserKeyCalculator)
 		{
 			mVariableSerDeserKeyCalculator = pVariableSerDeserKeyCalculator;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setTupleKindsVarTypesToVariableDeserializationMapping(TupleKindsVarTypesToVariableDeserializationMapper pTupleKindsVarTypesToVariableDeserializationMapping)
+		public TupleKindsVarTypesToVariableDeserializationMapper getTupleKindsVarTypesToVariableDeserializationMapping()
+		{
+			return mTupleKindsVarTypesToVariableDeserializationMapping;
+		}
+		
+		public Builder setTupleKindsVarTypesToVariableDeserializationMapping(
+			TupleKindsVarTypesToVariableDeserializationMapper pTupleKindsVarTypesToVariableDeserializationMapping)
 		{
 			mTupleKindsVarTypesToVariableDeserializationMapping = pTupleKindsVarTypesToVariableDeserializationMapping;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setTupleKindsVarTypesToVariableSerializationMapping(TupleKindsVarTypesToVariableSerializationMapper pTupleKindsVarTypesToVariableSerializationMapping)
+		public TupleKindsVarTypesToVariableSerializationMapper getTupleKindsVarTypesToVariableSerializationMapping()
+		{
+			return mTupleKindsVarTypesToVariableSerializationMapping;
+		}
+		
+		public Builder setTupleKindsVarTypesToVariableSerializationMapping(
+			TupleKindsVarTypesToVariableSerializationMapper pTupleKindsVarTypesToVariableSerializationMapping)
 		{
 			mTupleKindsVarTypesToVariableSerializationMapping = pTupleKindsVarTypesToVariableSerializationMapping;
 			return this;
 		}
 		
-		public KernelOptionsBuilder setTupleDefinitionsRepository(ITupleDefinitionRepository pTupleDefinitionsRepository)
+		public TupleKindVarTypeToKernelTypeMapper getTupleKindVarTypeToKernelTypeMapping()
 		{
-			mTupleDefinitionsRepository = pTupleDefinitionsRepository;
+			return mTupleKindVarTypeToKernelTypeMapping;
+		}
+		
+		public Builder setTupleKindVarTypeToKernelTypeMapping(TupleKindVarTypeToKernelTypeMapper pTupleKindVarTypeToKernelTypeMapping)
+		{
+			mTupleKindVarTypeToKernelTypeMapping = pTupleKindVarTypeToKernelTypeMapping;
 			return this;
 		}
 		
@@ -249,21 +350,23 @@ public class KernelBuilderOptions
 		public KernelBuilderOptions build()
 		{
 			return new KernelBuilderOptions(
-				mUtilityFunctionList,
-				mKernelParametersList,
-				mUtilityVariablesGetter,
-				mTupleKindsToVariablesGeneratorMapping,
-				mTupleKinds,
-				mVarTypeToKernelVariablesLineMapping,
-				mVarTypes,
-				mVariableSerDeserKeyCalculator,
-				mTupleKindsVarTypesToVariableDeserializationMapping,
-				mTupleKindsVarTypesToVariableSerializationMapping,
-				mUserFunction,
-				mTupleDefinitionsRepository,
-				mContextOptions,
-				mKernelOptions
+				getUtilityFunctionList(),
+				getKernelParametersList(),
+				getUtilityVariablesGetter(),
+				getTupleKindsToVariablesGeneratorMapping(),
+				getTupleKinds(),
+				getVarTypeToKernelVariablesLineMapping(),
+				getVarTypes(),
+				getTupleKindVariableTypeKeyCalculator(),
+				getTupleKindsVarTypesToVariableDeserializationMapping(),
+				getTupleKindsVarTypesToVariableSerializationMapping(),
+				getUserFunction(),
+				getTupleDefinitionsRepository(),
+				getContextOptions(),
+				getKernelOptions(),
+				getTupleKindVarTypeToKernelTypeMapping()
 			);
 		}
 	}
+	*/
 }

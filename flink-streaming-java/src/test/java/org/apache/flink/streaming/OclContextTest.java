@@ -1,13 +1,17 @@
 package org.apache.flink.streaming;
 
-import org.apache.flink.api.defaults.DefaultOclContextMappings;
 import org.apache.flink.api.bridge.OclContext;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.configuration.JsonSettingsRepository;
+import org.apache.flink.api.configuration.JsonTupleDefinition;
 import org.apache.flink.api.configuration.JsonTupleDefinitionsRepository;
+import org.apache.flink.api.engine.CppLibraryInfo;
 import org.apache.flink.api.engine.IUserFunctionsRepository;
 import org.apache.flink.api.engine.JsonUserFunctionRepository;
+import org.apache.flink.api.newConfiguration.JsonTupleRepository;
+import org.apache.flink.api.newEngine.kernel.KernelCodeBuilderEngine;
+import org.apache.flink.api.newEngine.kernel.builder.options.DefaultsValues;
 import org.apache.flink.api.tuple.IOclTuple;
 import org.apache.flink.api.tuple.Tuple1Ocl;
 import org.apache.flink.api.typeutils.OclTupleTypeInfo;
@@ -20,15 +24,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertEquals;
 
 public class OclContextTest
 {
@@ -40,7 +43,7 @@ public class OclContextTest
 					   new JsonUserFunctionRepository
 						   .Builder(Constants.FUNCTIONS_DIR)
 						   .setFileName(pFileName).build(),
-					   new DefaultOclContextMappings());
+					   new DefaultsValues.DefaultOclContextMappings());
 	}
 	
 	@Rule
@@ -79,6 +82,24 @@ public class OclContextTest
 	}
 	
 	@Test
+	public void AAA()
+	{
+		KernelCodeBuilderEngine vEngine = new KernelCodeBuilderEngine(
+			new JsonSettingsRepository(Constants.RESOURCES_DIR),
+			new JsonTupleRepository.Builder(Constants.RESOURCES_DIR).build(),
+			new JsonUserFunctionRepository
+				.Builder(Constants.FUNCTIONS_DIR)
+				.build()
+				.getUserFunctions(),
+			new DefaultsValues.DefaultOclContextMappings().getFunctionKernelBuilderMapper(),
+			new DefaultsValues.DefaultOclContextMappings().getFunctionKernelBuilderOptionMapper());
+		
+		CppLibraryInfo vInfo = vEngine.generateKernels();
+		
+		System.out.println(vInfo.getKernelsFolder());
+	}
+	
+//	@Test
 	public void OclMapSimple_StringToInt()
 	{
 		OclContext vContext = getOclContext("functions.json");
@@ -186,7 +207,7 @@ public class OclContextTest
 			.Builder(Constants.FUNCTIONS_DIR)
 			.setFileName("filterFunction2.json").build();
 		
-		OclContext vContext = new OclContext(a, b, c, new DefaultOclContextMappings());
+		OclContext vContext = new OclContext(a, b, c, new DefaultsValues.DefaultOclContextMappings());
 		StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(vContext);
 		vContext.open();
 		

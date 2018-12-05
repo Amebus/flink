@@ -1,10 +1,10 @@
 package org.apache.flink.api.bridge;
 
-import org.apache.flink.api.defaults.DefaultsSerializationTypes;
 import org.apache.flink.api.engine.BuildEngine;
 import org.apache.flink.api.engine.CppLibraryInfo;
 import org.apache.flink.api.engine.IOclContextMappings;
 import org.apache.flink.api.engine.IUserFunctionsRepository;
+import org.apache.flink.api.newEngine.kernel.builder.options.DefaultsValues;
 import org.apache.flink.api.serialization.StreamReader;
 import org.apache.flink.api.tuple.IOclTuple;
 import org.apache.flink.api.tuple.Tuple1Ocl;
@@ -151,15 +151,15 @@ public class OclContext implements Serializable
 										  byte vType;
 										  if(x.isInteger())
 										  {
-											  vType = DefaultsSerializationTypes.INT;
+											  vType = DefaultsValues.DefaultsSerializationTypes.INT;
 										  }
 										  else if (x.isDouble())
 										  {
-											  vType = DefaultsSerializationTypes.DOUBLE;
+											  vType = DefaultsValues.DefaultsSerializationTypes.DOUBLE;
 										  }
 										  else
 										  {
-											  vType = DefaultsSerializationTypes.STRING;
+											  vType = DefaultsValues.DefaultsSerializationTypes.STRING;
 										  }
 										  vInfoBuilder.setTType(vType);
 									  });

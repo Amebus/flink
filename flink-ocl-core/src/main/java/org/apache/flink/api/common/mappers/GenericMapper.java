@@ -6,10 +6,10 @@ import org.apache.flink.api.common.IMapperKeyComparerWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public abstract class GenericMapper<K, V, F> implements IMapper<K, V, F>
 {
-	
 	private Map<IMapperKeyComparerWrapper<K>, F> mMap;
 	private IMapperKeyComparerWrapper<K> mComparer;
 	
@@ -30,6 +30,21 @@ public abstract class GenericMapper<K, V, F> implements IMapper<K, V, F>
 	}
 	
 	@Override
+	public Iterable<K> getKeys()
+	{
+		return mMap
+			.keySet()
+			.stream()
+			.map(IMapperKeyComparerWrapper::getValue)
+			.collect(Collectors.toList());
+	}
+	
+	protected F internalUnregister(K pKey)
+	{
+		return mMap.remove(mComparer.setValue(pKey));
+	}
+	
+	@Override
 	public void register(K pKey, F pGetValueFunction)
 	{
 		mMap.put(mComparer.getNew(pKey), pGetValueFunction);
@@ -39,6 +54,12 @@ public abstract class GenericMapper<K, V, F> implements IMapper<K, V, F>
 	public boolean containsKey(K pKey)
 	{
 		return mMap.containsKey(mComparer.setValue(pKey));
+	}
+	
+	@Override
+	public boolean isEmpty()
+	{
+		return mMap.isEmpty();
 	}
 	
 	public IMapperKeyComparerWrapper<K> getComparer()

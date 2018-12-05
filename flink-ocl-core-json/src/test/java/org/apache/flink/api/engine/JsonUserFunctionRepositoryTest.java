@@ -1,6 +1,6 @@
 package org.apache.flink.api.engine;
 
-import org.apache.flink.api.defaults.DefaultFunctionsNames;
+import org.apache.flink.api.newEngine.kernel.builder.options.DefaultsValues;
 import org.apache.flink.streaming.helpers.Constants;
 import org.junit.Test;
 
@@ -103,7 +103,7 @@ public class JsonUserFunctionRepositoryTest
 		Optional<IUserFunction> vOptional;
 		IUserFunction vTempUF;
 		
-		assertTrue(userFunctions.stream().allMatch( x -> (x.getType().equals(DefaultFunctionsNames.MAP))));
+		assertTrue(userFunctions.stream().allMatch( x -> (x.getType().equals(DefaultsValues.DefaultFunctionsNames.MAP))));
 		assertEquals(1L, userFunctions.stream().filter(x -> x.getName().equals("map1")).count());
 		
 		vOptional = userFunctions.stream().filter(x -> x.getName().equals("map1")).findFirst();
@@ -123,10 +123,10 @@ public class JsonUserFunctionRepositoryTest
 	{
 		Collection<? extends IUserFunction> userFunctions = getUserFunctions("oneFunctionPerType.json");
 		
-		assertEquals(1, userFunctions.stream().filter(x -> x.getType().equals(DefaultFunctionsNames.MAP)).count());
-		assertEquals(1, userFunctions.stream().filter(x -> x.getType().equals(DefaultFunctionsNames.FILTER)).count());
+		assertEquals(1, userFunctions.stream().filter(x -> x.getType().equals(DefaultsValues.DefaultFunctionsNames.MAP)).count());
+		assertEquals(1, userFunctions.stream().filter(x -> x.getType().equals(DefaultsValues.DefaultFunctionsNames.FILTER)).count());
 //		assertEquals(1, userFunctions.stream().filter(IUserFunction::isFlatMap).count());
-		assertEquals(1, userFunctions.stream().filter(x -> x.getType().equals(DefaultFunctionsNames.REDUCE)).count());
+		assertEquals(1, userFunctions.stream().filter(x -> x.getType().equals(DefaultsValues.DefaultFunctionsNames.REDUCE)).count());
 	}
 	
 	@Test

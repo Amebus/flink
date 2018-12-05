@@ -21,7 +21,7 @@ public class KernelBuilder implements IBuilder<OclKernel>
 	private IOclContextOptions mOclContextOptions;
 	private IOclKernelsOptions mOclKernelOptions;
 	
-	private Iterable<String> mUtilityFuncitonList;
+	private Iterable<String> mUtilityFunctionList;
 	private Iterable<String> mKernelParametersList;
 	private IUtilityVariablesGetter mUtilityVariablesGetter;
 	
@@ -30,11 +30,11 @@ public class KernelBuilder implements IBuilder<OclKernel>
 	private Iterable<String> mTupleKinds;
 	
 	//Key -> varTypes
-	private TypeToKernelVariablesLineMapper mVarTypeToKernelVariablesLineMapping;
 	private Iterable<String> mVarTypes;
 	
 	//Key -> tupleKinds + varTypes generated with ITupleKindVariableTypeKeyCalculator
 	private ITupleKindVariableTypeKeyCalculator mVariableSerDeserKeyCalculator;
+	private TypeToKernelVariablesLineMapper mVarTypeToKernelVariablesLineMapping;
 	private TupleKindsVarTypesToVariableDeserializationMapper mTupleKindsVarTypesToVariableDeserializationMapping;
 	private TupleKindsVarTypesToVariableSerializationMapper mTupleKindsVarTypesToVariableSerializationMapping;
 	
@@ -49,7 +49,23 @@ public class KernelBuilder implements IBuilder<OclKernel>
 		mOclKernelOptions = pKernelBuilderOptions.getKernelOptions();
 		
 		
+		mUtilityFunctionList = pKernelBuilderOptions.getUtilityFunctionList();
+		mKernelParametersList = pKernelBuilderOptions.getKernelParametersList();
+		mUtilityVariablesGetter = pKernelBuilderOptions.getUtilityVariablesGetter();
 		
+		mTupleKindsToVariablesGeneratorMapping = pKernelBuilderOptions.getTupleKindsToVariablesGeneratorMapping();
+		mTupleKinds = pKernelBuilderOptions.getTupleKinds();
+		
+		mVarTypes = pKernelBuilderOptions.getVarTypes();
+		
+		mVariableSerDeserKeyCalculator = pKernelBuilderOptions.getVariableSerDeserKeyCalculator();
+		mVarTypeToKernelVariablesLineMapping = pKernelBuilderOptions.getVarTypeToKernelVariablesLineMapping();
+		mTupleKindsVarTypesToVariableDeserializationMapping =
+			pKernelBuilderOptions.getTupleKindsVarTypesToVariableDeserializationMapping();
+		mTupleKindsVarTypesToVariableSerializationMapping =
+			pKernelBuilderOptions.getTupleKindsVarTypesToVariableSerializationMapping();
+		
+		mTupleKindVarTypeToKernelTypeMapping = pKernelBuilderOptions.getTupleKindVarTypeToKernelTypeMapping();
 	}
 	
 	public IUserFunction getUserFunction()
@@ -147,7 +163,7 @@ public class KernelBuilder implements IBuilder<OclKernel>
 	protected String getUtilityFunctions()
 	{
 		StringBuilder vBuilder = new StringBuilder(100000);
-		mUtilityFuncitonList.forEach(vBuilder::append);
+		mUtilityFunctionList.forEach(vBuilder::append);
 		return vBuilder.toString();
 	}
 	
@@ -256,7 +272,8 @@ public class KernelBuilder implements IBuilder<OclKernel>
 									 .resolve(pTupleKind)
 									 .getKernelLogicalVariables(vUserFunction, vRepository);
 			
-							 vVariables.forEach(pKernelLogicalVariable -> vResult.put(pTupleKind, vVariables));
+							 vResult.put(pTupleKind, vVariables);
+							 //vVariables.forEach(pKernelLogicalVariable -> vResult.put(pTupleKind, vVariables));
 						 });
 		
 		return vResult;
@@ -271,6 +288,11 @@ public class KernelBuilder implements IBuilder<OclKernel>
 						 {
 						 	
 							 Iterable<KernelLogicalVariable> vVariables = pKernelLogicalVariables.get(pTupleKind);
+							 
+							 if(vVariables == null || !vVariables.iterator().hasNext())
+							 {
+							 	return;
+							 }
 							 
 							 forEachVarType( pVarType ->
 											 {
@@ -294,6 +316,11 @@ public class KernelBuilder implements IBuilder<OclKernel>
 	protected String getDeserialization(HashMap<String, Iterable<KernelLogicalVariable>> pKernelLogicalVariables)
 	{
 		StringKeyMapper<IVariableDeserialization> vMapper = mTupleKindsVarTypesToVariableDeserializationMapping;
+		
+		if(vMapper.isEmpty())
+		{
+			return "//Empty Deserialization routine\n";
+		}
 		
 		StringBuilder vBuilder = new StringBuilder(100000);
 		forEachTupleKind(pTupleKind ->
@@ -345,6 +372,11 @@ public class KernelBuilder implements IBuilder<OclKernel>
 	protected String getSerialization(HashMap<String, Iterable<KernelLogicalVariable>> pKernelLogicalVariables)
 	{
 		StringKeyMapper<IVariableSerialization> vMapper = mTupleKindsVarTypesToVariableSerializationMapping;
+		
+		if(vMapper.isEmpty())
+		{
+			return "//Empty Serialization routine\n";
+		}
 		
 		StringBuilder vBuilder = new StringBuilder(100000);
 		forEachTupleKind(pTupleKind ->

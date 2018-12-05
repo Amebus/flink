@@ -6,19 +6,20 @@ import org.apache.flink.api.common.IOptionableMapper;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public abstract class AbstractOptionableMapper<K, V, F, O>
+public abstract class GenericOptionableMapper<K, V, F, O>
 	implements IOptionableMapper<K, V, F, O>
 {
 	private Map<IMapperKeyComparerWrapper<K>, F> mMap;
 	private IMapperKeyComparerWrapper<K> mComparer;
 	
-	protected AbstractOptionableMapper()
+	protected GenericOptionableMapper()
 	{
 		this(new DefaultMapperKeyComparer<>(null));
 	}
 	
-	protected AbstractOptionableMapper(IMapperKeyComparerWrapper<K> pComparer)
+	protected GenericOptionableMapper(IMapperKeyComparerWrapper<K> pComparer)
 	{
 		mComparer = pComparer;
 		mMap = new HashMap<>();
@@ -27,6 +28,21 @@ public abstract class AbstractOptionableMapper<K, V, F, O>
 	protected F internalResolve(K pKey)
 	{
 		return mMap.get(mComparer.setValue(pKey));
+	}
+	
+	protected F internalUnregister(K pKey)
+	{
+		return mMap.remove(mComparer.setValue(pKey));
+	}
+	
+	@Override
+	public Iterable<K> getKeys()
+	{
+		return mMap
+			.keySet()
+			.stream()
+			.map(IMapperKeyComparerWrapper::getValue)
+			.collect(Collectors.toList());
 	}
 	
 	@Override
@@ -39,6 +55,12 @@ public abstract class AbstractOptionableMapper<K, V, F, O>
 	public boolean containsKey(K pKey)
 	{
 		return mMap.containsKey(mComparer.setValue(pKey));
+	}
+	
+	@Override
+	public boolean isEmpty()
+	{
+		return mMap.isEmpty();
 	}
 	
 	public IMapperKeyComparerWrapper<K> getComparer()

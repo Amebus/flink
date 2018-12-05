@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.flink.api.common.IBuilder;
 import org.apache.flink.api.common.JsonLoader;
 import org.apache.flink.api.common.JsonLoaderOptions;
-import org.apache.flink.api.defaults.DefaultFunctionsNames;
+import org.apache.flink.api.newEngine.kernel.builder.options.DefaultsValues;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -33,12 +33,12 @@ public class JsonUserFunctionRepository implements IUserFunctionsRepository
 	
 	protected int getSupportedFunctionTypesCount()
 	{
-		return DefaultFunctionsNames.SUPPORTED_FUNCTION_TYPES_COUNT;
+		return DefaultsValues.DefaultFunctionsNames.SUPPORTED_FUNCTION_TYPES_COUNT;
 	}
 	
 	protected void setFunctionEngineTypes()
 	{
-		mFunctionEngineTypes = DefaultFunctionsNames.getDefaultFunctionEngineTypes();
+		mFunctionEngineTypes = DefaultsValues.getDefaultFunctionEngineTypes();
 	}
 	
 	protected void loadFunctions()
