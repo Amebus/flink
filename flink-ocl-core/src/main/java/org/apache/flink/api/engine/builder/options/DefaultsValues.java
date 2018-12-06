@@ -5,14 +5,13 @@ import org.apache.flink.api.common.mappers.StringKeyMapper;
 import org.apache.flink.api.engine.IOclContextMappings;
 import org.apache.flink.api.engine.ITupleBytesDimensionGetters;
 import org.apache.flink.api.engine.IUserFunction;
-import org.apache.flink.api.oEngine.mappings.FunctionKernelBuilderMapping;
 import org.apache.flink.api.engine.builder.KernelBuilder;
 import org.apache.flink.api.engine.builder.mappers.FunctionKernelBuilderMapper;
 import org.apache.flink.api.engine.builder.mappers.FunctionKernelBuilderOptionMapper;
 import org.apache.flink.api.engine.builder.mappers.TupleKindVarTypeToKernelTypeMapper;
 import org.apache.flink.api.serialization.StreamReader;
 import org.apache.flink.api.serialization.StreamWriter;
-import org.apache.flink.newConfiguration.ITupleDefinitionRepository;
+import org.apache.flink.configuration.ITupleDefinitionRepository;
 
 import static org.apache.flink.api.common.utility.IterableHelper.getIterableFromArgs;
 import static org.apache.flink.api.common.utility.IterableHelper.getStringIterableFromArgs;

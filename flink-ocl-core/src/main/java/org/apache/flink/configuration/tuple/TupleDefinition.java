@@ -1,7 +1,7 @@
-package org.apache.flink.newConfiguration.tuple;
+package org.apache.flink.configuration.tuple;
 
-import org.apache.flink.newConfiguration.ITupleDefinition;
-import org.apache.flink.newConfiguration.ITupleVarDefinition;
+import org.apache.flink.configuration.ITupleDefinition;
+import org.apache.flink.configuration.ITupleVarDefinition;
 
 import java.util.*;
 

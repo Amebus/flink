@@ -1,14 +1,14 @@
-package org.apache.flink.api.newConfiguration;
+package org.apache.flink.api.configuration;
 
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.RegularExpression;
 import org.apache.flink.api.common.*;
 import org.apache.flink.api.common.comparers.StringKeyCaseInsenstiveComparer;
 import org.apache.flink.api.common.mappers.StringKeyMapper;
-import org.apache.flink.newConfiguration.ITupleDefinition;
-import org.apache.flink.newConfiguration.ITupleDefinitionRepository;
-import org.apache.flink.newConfiguration.ITupleVarDefinition;
-import org.apache.flink.newConfiguration.tuple.TupleDefinition;
-import org.apache.flink.newConfiguration.tuple.TupleVarDefinition;
+import org.apache.flink.configuration.ITupleDefinition;
+import org.apache.flink.configuration.ITupleDefinitionRepository;
+import org.apache.flink.configuration.ITupleVarDefinition;
+import org.apache.flink.configuration.tuple.TupleDefinition;
+import org.apache.flink.configuration.tuple.TupleVarDefinition;
 
 import java.util.*;
 

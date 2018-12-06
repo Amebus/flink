@@ -4,13 +4,11 @@ import org.apache.flink.api.engine.BuildEngine;
 import org.apache.flink.api.engine.CppLibraryInfo;
 import org.apache.flink.api.engine.IOclContextMappings;
 import org.apache.flink.api.engine.IUserFunctionsRepository;
-import org.apache.flink.api.engine.builder.options.DefaultsValues;
-import org.apache.flink.api.serialization.StreamReader;
 import org.apache.flink.api.tuple.IOclTuple;
 import org.apache.flink.api.tuple.Tuple1Ocl;
 import org.apache.flink.configuration.ISettingsRepository;
-import org.apache.flink.newConfiguration.ITupleDefinition;
-import org.apache.flink.newConfiguration.ITupleDefinitionRepository;
+import org.apache.flink.configuration.ITupleDefinition;
+import org.apache.flink.configuration.ITupleDefinitionRepository;
 
 import java.io.File;
 import java.io.Serializable;

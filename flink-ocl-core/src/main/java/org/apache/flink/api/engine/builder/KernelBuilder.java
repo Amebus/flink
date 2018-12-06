@@ -8,7 +8,7 @@ import org.apache.flink.api.engine.builder.mappers.*;
 import org.apache.flink.api.engine.OclKernel;
 import org.apache.flink.configuration.IOclContextOptions;
 import org.apache.flink.configuration.IOclKernelsOptions;
-import org.apache.flink.newConfiguration.ITupleDefinitionRepository;
+import org.apache.flink.configuration.ITupleDefinitionRepository;
 
 import java.util.*;
 import java.util.function.Consumer;

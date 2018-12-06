@@ -1,4 +1,4 @@
-package org.apache.flink.newConfiguration;
+package org.apache.flink.configuration;
 
 public interface ITupleDefinitionRepository
 {

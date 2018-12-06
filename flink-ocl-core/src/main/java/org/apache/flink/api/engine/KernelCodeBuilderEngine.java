@@ -3,7 +3,7 @@ package org.apache.flink.api.engine;
 import org.apache.flink.api.engine.builder.mappers.FunctionKernelBuilderMapper;
 import org.apache.flink.api.engine.builder.mappers.FunctionKernelBuilderOptionMapper;
 import org.apache.flink.configuration.ISettingsRepository;
-import org.apache.flink.newConfiguration.ITupleDefinitionRepository;
+import org.apache.flink.configuration.ITupleDefinitionRepository;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

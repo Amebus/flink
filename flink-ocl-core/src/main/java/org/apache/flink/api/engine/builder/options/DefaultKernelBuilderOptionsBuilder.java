@@ -5,8 +5,8 @@ import org.apache.flink.api.engine.builder.KernelBuilder;
 import org.apache.flink.api.engine.builder.KernelBuilderOptions;
 import org.apache.flink.api.engine.builder.mappers.TupleKindsVarTypesToVariableDeserializationMapper;
 import org.apache.flink.api.tuple.Tuple2Ocl;
-import org.apache.flink.newConfiguration.ITupleDefinition;
-import org.apache.flink.newConfiguration.ITupleVarDefinition;
+import org.apache.flink.configuration.ITupleDefinition;
+import org.apache.flink.configuration.ITupleVarDefinition;
 
 import java.util.ArrayList;
 import java.util.List;

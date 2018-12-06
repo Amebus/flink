@@ -4,7 +4,7 @@ import org.apache.flink.api.common.IBuilder;
 import org.apache.flink.api.engine.IUserFunction;
 import org.apache.flink.configuration.IOclContextOptions;
 import org.apache.flink.configuration.IOclKernelsOptions;
-import org.apache.flink.newConfiguration.ITupleDefinitionRepository;
+import org.apache.flink.configuration.ITupleDefinitionRepository;
 
 public interface IKernelBuilderOptionsBuilder<T extends KernelBuilderOptions> extends IBuilder<T>
 {
