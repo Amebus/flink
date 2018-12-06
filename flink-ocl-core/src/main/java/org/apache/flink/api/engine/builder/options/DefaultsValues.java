@@ -463,7 +463,8 @@ public class DefaultsValues
 		@Override
 		public String getUtilityVariables(IUserFunction pUserFunction, ITupleDefinitionRepository pRepository)
 		{
-			return "unsigned char _arity = _data[0];\n" +
+			byte vArity = pRepository.getTupleDefinition(pUserFunction.getInputTupleName()).getArity();
+			return "unsigned char _arity = " + vArity + ";\n" +
 				   "int _i = _dataIndexes[_gId];\n" +
 				   "int _userIndex = _i;\n" +
 				   "long _l = 0;" +

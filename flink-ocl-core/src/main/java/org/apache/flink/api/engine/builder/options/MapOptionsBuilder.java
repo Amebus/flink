@@ -19,12 +19,6 @@ import static org.apache.flink.api.common.utility.IterableHelper.getIterableFrom
 
 public class MapOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<KernelBuilderOptions>
 {
-	
-	public MapOptionsBuilder()
-	{
-		super();
-	}
-	
 	@Override
 	protected void setUtilityVariablesGetter()
 	{

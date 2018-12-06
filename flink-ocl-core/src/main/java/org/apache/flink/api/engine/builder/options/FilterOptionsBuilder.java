@@ -15,18 +15,6 @@ import static org.apache.flink.api.common.utility.IterableHelper.getIterableFrom
 public class FilterOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<KernelBuilderOptions>
 {
 	
-	
-	public FilterOptionsBuilder()
-	{
-		super();
-	}
-	
-//	@Override
-//	protected void setTupleKinds()
-//	{
-//		setTupleKinds(getStringIterableFromArgs(DefaultsValues.DefaultsTuplesKinds.INPUT_TUPLE));
-//	}
-	
 	protected String getBooleanType()
 	{
 		return DefaultsValues.Filter.BOOLEAN;
