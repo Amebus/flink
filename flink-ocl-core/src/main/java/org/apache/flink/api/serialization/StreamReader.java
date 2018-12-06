@@ -1,7 +1,7 @@
 package org.apache.flink.api.serialization;
 
 import com.sun.istack.internal.NotNull;
-import org.apache.flink.api.defaults.DefaultsSerializationTypes;
+import org.apache.flink.api.engine.builder.options.DefaultsValues;
 import org.apache.flink.api.tuple.IOclTuple;
 import org.apache.flink.api.tuple.Tuple1Ocl;
 import org.apache.flink.api.tuple.Tuple2Ocl;
@@ -123,13 +123,13 @@ public class StreamReader implements Iterable<IOclTuple>
 				vType = mStream[mTypeIndex++];
 				switch (vType)
 				{
-					case DefaultsSerializationTypes.INT:
+					case DefaultsValues.DefaultsSerializationTypes.INT:
 						integerFromByteArray();
 						break;
-					case DefaultsSerializationTypes.DOUBLE:
+					case DefaultsValues.DefaultsSerializationTypes.DOUBLE:
 						doubleFromByteArray();
 						break;
-					case DefaultsSerializationTypes.STRING:
+					case DefaultsValues.DefaultsSerializationTypes.STRING:
 						stringFromByteArray();
 						break;
 					default:

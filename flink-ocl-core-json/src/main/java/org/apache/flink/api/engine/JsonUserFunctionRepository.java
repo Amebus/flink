@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.flink.api.common.IBuilder;
 import org.apache.flink.api.common.JsonLoader;
 import org.apache.flink.api.common.JsonLoaderOptions;
-import org.apache.flink.api.newEngine.kernel.builder.options.DefaultsValues;
+import org.apache.flink.api.engine.builder.options.DefaultsValues;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;

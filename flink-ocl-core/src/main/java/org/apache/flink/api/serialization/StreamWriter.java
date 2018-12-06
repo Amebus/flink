@@ -1,7 +1,7 @@
 package org.apache.flink.api.serialization;
 
 
-import org.apache.flink.api.defaults.DefaultsSerializationTypes;
+import org.apache.flink.api.engine.builder.options.DefaultsValues;
 import org.apache.flink.api.tuple.IOclTuple;
 
 public class StreamWriter
@@ -96,13 +96,13 @@ public class StreamWriter
 			switch (vT.getClass().getName())
 			{
 				case "java.lang.Integer":
-					vResult[vI++] = DefaultsSerializationTypes.INT;
+					vResult[vI++] = DefaultsValues.DefaultsSerializationTypes.INT;
 					break;
 				case "java.lang.Double":
-					vResult[vI++] = DefaultsSerializationTypes.DOUBLE;
+					vResult[vI++] = DefaultsValues.DefaultsSerializationTypes.DOUBLE;
 					break;
 				case "java.lang.String":
-					vResult[vI++] = DefaultsSerializationTypes.STRING;
+					vResult[vI++] = DefaultsValues.DefaultsSerializationTypes.STRING;
 					break;
 				default:
 					throw new IllegalArgumentException("Object type not recognized, unable to serialize it");
@@ -123,12 +123,12 @@ public class StreamWriter
 			vT = pTuple.getFieldOcl(i);
 			switch (mVarTypes[vIndex++])
 			{
-				case DefaultsSerializationTypes.DOUBLE:
+				case DefaultsValues.DefaultsSerializationTypes.DOUBLE:
 					vDim += Dimensions.DOUBLE;
 					break;
-				case DefaultsSerializationTypes.STRING:
+				case DefaultsValues.DefaultsSerializationTypes.STRING:
 					vDim += (((String)vT).length() + 1);
-				case DefaultsSerializationTypes.INT:
+				case DefaultsValues.DefaultsSerializationTypes.INT:
 					vDim += Dimensions.INT;
 			}
 		}
@@ -145,15 +145,15 @@ public class StreamWriter
 		{
 			switch (mVarTypes[i])
 			{
-				case DefaultsSerializationTypes.INT:
+				case DefaultsValues.DefaultsSerializationTypes.INT:
 					mTempInteger = pTuple.getField(i);
 					insertInt(pStream);
 					break;
-				case DefaultsSerializationTypes.DOUBLE:
+				case DefaultsValues.DefaultsSerializationTypes.DOUBLE:
 					mTempDouble = pTuple.getField(i);
 					insertDouble(pStream);
 					break;
-				case DefaultsSerializationTypes.STRING:
+				case DefaultsValues.DefaultsSerializationTypes.STRING:
 					mTempString = pTuple.getField(i);
 					insertString(pStream);
 					break;

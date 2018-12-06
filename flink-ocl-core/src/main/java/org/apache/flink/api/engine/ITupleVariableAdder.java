@@ -1,6 +1,6 @@
 package org.apache.flink.api.engine;
 
-import org.apache.flink.api.engine.tuple.variable.VarDefinition;
+import org.apache.flink.api.oEngine.variable.VarDefinition;
 import org.apache.flink.configuration.CTType;
 
 import java.io.Serializable;

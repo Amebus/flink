@@ -1,7 +1,7 @@
 package org.apache.flink.streaming.api.serialization;
 
 
-import org.apache.flink.api.newEngine.kernel.builder.options.DefaultsValues;
+import org.apache.flink.api.engine.builder.options.DefaultsValues;
 import org.apache.flink.api.serialization.Dimensions;
 import org.apache.flink.api.serialization.StreamWriter;
 import org.apache.flink.api.serialization.StreamWriterResult;

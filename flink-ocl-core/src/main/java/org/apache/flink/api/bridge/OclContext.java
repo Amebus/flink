@@ -4,13 +4,13 @@ import org.apache.flink.api.engine.BuildEngine;
 import org.apache.flink.api.engine.CppLibraryInfo;
 import org.apache.flink.api.engine.IOclContextMappings;
 import org.apache.flink.api.engine.IUserFunctionsRepository;
-import org.apache.flink.api.newEngine.kernel.builder.options.DefaultsValues;
+import org.apache.flink.api.engine.builder.options.DefaultsValues;
 import org.apache.flink.api.serialization.StreamReader;
 import org.apache.flink.api.tuple.IOclTuple;
 import org.apache.flink.api.tuple.Tuple1Ocl;
 import org.apache.flink.configuration.ISettingsRepository;
-import org.apache.flink.configuration.ITupleDefinition;
-import org.apache.flink.configuration.ITupleDefinitionsRepository;
+import org.apache.flink.newConfiguration.ITupleDefinition;
+import org.apache.flink.newConfiguration.ITupleDefinitionRepository;
 
 import java.io.File;
 import java.io.Serializable;
@@ -23,7 +23,7 @@ import java.util.Objects;
 public class OclContext implements Serializable
 {
 	transient private ISettingsRepository mSettingsRepository;
-	transient private ITupleDefinitionsRepository mTupleDefinitionsRepository;
+	transient private ITupleDefinitionRepository mTupleDefinitionRepository;
 	transient private IUserFunctionsRepository mFunctionRepository;
 	transient private IOclContextMappings mOclContextMappings;
 	
@@ -32,15 +32,15 @@ public class OclContext implements Serializable
 	private OclBridge mOclBridgeContext;
 	
 	public OclContext(ISettingsRepository pSettingsRepository,
-					  ITupleDefinitionsRepository pTupleDefinitionsRepository,
+					  ITupleDefinitionRepository pTupleDefinitionRepository,
 					  IUserFunctionsRepository pUserFunctionsRepository,
 					  IOclContextMappings pOclContextMappings)
 	{
 		mSettingsRepository = pSettingsRepository;
-		mTupleDefinitionsRepository = pTupleDefinitionsRepository;
+		mTupleDefinitionRepository = pTupleDefinitionRepository;
 		mFunctionRepository = pUserFunctionsRepository;
 		mOclContextMappings = pOclContextMappings;
-		mOclBridgeContext = new OclBridge(mOclContextMappings.getStreamWriter(), mOclContextMappings.getStreamReader());
+		mOclBridgeContext = new OclBridge(mOclContextMappings.getStreamWriter());
 	}
 	
 	public void open()
@@ -60,8 +60,10 @@ public class OclContext implements Serializable
 	
 	private void generatesKernels()
 	{
-		mCppLibraryInfo = new BuildEngine(mSettingsRepository, mOclContextMappings.getFunctionKernelBuilderMapping())
-			.generateKernels(mTupleDefinitionsRepository, mFunctionRepository.getUserFunctions())
+		mCppLibraryInfo = new BuildEngine(mSettingsRepository,
+										  mOclContextMappings.getFunctionKernelBuilderMapper(),
+										  mOclContextMappings.getFunctionKernelBuilderOptionMapper())
+			.generateKernels(mTupleDefinitionRepository, mFunctionRepository.getUserFunctions())
 			.getCppLibraryInfo();
 	}
 	
@@ -115,12 +117,12 @@ public class OclContext implements Serializable
 	{
 		
 		String vOutputTupleName = mFunctionRepository.getUserFunctionByName(pUserFunctionName).getOutputTupleName();
-		ITupleDefinition vOutputTuple = mTupleDefinitionsRepository.getTupleDefinition(vOutputTupleName);
-		int vTupleDim = vOutputTuple.getMaxDimension();
+		ITupleDefinition vOutputTuple = mTupleDefinitionRepository.getTupleDefinition(vOutputTupleName);
+		int vTupleDim = mOclContextMappings.getTupleBytesDimensionGetters().getTupleDimension(vOutputTuple);
 		OutputTupleInfo vOutputTupleInfo = getOutputTupleInfo(vOutputTuple);
 		
 		byte[] vStream = mOclBridgeContext.map(pUserFunctionName, pTuples, vTupleDim, vOutputTupleInfo, pInputTuplesCount);
-		return StreamReader.getStreamReader().setStream(vStream);
+		return mOclContextMappings.getStreamReader().setStream(vStream);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -130,8 +132,8 @@ public class OclContext implements Serializable
 		int pInputTuplesCount)
 	{
 		String vOutputTupleName = mFunctionRepository.getUserFunctionByName(pUserFunctionName).getOutputTupleName();
-		ITupleDefinition vOutputTuple = mTupleDefinitionsRepository.getTupleDefinition(vOutputTupleName);
-		int vTupleDim = vOutputTuple.getMaxDimension();
+		ITupleDefinition vOutputTuple = mTupleDefinitionRepository.getTupleDefinition(vOutputTupleName);
+		int vTupleDim = mOclContextMappings.getTupleBytesDimensionGetters().getTupleDimension(vOutputTuple);
 		OutputTupleInfo vOutputTupleInfo = getOutputTupleInfo(vOutputTuple);
 		
 //		byte[] vStream = mOclBridgeContext.reduce(pUserFunctionName, pTuples, vTupleDim, vOutputTupleInfo, pInputTuplesCount);
@@ -145,25 +147,11 @@ public class OclContext implements Serializable
 			new OutputTupleInfo.OutputTupleInfoBuilder()
 				.setArity(pOutputTuple.getArity());
 		
-		pOutputTuple.cIterator()
-					.forEachRemaining(x ->
-									  {
-										  byte vType;
-										  if(x.isInteger())
-										  {
-											  vType = DefaultsValues.DefaultsSerializationTypes.INT;
-										  }
-										  else if (x.isDouble())
-										  {
-											  vType = DefaultsValues.DefaultsSerializationTypes.DOUBLE;
-										  }
-										  else
-										  {
-											  vType = DefaultsValues.DefaultsSerializationTypes.STRING;
-										  }
-										  vInfoBuilder.setTType(vType);
-									  });
-		
+		pOutputTuple
+			.forEach(pVarDef ->
+						 vInfoBuilder.setTType(mOclContextMappings
+												   .getVarTypeToSerializationTypeMapper()
+												   .resolve(pVarDef.getType())));
 		return vInfoBuilder.build();
 	}
 }

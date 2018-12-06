@@ -1,10 +1,8 @@
 package org.apache.flink.api.newEngine;
 
-import org.apache.flink.api.configuration.JsonSettingsRepository;
 import org.apache.flink.api.engine.IUserFunction;
 import org.apache.flink.api.engine.JsonUserFunction;
 import org.apache.flink.api.engine.JsonUserFunctionRepository;
-import org.apache.flink.api.newEngine.kernel.KernelCodeBuilderEngine;
 import org.apache.flink.streaming.helpers.Constants;
 import org.junit.Test;
 

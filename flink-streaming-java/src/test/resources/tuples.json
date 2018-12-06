@@ -9,6 +9,6 @@
     "t0": "int"
   },
   "tupleThree": {
-    "t0": "string:12"
+    "t0": "string::D12"
   }
 }

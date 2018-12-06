@@ -1,31 +1,37 @@
 package org.apache.flink.api.engine;
 
-import org.apache.flink.api.engine.kernel.KernelCodeBuilderEngine;
-import org.apache.flink.api.engine.mappings.FunctionKernelBuilderMapping;
+import org.apache.flink.api.engine.builder.mappers.FunctionKernelBuilderMapper;
+import org.apache.flink.api.engine.builder.mappers.FunctionKernelBuilderOptionMapper;
 import org.apache.flink.configuration.ISettingsRepository;
-import org.apache.flink.configuration.ITupleDefinitionsRepository;
+import org.apache.flink.newConfiguration.ITupleDefinitionRepository;
 
 public class BuildEngine
 {
 	private ISettingsRepository mSettingsRepository;
 	private CppLibraryInfo mCppLibraryInfo;
-	private FunctionKernelBuilderMapping mFunctionKernelBuilderMapping;
+	private FunctionKernelBuilderMapper mFunctionKernelBuilderMapper;
+	private FunctionKernelBuilderOptionMapper mFunctionKernelBuilderOptionMapper;
 	
-	public BuildEngine(ISettingsRepository pSettingsRepository, FunctionKernelBuilderMapping pFunctionKernelBuilderMapping)
+	public BuildEngine(
+		ISettingsRepository pSettingsRepository,
+		FunctionKernelBuilderMapper pFunctionKernelBuilderMapper,
+		FunctionKernelBuilderOptionMapper pFunctionKernelBuilderOptionMapper)
 	{
 		mSettingsRepository = pSettingsRepository;
-		mFunctionKernelBuilderMapping = pFunctionKernelBuilderMapping;
+		mFunctionKernelBuilderMapper = pFunctionKernelBuilderMapper;
+		mFunctionKernelBuilderOptionMapper = pFunctionKernelBuilderOptionMapper;
 	}
 	
 	public BuildEngine generateKernels(
-		ITupleDefinitionsRepository pTupleDefinitions,
+		ITupleDefinitionRepository pTupleDefinitions,
 		Iterable<? extends IUserFunction> pUserFunctions)
 	{
 		mCppLibraryInfo = new KernelCodeBuilderEngine(
 			mSettingsRepository,
 			pTupleDefinitions,
 			pUserFunctions,
-			mFunctionKernelBuilderMapping)
+			mFunctionKernelBuilderMapper,
+			mFunctionKernelBuilderOptionMapper)
 			.generateKernels();
 		return this;
 	}

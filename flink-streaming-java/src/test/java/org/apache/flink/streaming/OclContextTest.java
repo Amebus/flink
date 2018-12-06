@@ -4,19 +4,17 @@ import org.apache.flink.api.bridge.OclContext;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.configuration.JsonSettingsRepository;
-import org.apache.flink.api.configuration.JsonTupleDefinition;
-import org.apache.flink.api.configuration.JsonTupleDefinitionsRepository;
 import org.apache.flink.api.engine.CppLibraryInfo;
 import org.apache.flink.api.engine.IUserFunctionsRepository;
 import org.apache.flink.api.engine.JsonUserFunctionRepository;
+import org.apache.flink.api.engine.KernelCodeBuilderEngine;
+import org.apache.flink.api.engine.builder.options.DefaultsValues;
 import org.apache.flink.api.newConfiguration.JsonTupleRepository;
-import org.apache.flink.api.newEngine.kernel.KernelCodeBuilderEngine;
-import org.apache.flink.api.newEngine.kernel.builder.options.DefaultsValues;
 import org.apache.flink.api.tuple.IOclTuple;
 import org.apache.flink.api.tuple.Tuple1Ocl;
 import org.apache.flink.api.typeutils.OclTupleTypeInfo;
 import org.apache.flink.configuration.ISettingsRepository;
-import org.apache.flink.configuration.ITupleDefinitionsRepository;
+import org.apache.flink.newConfiguration.ITupleDefinitionRepository;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.helpers.Constants;
@@ -39,7 +37,7 @@ public class OclContextTest
 	private OclContext getOclContext(String pFileName)
 	{
 		return new OclContext(new JsonSettingsRepository(Constants.RESOURCES_DIR),
-					   new JsonTupleDefinitionsRepository(Constants.RESOURCES_DIR),
+					   new JsonTupleRepository.Builder(Constants.RESOURCES_DIR).build(),
 					   new JsonUserFunctionRepository
 						   .Builder(Constants.FUNCTIONS_DIR)
 						   .setFileName(pFileName).build(),
@@ -60,7 +58,7 @@ public class OclContextTest
 		vContext.close();
 	}
 	
-//	@Test
+	@Test
 	public void OclMapSimple_IntToString()
 	{
 		OclContext vContext = getOclContext("functions.json");
@@ -81,7 +79,7 @@ public class OclContextTest
 						});
 	}
 	
-	@Test
+//	@Test
 	public void AAA()
 	{
 		KernelCodeBuilderEngine vEngine = new KernelCodeBuilderEngine(
@@ -99,7 +97,7 @@ public class OclContextTest
 		System.out.println(vInfo.getKernelsFolder());
 	}
 	
-//	@Test
+	@Test
 	public void OclMapSimple_StringToInt()
 	{
 		OclContext vContext = getOclContext("functions.json");
@@ -124,7 +122,7 @@ public class OclContextTest
 		
 	}
 	
-//	@Test
+	@Test
 	public void OclFilterSimple()
 	{
 		OclContext vContext = getOclContext("filterFunction2.json");
@@ -202,7 +200,7 @@ public class OclContextTest
 	public void simpleMapTest() throws  Exception
 	{
 		ISettingsRepository a = new JsonSettingsRepository(Constants.RESOURCES_DIR);
-		ITupleDefinitionsRepository b = new JsonTupleDefinitionsRepository(Constants.RESOURCES_DIR);
+		ITupleDefinitionRepository b = new JsonTupleRepository.Builder(Constants.RESOURCES_DIR).build();
 		IUserFunctionsRepository c = new JsonUserFunctionRepository
 			.Builder(Constants.FUNCTIONS_DIR)
 			.setFileName("filterFunction2.json").build();
