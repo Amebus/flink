@@ -47,7 +47,7 @@ int stringToInteger(char *s)
     return r;
 }
 
-int globalStringToInteger(__global char *s)
+int localStringToInteger(__local unsigned char *s)
 {
     const char z = '0';
     int r = 0, st = 0, p = 1;
@@ -67,6 +67,7 @@ int globalStringToInteger(__global char *s)
     }
     return r;
 }
+
 
 #define SER_INT(i, si, r)          \
         r[si] = (i >> 24) & 0xFF;  \
@@ -148,21 +149,23 @@ int globalStringToInteger(__global char *s)
             rs = (__local unsigned char *)&d[si]; 	\
             si+=ri;                 			    \
 
-#define INT = 1;
-#define DOUBLE = 2;
-#define STRING = 3;
+#define INT 1
+#define DOUBLE 2
+#define STRING 3
 
 __kernel void mapStringToInt(
 	__global unsigned char *_data, 
 	__global int *_dataIndexes, 
-	__global unsigned char *_result
+    __global unsigned char *_jobDone,
+	__global unsigned char *_result,
     __local unsigned char *_localCache)
 {
     // region variables to add
-    int _grSize = get_local_size(0);
-    int _lId = get_local_id(0);
-    int _grId = get_group_id(0);
-    int _gId = get_global_id(0);
+    uint _grSize = get_local_size(0);
+    uint _lId = get_local_id(0);
+    uint _grId = get_group_id(0);
+    //
+    uint _gId = get_global_id(0);
     unsigned char _arity = 3;
     int _i = _dataIndexes[_gId];
     int _userIndex = _i;
@@ -173,13 +176,13 @@ __kernel void mapStringToInt(
     int _ri0 = _roff + _grId * _otd; //Deve cambiare, _gId -> _grId
 
     // region variables to add
-    int _grSize = get_local_size(0);
-    int _lId = get_local_id(0);
-    int _grId = get_group_id(0);
-    int _lri0 = _lId * _otd;
-    int _lri1 = _lri0 + getMaxByte();
-    int _temp = 0;
+    uint _lri0 = _lId * _otd;
+    uint _lri1 = _lri0 + getMaxByte();
+    uint _uiTemp = 0;
+    int _iTemp = 0;
     unsigned char _tCounter = 0;
+    bool _continueCopy = 1;
+    uint _copyLength = 0;
     //
 
     int _r0;
@@ -187,14 +190,14 @@ __kernel void mapStringToInt(
     int _sl0;
     __local unsigned char* _t0;
 
-    //copy from global to local
+    //copy from global to private
     unsigned char _types[3];
     _types[0] = _data[1];
     _types[1] = _data[2];
     _types[2] = _data[3];
 
-    int _continueCopy = 1;
-    int _copyLength = 0;
+    _jobDone[_gId] = 0;
+
     for(int i = _i, k = _lId * _otd, j = 0; _tCounter < _arity; _tCounter++)
     {
         if(_types[_tCounter] < STRING)
@@ -214,7 +217,7 @@ __kernel void mapStringToInt(
         }
         else
         {
-            SER_INT( getStringMaxByte(), k, _localCache);
+            //if per capire la lunghezza massima della stringa
             i+=4;
             do 
             {
@@ -238,22 +241,19 @@ __kernel void mapStringToInt(
 
     for(uint _stride = _grSize/2; _stride > 0 ; _stride /= 2)
     {
-
         if(_lId < _stride)
         {
             //dentro al ciclo con lo stride
-            _temp = _i;
-            DESER_STRING( _localCache, _i, _t0, _sl0 );
+            _iTemp = _i;
+            DESER_STRING( _localCache, _iTemp, _t0, _sl0 );
 
             //funzione utente
-            _r0 = globalStringToInteger(_t0);
+            _r0 = localStringToInteger(_t0);
 
 
-            _i = _temp;
-
-            _temp = _ri0;
-            SER_INT( _r0, _ri0, _localCache );
-            _ri0 = _temp;
+            _iTemp = _ri0;
+            SER_INT( _r0, _iTemp, _localCache );
+            
         }   
         barrier(CLK_LOCAL_MEM_FENCE);
     }
@@ -264,10 +264,20 @@ __kernel void mapStringToInt(
     //capire come metterlo giusto per ogni passaggio intermedio e quello finale
     if(_lId == 0)
     {
-        for(int i = 0, j = _grId; i < _otd; i++, j++)
+        for(int i = 0, j = _ri0; i < _otd; i++, j++)
         {
             _result[j] = _localCache[i];
         }
     }
+    else if(_jobDone[_gId] == 0)
+    {
+        //aggiorna _jobDone per dire che ha già scritto
+        _jobDone[_gId] = 1;
 
+        for(int i = 0, j = _ri0; i < _otd; i++, j++)
+        {
+            _result[j] = _localCache[i];
+        }
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
 };

@@ -6,6 +6,7 @@ import org.apache.flink.api.engine.IOclContextMappings;
 import org.apache.flink.api.engine.ITupleBytesDimensionGetters;
 import org.apache.flink.api.engine.IUserFunction;
 import org.apache.flink.api.engine.builder.KernelBuilder;
+import org.apache.flink.api.engine.builder.ReduceKernelBuilder;
 import org.apache.flink.api.engine.builder.mappers.FunctionKernelBuilderMapper;
 import org.apache.flink.api.engine.builder.mappers.FunctionKernelBuilderOptionMapper;
 import org.apache.flink.api.engine.builder.mappers.TupleKindVarTypeToKernelTypeMapper;
@@ -150,7 +151,49 @@ public class DefaultsValues
 	
 	public static class Reduce
 	{
-	
+		public static final String LOCAL_TUPLE_A = "local-a";
+		public static final String LOCAL_TUPLE_B = "local-b";
+		public static final String IDENTITY_TUPLE = "identity";
+		
+		public static Iterable<String> getDefaultTuplesEngineKinds()
+		{
+			return getStringIterableFromArgs(LOCAL_TUPLE_A,
+											 LOCAL_TUPLE_B,
+											 IDENTITY_TUPLE);
+		}
+		
+		public static TupleKindVarTypeToKernelTypeMapper getTupleKindVarTypeToKernelTypeMapper(
+			KernelBuilder.ITupleKindVariableTypeKeyCalculator pKeyCalculator)
+		{
+			TupleKindVarTypeToKernelTypeMapper vMapper = DefaultsValues.getTupleKindVarTypeToKernelTypeMapper();
+			
+			enrichMapper(pKeyCalculator, vMapper, LOCAL_TUPLE_A);
+			
+			enrichMapper(pKeyCalculator, vMapper, LOCAL_TUPLE_B);
+			
+			vMapper.register(
+				pKeyCalculator.getKey(IDENTITY_TUPLE, DefaultVarTypes.INT),
+				"int");
+			
+			return vMapper;
+		}
+		
+		private static void enrichMapper(KernelBuilder.ITupleKindVariableTypeKeyCalculator pKeyCalculator,
+										 TupleKindVarTypeToKernelTypeMapper pMapper,
+										 String pTupleKind)
+		{
+			pMapper.register(
+				pKeyCalculator.getKey(pTupleKind, DefaultVarTypes.INT),
+				"int");
+			
+			pMapper.register(
+				pKeyCalculator.getKey(pTupleKind, DefaultVarTypes.DOUBLE),
+				"double");
+			
+			pMapper.register(
+				pKeyCalculator.getKey(pTupleKind, DefaultVarTypes.STRING),
+				"__local unsigned char*");
+		}
 	}
 	
 	public static class DefaultUtilityFunctions
@@ -234,8 +277,6 @@ public class DefaultsValues
 		
 		public static final String INPUT_TUPLE = "input-tuple";
 		public static final String OUTPUT_TUPLE = "output-tuple";
-		
-		public static final String CACHE_TUPLE = "cache-tuple";
 	}
 	
 	public static class DefaultVarTypes
@@ -370,7 +411,7 @@ public class DefaultsValues
 		{
 			register(DefaultFunctionsNames.MAP, KernelBuilder::new);
 			register(DefaultFunctionsNames.FILTER, KernelBuilder::new);
-			register(DefaultFunctionsNames.REDUCE, KernelBuilder::new);
+			register(DefaultFunctionsNames.REDUCE, ReduceKernelBuilder::new);
 		}
 	}
 	
@@ -384,12 +425,11 @@ public class DefaultsValues
 		
 		protected void setUpMappers()
 		{
-			
 			register(DefaultFunctionsNames.MAP, new MapOptionsBuilder());
 
 			register(DefaultFunctionsNames.FILTER, new FilterOptionsBuilder());
-//
-//			register(DefaultFunctionsNames.REDUCE, );
+
+			register(DefaultFunctionsNames.REDUCE, new ReduceOptionsBuilder());
 		}
 	}
 	

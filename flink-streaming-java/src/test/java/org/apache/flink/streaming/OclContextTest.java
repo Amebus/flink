@@ -48,7 +48,7 @@ public class OclContextTest
 	public ExpectedException expectedException = ExpectedException.none();
 	
 	
-//	@Test
+	@Test
 	public void OclReduceSimple()
 	{
 		OclContext vContext = getOclContext("reduce.json");
@@ -58,7 +58,7 @@ public class OclContextTest
 		vContext.close();
 	}
 	
-	@Test
+//	@Test
 	public void OclMapSimple_IntToString()
 	{
 		OclContext vContext = getOclContext("functions.json");
@@ -97,7 +97,7 @@ public class OclContextTest
 		System.out.println(vInfo.getKernelsFolder());
 	}
 	
-	@Test
+//	@Test
 	public void OclMapSimple_StringToInt()
 	{
 		OclContext vContext = getOclContext("functions.json");
@@ -122,7 +122,7 @@ public class OclContextTest
 		
 	}
 	
-	@Test
+//	@Test
 	public void OclFilterSimple()
 	{
 		OclContext vContext = getOclContext("filterFunction2.json");

@@ -152,16 +152,23 @@ public class KernelBuilder implements IBuilder<OclKernel>
 		HashMap<String, KernelVariablesLine> vKernelVariablesLines
 			= getKernelVariablesLines(vKernelLogicalVariables);
 		
+		return getKernelCode(vKernelLogicalVariables, vKernelVariablesLines);
+	}
+	
+	protected String getKernelCode(
+		HashMap<String, Iterable<KernelLogicalVariable>> pKernelLogicalVariables,
+		HashMap<String, KernelVariablesLine> pKernelVariablesLines)
+	{
 		return getUtilityFunctions() + "\n" +
 			   getSerializationMacros() + "\n" +
 			   getDeserializationMacros() + "\n" +
 			   getKernelSignature() + "\n" +
 			   "\n{\n" +
 			   getUtilityVars() +
-			   getVariableDefinitionsLine(vKernelVariablesLines) +
-			   getDeserialization(vKernelLogicalVariables) +
+			   getVariableDefinitionsLine(pKernelVariablesLines) +
+			   getDeserialization(pKernelLogicalVariables) +
 			   getUserFunction().getFunction() + "\n" +
-			   getSerialization(vKernelLogicalVariables) +
+			   getSerialization(pKernelLogicalVariables) +
 			   "\n};\n";
 	}
 	
@@ -223,7 +230,7 @@ public class KernelBuilder implements IBuilder<OclKernel>
 	
 	protected String getUtilityVars()
 	{
-		return "int _gId = get_global_id(0);\n" +
+		return "uint _gId = get_global_id(0);\n" +
 			   mUtilityVariablesGetter.getUtilityVariables(mUserFunction, mTupleDefinitions) +
 			   "\n";
 	}

@@ -171,8 +171,9 @@ public class MapOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Kernel
 				.getKey(DefaultsValues.DefaultsTuplesKinds.OUTPUT_TUPLE, DefaultsValues.DefaultVarTypes.INT),
 			pKernelLogicalVariable ->
 			{
-				String vLine = "SER_INT( #, _ri0, _result );"
-					.replace("#", pKernelLogicalVariable.getVarName());
+				String vLine = "SER_INT( #, @, _result );"
+					.replace("#", pKernelLogicalVariable.getVarName())
+					.replace("@","_ri" + pKernelLogicalVariable.getIndex());
 				return new KernelBuilder
 					.KernelSerializationLine(vLine, pKernelLogicalVariable.getIndex());
 			});
@@ -228,8 +229,8 @@ public class MapOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Kernel
 			vOffset += pTupleDefinition.getArity();
 			
 			return
-				"int _roff = " + vOffset + ";\n" +
-				"int _otd = " + getTupleDim(pTupleDefinition) + ";\n" +
+				"uint _roff = " + vOffset + ";\n" +
+				"uint _otd = " + getTupleDim(pTupleDefinition) + ";\n" +
 				getFirstResultIndex() + "\n" +
 				getTailResultIndexes(pTupleDefinition) + "\n";
 		}
@@ -241,7 +242,7 @@ public class MapOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Kernel
 		
 		protected String getFirstResultIndex()
 		{
-			return "int _ri0 = _roff + _gId * _otd;";
+			return "uint _ri0 = _roff + _gId * _otd;";
 		}
 		
 		private String getTailResultIndexes(ITupleDefinition pTupleDefinition)
@@ -266,7 +267,7 @@ public class MapOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Kernel
 			{
 				vPreviousTypeDim += 4;
 			}
-			return "int " +
+			return "uint " +
 				   "_ri" + pCurrentDefinition.getIndex() +
 				   " = " +
 				   "_ri" + (pPreviousDefinition.getIndex()) +

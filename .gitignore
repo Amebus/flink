@@ -38,3 +38,5 @@ tools/flink-*
 tools/releasing/release
 
 Cpp/Out/*
+
+oclinfo\.txt
