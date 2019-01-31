@@ -50,10 +50,10 @@ JNIEXPORT jbooleanArray JNICALL Java_org_apache_flink_api_bridge_AbstractOclBrid
 /*
  * Class:     org_apache_flink_api_bridge_AbstractOclBridge
  * Method:    OclReduce
- * Signature: (Ljava/lang/String;[B[II[B)[B
+ * Signature: (Ljava/lang/String;[B[II[BI)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_org_apache_flink_api_bridge_AbstractOclBridge_OclReduce
-  (JNIEnv *, jobject, jstring, jbyteArray, jintArray, jint, jbyteArray);
+  (JNIEnv *, jobject, jstring, jbyteArray, jintArray, jint, jbyteArray, jint);
 
 #ifdef __cplusplus
 }

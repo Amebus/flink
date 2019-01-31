@@ -55,6 +55,13 @@ public class OclContextTest
 		
 		vContext.open();
 		
+		List<IOclTuple> vTuples = new ArrayList<>(2);
+		
+		vTuples.add(new Tuple1Ocl<>(1));
+		vTuples.add(new Tuple1Ocl<>(5));
+		
+		IOclTuple vResult = vContext.reduce("reduceTest", vTuples, vTuples.size());
+		
 		vContext.close();
 	}
 	

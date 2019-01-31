@@ -1,9 +1,7 @@
 package org.apache.flink.api.bridge;
 
-import org.apache.flink.api.engine.BuildEngine;
-import org.apache.flink.api.engine.CppLibraryInfo;
-import org.apache.flink.api.engine.IOclContextMappings;
-import org.apache.flink.api.engine.IUserFunctionsRepository;
+import org.apache.flink.api.engine.*;
+import org.apache.flink.api.serialization.StreamReader;
 import org.apache.flink.api.tuple.IOclTuple;
 import org.apache.flink.api.tuple.Tuple1Ocl;
 import org.apache.flink.configuration.ISettingsRepository;
@@ -129,14 +127,29 @@ public class OclContext implements Serializable
 		Iterable<R> pTuples,
 		int pInputTuplesCount)
 	{
-		String vOutputTupleName = mFunctionRepository.getUserFunctionByName(pUserFunctionName).getOutputTupleName();
+		IUserFunction vUserFunction = mFunctionRepository.getUserFunctionByName(pUserFunctionName);
+		String vOutputTupleName = vUserFunction.getOutputTupleName();
 		ITupleDefinition vOutputTuple = mTupleDefinitionRepository.getTupleDefinition(vOutputTupleName);
 		int vTupleDim = mOclContextMappings.getTupleBytesDimensionGetters().getTupleDimension(vOutputTuple);
-		OutputTupleInfo vOutputTupleInfo = getOutputTupleInfo(vOutputTuple);
+		IdentityValues vIdentityValues = new IdentityValues(vOutputTuple, vTupleDim);
+		int vWorkGroupSize = vUserFunction.getWorkGroupSize();
 		
-//		byte[] vStream = mOclBridgeContext.reduce(pUserFunctionName, pTuples, vTupleDim, vOutputTupleInfo, pInputTuplesCount);
-//		return (R)StreamReader.getStreamReader().setStream(vStream).iterator().next();
-		return (R)new Tuple1Ocl<>();
+		if(!vUserFunction.isWorkGroupSpecified())
+		{
+			throw new IllegalArgumentException("The WorkGroupSize of the Reduce function must be specified");
+		}
+		
+		byte[] vStream =
+			mOclBridgeContext
+				.reduce(
+					pUserFunctionName,
+					pTuples,
+					vTupleDim,
+					vIdentityValues.toIdentityArray(),
+					pInputTuplesCount,
+					vWorkGroupSize);
+		return (R) StreamReader.getStreamReader().setStream(vStream).iterator().next();
+//		return (R) new Tuple1Ocl<>();
 	}
 	
 	private OutputTupleInfo getOutputTupleInfo(ITupleDefinition pOutputTuple)

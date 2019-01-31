@@ -51,10 +51,10 @@ public abstract class AbstractOclBridge implements Serializable
 	 * @param pData
 	 * @param pIndexes
 	 * @param pOutputTupleDimension
-	 * @param pOutputTupleArity The signature of the output tuple i.e. the arity plus the type of the elements
+	 * @param pIdentity The signature of the output tuple i.e. the arity plus the type of the elements
 	 * @return The resulting stream of bytes of the OpenCL computation
 	 * (to be used by {@link org.apache.flink.api.serialization.StreamReader})
 	 */
 	protected final native byte[] OclReduce(String pKernelName, byte[] pData, int[] pIndexes,
-											int pOutputTupleDimension, byte[] pOutputTupleArity);
+											int pOutputTupleDimension, byte[] pIdentity, int pWorkGroupSize);
 }

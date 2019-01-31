@@ -371,6 +371,13 @@ public class KernelBuilder implements IBuilder<OclKernel>
 	
 	protected String getDeserialization(HashMap<String, Iterable<KernelLogicalVariable>> pKernelLogicalVariables)
 	{
+		return getDeserialization(pKernelLogicalVariables, getTupleKinds());
+	}
+	
+	protected String getDeserialization(
+		HashMap<String, Iterable<KernelLogicalVariable>> pKernelLogicalVariables,
+		Iterable<String> pTupleKindsToUse)
+	{
 		StringKeyMapper<IVariableDeserialization> vMapper = mTupleKindsVarTypesToVariableDeserializationMapping;
 		
 		if(vMapper.isEmpty())
@@ -381,6 +388,11 @@ public class KernelBuilder implements IBuilder<OclKernel>
 		StringBuilder vBuilder = new StringBuilder(100000);
 		forEachTupleKind(pTupleKind ->
 						 {
+							 if(StreamUtility.streamFrom(pTupleKindsToUse).noneMatch(pK -> pK.equals(pTupleKind)))
+							 {
+								 return;
+							 }
+						 	
 							 Iterable<KernelLogicalVariable> vVariables = pKernelLogicalVariables.get(pTupleKind);
 							 List<KernelDeserializationLine> vLines = new ArrayList<>();
 							 
@@ -425,7 +437,14 @@ public class KernelBuilder implements IBuilder<OclKernel>
 		return vBuilder.toString();
 	}
 	
-	protected String getSerialization(HashMap<String, Iterable<KernelLogicalVariable>> pKernelLogicalVariables)
+	protected String getSerialization(HashMap<String, Iterable<KernelLogicalVariable>> pKernelLogicalVariables )
+	{
+		return getSerialization(pKernelLogicalVariables, getTupleKinds());
+	}
+	
+	protected String getSerialization(
+		HashMap<String, Iterable<KernelLogicalVariable>> pKernelLogicalVariables,
+		Iterable<String> pTupleKindsToUse)
 	{
 		StringKeyMapper<IVariableSerialization> vMapper = mTupleKindsVarTypesToVariableSerializationMapping;
 		
@@ -437,6 +456,11 @@ public class KernelBuilder implements IBuilder<OclKernel>
 		StringBuilder vBuilder = new StringBuilder(100000);
 		forEachTupleKind(pTupleKind ->
 						 {
+						 	if(StreamUtility.streamFrom(pTupleKindsToUse).noneMatch(pK -> pK.equals(pTupleKind)))
+							{
+								return;
+							}
+						 	
 							 Iterable<KernelLogicalVariable> vVariables = pKernelLogicalVariables.get(pTupleKind);
 							 List<KernelSerializationLine> vLines = new ArrayList<>();
 			
@@ -591,7 +615,7 @@ public class KernelBuilder implements IBuilder<OclKernel>
 		
 		public boolean isBytesDimSpecified()
 		{
-			return mBytesDim < 1;
+			return mBytesDim > 0;
 		}
 	}
 	

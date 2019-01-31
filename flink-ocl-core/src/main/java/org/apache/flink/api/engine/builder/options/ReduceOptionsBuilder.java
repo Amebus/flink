@@ -27,8 +27,9 @@ public class ReduceOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Ker
 		setKernelParametersList(
 			getStringIterableFromArgs("__global unsigned char *_data",
 									  "__global int *_dataIndexes",
-									  "__global unsigned char *_jobDone",
-									  "__global unsigned char *_result",
+									  "__global unsigned char *_finalResult",
+									  "__global unsigned char *_identity",
+									  "__global unsigned char *_midResults",
 									  "__local unsigned char *_localCache"));
 	}
 	
@@ -70,10 +71,10 @@ public class ReduceOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Ker
 		getIterableFromArgs(
 			getAIntSerialization(),
 			getADoubleSerialization(),
-			getAStringSerialization(),
-			getBIntSerialization(),
-			getBDoubleSerialization(),
-			getBStringSerialization())
+			getAStringSerialization())
+//			getBIntSerialization(),
+//			getBDoubleSerialization(),
+//			getBStringSerialization())
 			.forEach(pGenerator -> vMapper.register(pGenerator.f0, pGenerator.f1));
 		
 		setTupleKindsVarTypesToVariableSerializationMapping(vMapper);
@@ -183,6 +184,7 @@ public class ReduceOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Ker
 			return super.getUtilityVariables(pUserFunction, pRepository) +
 				   "\n\n" +
 				   getOclIndexes() +
+				   getAdditionalOclVariables() +
 				   "\n\n" +
 				   getOutputUtilityVariables(vTupleDefinition) +
 				   "\n\n" +
@@ -191,9 +193,17 @@ public class ReduceOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Ker
 		
 		protected String getOclIndexes()
 		{
+			return "uint _lId = get_local_id(0);\n" +
+				   "uint _grId = get_group_id(0);\n";
+		}
+		
+		protected String getAdditionalOclVariables()
+		{
 			return "uint _grSize = get_local_size(0);\n" +
-				   "uint _lId = get_local_id(0);\n" +
-				   "uint _grId = get_group_id(0);";
+				   "uint _gSize = get_global_size(0);\n" +
+				   "uint _outputCount = get_num_groups(0);\n" +
+				   "uint _steps = ceil(log2((double)_gSize)/log2((double)_grSize));\n" +
+				   "\n";
 		}
 		
 		protected String getAdditionalVariables(ITupleDefinition pTupleDefinition)
@@ -457,50 +467,50 @@ public class ReduceOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Ker
 			});
 	}
 	
-	private Tuple2Ocl<String, KernelBuilder.IVariableSerialization> getBIntSerialization()
-	{
-		return new Tuple2Ocl<>(
-			getTupleKindVariableTypeKeyCalculator()
-				.getKey(DefaultsValues.Reduce.LOCAL_TUPLE_B, DefaultsValues.DefaultVarTypes.INT),
-			pKernelLogicalVariable ->
-			{
-				String vLine = "SER_INT( #, _iTemp, _localCache );"
-					.replace("#", pKernelLogicalVariable.getVarName());
-				return new KernelBuilder
-					.KernelSerializationLine(vLine, pKernelLogicalVariable.getIndex());
-			});
-	}
+//	private Tuple2Ocl<String, KernelBuilder.IVariableSerialization> getBIntSerialization()
+//	{
+//		return new Tuple2Ocl<>(
+//			getTupleKindVariableTypeKeyCalculator()
+//				.getKey(DefaultsValues.Reduce.LOCAL_TUPLE_B, DefaultsValues.DefaultVarTypes.INT),
+//			pKernelLogicalVariable ->
+//			{
+//				String vLine = "SER_INT( #, _iTemp, _localCache );"
+//					.replace("#", pKernelLogicalVariable.getVarName());
+//				return new KernelBuilder
+//					.KernelSerializationLine(vLine, pKernelLogicalVariable.getIndex());
+//			});
+//	}
 	
-	private Tuple2Ocl<String, KernelBuilder.IVariableSerialization> getBDoubleSerialization()
-	{
-		return new Tuple2Ocl<>(
-			getTupleKindVariableTypeKeyCalculator()
-				.getKey(DefaultsValues.Reduce.LOCAL_TUPLE_B, DefaultsValues.DefaultVarTypes.DOUBLE),
-			pKernelLogicalVariable ->
-			{
-				String vLine = "SER_DOUBLE( #, _iTemp, _localCache, _l)"
-					.replace("#", pKernelLogicalVariable.getVarName());
-				return new KernelBuilder
-					.KernelSerializationLine(vLine, pKernelLogicalVariable.getIndex());
-			});
-	}
+//	private Tuple2Ocl<String, KernelBuilder.IVariableSerialization> getBDoubleSerialization()
+//	{
+//		return new Tuple2Ocl<>(
+//			getTupleKindVariableTypeKeyCalculator()
+//				.getKey(DefaultsValues.Reduce.LOCAL_TUPLE_B, DefaultsValues.DefaultVarTypes.DOUBLE),
+//			pKernelLogicalVariable ->
+//			{
+//				String vLine = "SER_DOUBLE( #, _iTemp, _localCache, _l)"
+//					.replace("#", pKernelLogicalVariable.getVarName());
+//				return new KernelBuilder
+//					.KernelSerializationLine(vLine, pKernelLogicalVariable.getIndex());
+//			});
+//	}
 	
-	private Tuple2Ocl<String, KernelBuilder.IVariableSerialization> getBStringSerialization()
-	{
-		return new Tuple2Ocl<>(
-			getTupleKindVariableTypeKeyCalculator()
-				.getKey(DefaultsValues.Reduce.LOCAL_TUPLE_B, DefaultsValues.DefaultVarTypes.STRING),
-			pKernelLogicalVariable ->
-			{
-				//SER_STRING( _r0, _ri0, 12, _result );
-				String vLine = "SER_STRING( #, @, _iTemp, _localCache );"
-					.replace("#", pKernelLogicalVariable.getVarName())
-					.replace("-", "" + pKernelLogicalVariable.getBytesDim());
-				
-				return new KernelBuilder
-					.KernelSerializationLine(vLine, pKernelLogicalVariable.getIndex());
-			});
-	}
+//	private Tuple2Ocl<String, KernelBuilder.IVariableSerialization> getBStringSerialization()
+//	{
+//		return new Tuple2Ocl<>(
+//			getTupleKindVariableTypeKeyCalculator()
+//				.getKey(DefaultsValues.Reduce.LOCAL_TUPLE_B, DefaultsValues.DefaultVarTypes.STRING),
+//			pKernelLogicalVariable ->
+//			{
+//				//SER_STRING( _r0, _ri0, 12, _result );
+//				String vLine = "SER_STRING( #, @, _iTemp, _localCache );"
+//					.replace("#", pKernelLogicalVariable.getVarName())
+//					.replace("-", "" + pKernelLogicalVariable.getBytesDim());
+//
+//				return new KernelBuilder
+//					.KernelSerializationLine(vLine, pKernelLogicalVariable.getIndex());
+//			});
+//	}
 	
 	@Override
 	protected Iterable<Tuple2Ocl<String, KernelBuilder.IVariableDeserialization>> getKernelVariableDeserialization()

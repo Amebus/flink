@@ -240,9 +240,12 @@ class OclKernelExecutionInfo
         }
         size_t GetStreamSize()
         {
-            return mStreamSize;
+            return this->mStreamSize;
         }
-        int GetStreamLength();
+        int GetStreamLength()
+        {
+            return this->mStreamLength;
+        }
 
 
         int* GetIndexes()
@@ -365,9 +368,19 @@ class OclMapExecutionInfo : public OclKernelExecutionInfoForOutputTuple
 class OclReduceExecutionInfo : public OclKernelExecutionInfoForOutputTuple
 {
     private: 
+        int mWorkGroupSize;
+
         int mLocalCacheLength;
         unsigned char *mLocalCache;
         size_t mLocalCacheSize;
+
+        int mIdentityLength;
+        unsigned char *mIdentity;
+        size_t mIdendtitySize;
+
+        int mMidResultLength;
+        size_t mMidResultSize;
+        unsigned char *mMidResult;
     protected:
         void SetUpResult()
         {
@@ -375,22 +388,48 @@ class OclReduceExecutionInfo : public OclKernelExecutionInfoForOutputTuple
             mResultSize = sizeof(unsigned char) * mResultLength;
             mResult = new unsigned char[mResultLength];
         }
-        OclReduceExecutionInfo* SetUpLocalCache()
+        OclReduceExecutionInfo* SetUpMidResult()
         {
-            mLocalCacheLength = 0;
+            mMidResultLength = this->GetStreamLength();
+            mMidResultSize = this->GetStreamSize();
+            mMidResult = new unsigned char[mMidResultLength];
+            return this;
+        }
+        OclReduceExecutionInfo* SetUpIdentityAndLocalCache(jbyteArray pIdentity, jint pWorkGroupSize)
+        {
+            mWorkGroupSize = pWorkGroupSize;
+
+            mIdentityLength = mEnv->GetArrayLength(pIdentity);
+            mIdentity = (unsigned char *)mEnv->GetByteArrayElements(pIdentity, 0);
+            mIdendtitySize = sizeof(unsigned char) * mIdentityLength;
+
+            mLocalCacheLength = mWorkGroupSize * mOutputTupleDimension;//calcolare a dovere la dimensione della local cache
             mLocalCacheSize = sizeof(unsigned char) * mLocalCacheLength;
             mLocalCache = new unsigned char[mLocalCacheLength];
+
+            for(int i = 0; i < mLocalCacheLength; i++)
+            {
+                for(int j = 0; j < mIdentityLength; j++)
+                {
+                    mLocalCache[i] = mIdentity[i];
+                }
+            }
             return this;
         }
     public:
         OclReduceExecutionInfo (JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, 
-                                jint pOutputTupleDimension, jbyteArray pOutputTupleInfo)
-            : OclKernelExecutionInfoForOutputTuple (pEnv, pObj, pKernelName, pStream, pIndexes, pOutputTupleDimension, pOutputTupleInfo)
+                                jint pOutputTupleDimension, jbyteArray pIdentity, jint pWorkGroupSize)
+            : OclKernelExecutionInfoForOutputTuple (pEnv, pObj, pKernelName, pStream, pIndexes, pOutputTupleDimension, pIdentity)
         {
-            this->SetUpLocalCache()->SetUpResult();
+            this->SetUpIdentityAndLocalCache(pIdentity, pWorkGroupSize)->SetUpResult();
         }
 
         #pragma region getters
+
+        int GetWorkGroupSize()
+        {
+            return mWorkGroupSize;
+        }
 
         unsigned char* GetLocalCache()
         {
@@ -405,6 +444,35 @@ class OclReduceExecutionInfo : public OclKernelExecutionInfoForOutputTuple
         int GetLocalCacheLength()
         {
             return mLocalCacheLength;
+        }
+
+        unsigned char* GetIdentity()
+        {
+            return mIdentity;
+        }
+
+        size_t GetIdentitySize()
+        {
+            return mIdendtitySize;
+        }
+
+        int GetIdentityLength()
+        {
+            return mIdentityLength;
+        }
+
+        unsigned char* GetMidResult()
+        {
+            return mMidResult;
+        }
+
+        size_t GetMidResultSize()
+        {
+            return mMidResultSize;
+        }
+        int GetMidResultLength()
+        {
+            return mMidResultLength;
         }
 
         #pragma endregion
@@ -455,24 +523,43 @@ void RunKernel(OclKernelExecutionInfo* pKernelInfo)
 
 void RunKernel(OclReduceExecutionInfo* pKernelInfo)
 {
-    size_t vStreamSize, vIndexesSize, vResultSize, vLocalCacheSize, vArgSize;
+    size_t vStreamSize, vIndexesSize, vResultSize, vLocalCacheSize, vIdentiySize, vMidResultSize;
     vStreamSize = pKernelInfo->GetStreamSize();
     vIndexesSize = pKernelInfo->GetIndexesSize();
     vResultSize = pKernelInfo->GetResultSize();
     vLocalCacheSize = pKernelInfo->GetLocalCacheSize();
+    vIdentiySize = pKernelInfo->GetIdentitySize();
+    vMidResultSize = pKernelInfo->GetMidResultSize();
     std::vector<cl::Buffer> vBuffers;
     try
     {
         int vArgIndex = 0;
         cl::Kernel vKernel = cl::Kernel(gProgrmasList[pKernelInfo->GetKernelName()], pKernelInfo->GetCharKernelName());
 
+        std::cout << "Creating: StreamBuffer" << std::endl;
+        std::cout << "size - " << vStreamSize << std::endl;
+        std::cout << "length - " << pKernelInfo->GetStreamLength() << std::endl;
         cl::Buffer vStreamBuffer(gContext, CL_MEM_READ_ONLY, vStreamSize);
+        std::cout << "Creating: IndexesBuffer" << std::endl;
         cl::Buffer vIndexesBuffer(gContext, CL_MEM_READ_ONLY, vIndexesSize);
+        std::cout << "Creating: ResultBuffer" << std::endl;
         cl::Buffer vResultBuffer(gContext, CL_MEM_WRITE_ONLY, vResultSize);
+
+        std::cout << "Creating: IdendityBuffer" << std::endl;
+        cl::Buffer vIdendityBuffer(gContext, CL_MEM_READ_ONLY, vIdentiySize);
+        std::cout << "Creating: MidResultBuffer" << std::endl;
+        std::cout << "size - " << vMidResultSize << std::endl;
+        std::cout << "length - " << pKernelInfo->GetMidResultLength() << std::endl;
+        cl::Buffer vMidResultBuffer(gContext,  CL_MEM_READ_WRITE, vMidResultSize);
+        std::cout << "Creating: MidResultBuffer - ok" << std::endl;
+
+        std::cout << "Creating: LocalCacheBuffer" << std::endl;
         cl::Buffer vLocalCacheBuffer(gContext, CL_MEM_READ_WRITE, vLocalCacheSize);
 
         gCommandQueue.enqueueWriteBuffer(vStreamBuffer, CL_TRUE, 0, vStreamSize, pKernelInfo->GetStream());
         gCommandQueue.enqueueWriteBuffer(vIndexesBuffer, CL_TRUE, 0, vIndexesSize, pKernelInfo->GetIndexes());
+        gCommandQueue.enqueueWriteBuffer(vIdendityBuffer, CL_TRUE, 0, vIdentiySize, pKernelInfo->GetIndexes());
+        
         gCommandQueue.enqueueWriteBuffer(vLocalCacheBuffer, CL_TRUE, 0, vLocalCacheSize, pKernelInfo->GetLocalCache());
 
         // std::cout << "Set arg: StreamBuffer" << std::endl;
@@ -482,9 +569,16 @@ void RunKernel(OclReduceExecutionInfo* pKernelInfo)
         // std::cout << "Set arg: ResultBuffer" << std::endl;
         vKernel.setArg(vArgIndex++, vResultBuffer);
 
-        cl::NDRange global(pKernelInfo->GetIndexesLength());
+        vKernel.setArg(vArgIndex++, vIdendityBuffer);
 
-        gCommandQueue.enqueueNDRangeKernel(vKernel, cl::NullRange, global, cl::NullRange);
+        vKernel.setArg(vArgIndex++, vMidResultBuffer);
+
+        vKernel.setArg(vArgIndex++, vLocalCacheBuffer);
+
+        cl::NDRange global(pKernelInfo->GetIndexesLength());
+        cl::NDRange local(pKernelInfo->GetWorkGroupSize());
+
+        gCommandQueue.enqueueNDRangeKernel(vKernel, cl::NullRange, global, local);
 
         gCommandQueue.enqueueReadBuffer(vResultBuffer, CL_TRUE, 0, vResultSize, pKernelInfo->GetResult());
     }
@@ -692,10 +786,11 @@ Java_org_apache_flink_api_bridge_AbstractOclBridge_OclFilter(
 JNIEXPORT jbyteArray JNICALL 
 Java_org_apache_flink_api_bridge_AbstractOclBridge_OclReduce(
     JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, 
-    jint pOutputTupleDimension, jbyteArray pOutputTupleInfo)
+    jint pOutputTupleDimension, jbyteArray pIdentity, jint pWorkGroupSize)
 {
 
-    OclKernelExecutionInfo *vKernelInfo = new OclReduceExecutionInfo(pEnv, pObj, pKernelName, pStream, pIndexes, pOutputTupleDimension, pOutputTupleInfo);
+    OclReduceExecutionInfo *vKernelInfo 
+        = new OclReduceExecutionInfo(pEnv, pObj, pKernelName, pStream, pIndexes, pOutputTupleDimension, pIdentity, pWorkGroupSize);
 
     RunKernel(vKernelInfo);
 

@@ -26,6 +26,10 @@ public class JsonUserFunction extends GenericUserFunction implements IUserFuncti
 	@SerializedName("function")
 	@Expose
 	private List<String> mFunctionLines;
+	@SerializedName("workGroupSize")
+	@Expose
+	private int mWorkGroupSize;
+	
 	
 	private transient String mFunction;
 	
@@ -78,5 +82,11 @@ public class JsonUserFunction extends GenericUserFunction implements IUserFuncti
 	public String getOutputTupleName()
 	{
 		return mOutputTupleName;
+	}
+	
+	@Override
+	public int getWorkGroupSize()
+	{
+		return mWorkGroupSize;
 	}
 }

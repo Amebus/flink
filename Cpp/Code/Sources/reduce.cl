@@ -152,16 +152,26 @@ int localStringToInteger(__local unsigned char *s)
 #define INT 1
 #define DOUBLE 2
 #define STRING 3
+#define LAST_STEP 1
+
+#define STRING_MAX_BYTE_1 1
+#define STRING_MAX_BYTE_2 1
 
 __kernel void mapStringToInt(
 	__global unsigned char *_data, 
 	__global int *_dataIndexes, 
-    __global unsigned char *_jobDone,
-	__global unsigned char *_result,
+    __global unsigned char *_finalResult,
+	__global unsigned char *_identity,
+    __global unsigned char *_midResults,
     __local unsigned char *_localCache)
 {
+    
     // region variables to add
     uint _grSize = get_local_size(0);
+    uint _gSize = get_global_size(0);
+    uint _outputCount = get_num_groups(0);
+    uint _steps = ceil(log2((double)_gSize)/log2((double)_grSize));
+    
     uint _lId = get_local_id(0);
     uint _grId = get_group_id(0);
     //
@@ -190,14 +200,11 @@ __kernel void mapStringToInt(
     int _sl0;
     __local unsigned char* _t0;
 
-    //copy from global to private
+    //copy from global to local
     unsigned char _types[3];
     _types[0] = _data[1];
     _types[1] = _data[2];
     _types[2] = _data[3];
-
-    _jobDone[_gId] = 0;
-
     for(int i = _i, k = _lId * _otd, j = 0; _tCounter < _arity; _tCounter++)
     {
         if(_types[_tCounter] < STRING)
@@ -217,18 +224,28 @@ __kernel void mapStringToInt(
         }
         else
         {
-            //if per capire la lunghezza massima della stringa
             i+=4;
-            do 
+            do
             {
                 _localCache[k] = _data[i++];
                 _continueCopy = _localCache[k] != '\0';
                 k++;
             } while(_continueCopy);
 
-            if(k < getStringMaxByte())
+            int _sMaxBytes = 0;
+            //if to understand the string max length
+            if(_tCounter == 1)
             {
-                for(;k < getStringMaxByte(); k++)
+                _sMaxBytes = STRING_MAX_BYTE_1;
+            }
+            else
+            {
+                _sMaxBytes = STRING_MAX_BYTE_2;
+            }
+
+            if(k < _sMaxBytes)
+            {
+                for(;k < _sMaxBytes; k++)
                 {
                     _localCache[k] = '\0';
                 }
@@ -239,45 +256,64 @@ __kernel void mapStringToInt(
 
     barrier(CLK_LOCAL_MEM_FENCE);
 
-    for(uint _stride = _grSize/2; _stride > 0 ; _stride /= 2)
+    for(uint _currentStep = _steps; _currentStep > 0 && _grId < _outputCount; _currentStep--)
     {
-        if(_lId < _stride)
+        _outputCount = ceil((double)_outputCount/_grSize);
+
+        for(uint _stride = _grSize/2; _stride > 0; _stride /= 2)
         {
-            //dentro al ciclo con lo stride
-            _iTemp = _i;
-            DESER_STRING( _localCache, _iTemp, _t0, _sl0 );
+            if(_lId < _stride)
+            {
+                //dentro al ciclo con lo stride
+                _iTemp = _i;
+                DESER_STRING( _localCache, _iTemp, _t0, _sl0 );
 
-            //funzione utente
-            _r0 = localStringToInteger(_t0);
+                //funzione utente
+                _r0 = localStringToInteger(_t0);
 
 
-            _iTemp = _ri0;
-            SER_INT( _r0, _iTemp, _localCache );
-            
-        }   
-        barrier(CLK_LOCAL_MEM_FENCE);
+                _iTemp = _ri0;
+                SER_INT( _r0, _iTemp, _localCache );
+            }   
+            barrier(CLK_LOCAL_MEM_FENCE);
+        }
+
+        if(_currentStep > LAST_STEP)
+        {
+            for(uint i = 0, j = _gId; i < _otd; i++, j++)
+            {
+                _midResults[j] = _identity[i];
+            }
+            barrier(CLK_GLOBAL_MEM_FENCE);
+
+            for(uint i = 0, j = _grId; i < _otd; i++, j++)
+            {
+                _midResults[j] = _localCache[i];
+            }
+            barrier(CLK_GLOBAL_MEM_FENCE);
+
+        }
+        else
+        {
+            barrier(CLK_LOCAL_MEM_FENCE);
+        }
+
+        if(_grId < _outputCount)
+        {
+            for(uint i = 0, j = _gId, k = _lId * _otd; i < _otd; i++, j++, k++)
+            {
+                _localCache[k] = _midResults[j];
+            }
+            barrier(CLK_LOCAL_MEM_FENCE);
+        }
     }
-    //Manca ciclo globale per sapere se finire oppure no
 
-    //manca attribuzione dei valori identità per la riduzione
-
-    //capire come metterlo giusto per ogni passaggio intermedio e quello finale
-    if(_lId == 0)
+    //copia risultato
+    if(_gId == 0)
     {
         for(int i = 0, j = _ri0; i < _otd; i++, j++)
         {
-            _result[j] = _localCache[i];
+            _finalResult[j] = _localCache[i];
         }
     }
-    else if(_jobDone[_gId] == 0)
-    {
-        //aggiorna _jobDone per dire che ha già scritto
-        _jobDone[_gId] = 1;
-
-        for(int i = 0, j = _ri0; i < _otd; i++, j++)
-        {
-            _result[j] = _localCache[i];
-        }
-    }
-    barrier(CLK_LOCAL_MEM_FENCE);
 };

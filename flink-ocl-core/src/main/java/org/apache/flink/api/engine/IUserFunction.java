@@ -13,6 +13,12 @@ public interface IUserFunction extends Serializable
 	String getFunction();
 	String getInputTupleName();
 	String getOutputTupleName();
+	int getWorkGroupSize();
+	
+	default boolean isWorkGroupSpecified()
+	{
+		return getWorkGroupSize() > 0;
+	}
 	
 	default boolean isInputTupleSpecified()
 	{

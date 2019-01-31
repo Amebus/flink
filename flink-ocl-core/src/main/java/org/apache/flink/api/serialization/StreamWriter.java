@@ -31,7 +31,7 @@ public class StreamWriter
 			return sStreamWriter;
 	}
 	
-	private StreamWriter()
+	protected StreamWriter()
 	{
 	
 	}
@@ -77,14 +77,14 @@ public class StreamWriter
 		int vI = 0;
 		for (IOclTuple vTuple : mTupleList)
 		{
-			vTupleIndexes[vI++] = writeStream(vTuple, vStream);
+			vTupleIndexes[vI++] = writeStream(vTuple, vStream, vArity, mVarTypes);
 		}
 		
 		return new StreamWriterResult(vStream, vTupleIndexes);
 	}
 	
 	
-	private byte[] getTypes(IOclTuple pTuple)
+	protected byte[] getTypes(IOclTuple pTuple)
 	{
 		byte[] vResult = new byte[pTuple.getArityOcl()];
 		int vI = 0;
@@ -136,14 +136,13 @@ public class StreamWriter
 		return vDim;
 	}
 	
-	private int writeStream(IOclTuple pTuple, byte[] pStream)
+	protected int writeStream(IOclTuple pTuple, byte[] pStream, byte pArity, byte[] pVarTypes)
 	{
-		byte vArity = pStream[0];
 		int vStartIndex = mIndex;
 		
-		for (int i = 0; i < vArity; i++)
+		for (int i = 0; i < pArity; i++)
 		{
-			switch (mVarTypes[i])
+			switch (pVarTypes[i])
 			{
 				case DefaultsValues.DefaultsSerializationTypes.INT:
 					mTempInteger = pTuple.getField(i);

@@ -56,8 +56,9 @@ public class OclBridge extends AbstractOclBridge
 	public byte[] reduce(String pUserFunctionName,
 						 Iterable< ? extends IOclTuple> pTuples,
 						 int pOutputTupleDimension,
-						 OutputTupleInfo pOutputTupleInfo,
-						 int pInputTuplesCount)
+						 byte[] pIdentity,
+						 int pInputTuplesCount,
+						 int pWorkGroupSize)
 	{
 		StreamWriterResult vWriterResult =
 			mStreamWriter
@@ -69,6 +70,7 @@ public class OclBridge extends AbstractOclBridge
 							   vWriterResult.getStream(),
 							   vWriterResult.getPositions(),
 							   pOutputTupleDimension,
-							   pOutputTupleInfo.toJniCompatibleFormat());
+							   pIdentity,
+							   pWorkGroupSize);
 	}
 }

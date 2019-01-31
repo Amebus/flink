@@ -40,3 +40,5 @@ tools/releasing/release
 Cpp/Out/*
 
 oclinfo\.txt
+
+classes/
