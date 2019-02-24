@@ -384,6 +384,7 @@ class OclReduceExecutionInfo : public OclKernelExecutionInfoForOutputTuple
     protected:
         void SetUpResult()
         {
+            mInfoLength = 1 + mStream[0];
             mResultLength = mInfoLength + mOutputTupleDimension;
             mResultSize = sizeof(unsigned char) * mResultLength;
             mResult = new unsigned char[mResultLength];
@@ -395,15 +396,13 @@ class OclReduceExecutionInfo : public OclKernelExecutionInfoForOutputTuple
             mMidResult = new unsigned char[mMidResultLength];
             return this;
         }
-        OclReduceExecutionInfo* SetUpIdentityAndLocalCache(jbyteArray pIdentity, jint pWorkGroupSize)
+        OclReduceExecutionInfo* SetUpIdentityAndLocalCache(jbyteArray pIdentity)
         {
-            mWorkGroupSize = pWorkGroupSize;
-
             mIdentityLength = mEnv->GetArrayLength(pIdentity);
             mIdentity = (unsigned char *)mEnv->GetByteArrayElements(pIdentity, 0);
             mIdendtitySize = sizeof(unsigned char) * mIdentityLength;
 
-            mLocalCacheLength = mWorkGroupSize * mOutputTupleDimension;//calcolare a dovere la dimensione della local cache
+            mLocalCacheLength = mWorkGroupSize * mOutputTupleDimension;
             mLocalCacheSize = sizeof(unsigned char) * mLocalCacheLength;
             mLocalCache = new unsigned char[mLocalCacheLength];
 
@@ -421,7 +420,8 @@ class OclReduceExecutionInfo : public OclKernelExecutionInfoForOutputTuple
                                 jint pOutputTupleDimension, jbyteArray pIdentity, jint pWorkGroupSize)
             : OclKernelExecutionInfoForOutputTuple (pEnv, pObj, pKernelName, pStream, pIndexes, pOutputTupleDimension, pIdentity)
         {
-            this->SetUpIdentityAndLocalCache(pIdentity, pWorkGroupSize)->SetUpResult();
+            mWorkGroupSize = pWorkGroupSize;
+            this->SetUpMidResult()->SetUpIdentityAndLocalCache(pIdentity)->SetUpResult();
         }
 
         #pragma region getters
@@ -474,7 +474,14 @@ class OclReduceExecutionInfo : public OclKernelExecutionInfoForOutputTuple
         {
             return mMidResultLength;
         }
-
+        unsigned char* GetResult()
+        {
+            for(int i = 0; i < mInfoLength; i++)
+            {
+                mResult[i] = mStream[i];
+            }
+            return mResult;
+        }
         #pragma endregion
 };
 
@@ -536,44 +543,45 @@ void RunKernel(OclReduceExecutionInfo* pKernelInfo)
         int vArgIndex = 0;
         cl::Kernel vKernel = cl::Kernel(gProgrmasList[pKernelInfo->GetKernelName()], pKernelInfo->GetCharKernelName());
 
-        std::cout << "Creating: StreamBuffer" << std::endl;
-        std::cout << "size - " << vStreamSize << std::endl;
-        std::cout << "length - " << pKernelInfo->GetStreamLength() << std::endl;
         cl::Buffer vStreamBuffer(gContext, CL_MEM_READ_ONLY, vStreamSize);
-        std::cout << "Creating: IndexesBuffer" << std::endl;
         cl::Buffer vIndexesBuffer(gContext, CL_MEM_READ_ONLY, vIndexesSize);
-        std::cout << "Creating: ResultBuffer" << std::endl;
         cl::Buffer vResultBuffer(gContext, CL_MEM_WRITE_ONLY, vResultSize);
 
-        std::cout << "Creating: IdendityBuffer" << std::endl;
-        cl::Buffer vIdendityBuffer(gContext, CL_MEM_READ_ONLY, vIdentiySize);
-        std::cout << "Creating: MidResultBuffer" << std::endl;
-        std::cout << "size - " << vMidResultSize << std::endl;
-        std::cout << "length - " << pKernelInfo->GetMidResultLength() << std::endl;
+        cl::Buffer vIdendityBuffer(gContext, CL_MEM_READ_ONLY, vIdentiySize);;
         cl::Buffer vMidResultBuffer(gContext,  CL_MEM_READ_WRITE, vMidResultSize);
-        std::cout << "Creating: MidResultBuffer - ok" << std::endl;
 
-        std::cout << "Creating: LocalCacheBuffer" << std::endl;
-        cl::Buffer vLocalCacheBuffer(gContext, CL_MEM_READ_WRITE, vLocalCacheSize);
+        //cl::Buffer vLocalCacheBuffer(gContext, CL_MEM_READ_WRITE, vLocalCacheSize);
 
         gCommandQueue.enqueueWriteBuffer(vStreamBuffer, CL_TRUE, 0, vStreamSize, pKernelInfo->GetStream());
         gCommandQueue.enqueueWriteBuffer(vIndexesBuffer, CL_TRUE, 0, vIndexesSize, pKernelInfo->GetIndexes());
         gCommandQueue.enqueueWriteBuffer(vIdendityBuffer, CL_TRUE, 0, vIdentiySize, pKernelInfo->GetIndexes());
         
-        gCommandQueue.enqueueWriteBuffer(vLocalCacheBuffer, CL_TRUE, 0, vLocalCacheSize, pKernelInfo->GetLocalCache());
+        //gCommandQueue.enqueueWriteBuffer(vLocalCacheBuffer, CL_TRUE, 0, vLocalCacheSize, pKernelInfo->GetLocalCache());
 
-        // std::cout << "Set arg: StreamBuffer" << std::endl;
+        //std::cout << "Set arg: StreamBuffer" << std::endl;
         vKernel.setArg(vArgIndex++, vStreamBuffer);
-        // std::cout << "Set arg: IndexesBuffer" << std::endl;
+        //std::cout << "Ok" << std::endl;
+        //std::cout << "Set arg: IndexesBuffer" << std::endl;
         vKernel.setArg(vArgIndex++, vIndexesBuffer);
+        // std::cout << "Ok" << std::endl;
         // std::cout << "Set arg: ResultBuffer" << std::endl;
         vKernel.setArg(vArgIndex++, vResultBuffer);
+        //std::cout << "Ok" << std::endl;
 
+        //std::cout << "Set arg: IdendityBuffer" << std::endl;
         vKernel.setArg(vArgIndex++, vIdendityBuffer);
+        //std::cout << "Ok" << std::endl;
 
+        //std::cout << "Set arg: MidResultBuffer" << std::endl;
         vKernel.setArg(vArgIndex++, vMidResultBuffer);
+        //std::cout << "Ok" << std::endl;
 
-        vKernel.setArg(vArgIndex++, vLocalCacheBuffer);
+        // std::cout << "Set arg: LocalCacheBuffer" << std::endl;
+        // std::cout << "unsigned char - " << sizeof(unsigned char) << std::endl;
+        // std::cout << "length - " << pKernelInfo->GetLocalCacheLength() << std::endl;
+        // std::cout << "size - " << pKernelInfo->GetLocalCacheSize() << std::endl;
+        vKernel.setArg(vArgIndex++, cl::Local(pKernelInfo->GetLocalCacheSize()));
+        //std::cout << "Ok" << std::endl;
 
         cl::NDRange global(pKernelInfo->GetIndexesLength());
         cl::NDRange local(pKernelInfo->GetWorkGroupSize());

@@ -1,6 +1,8 @@
 package org.apache.flink.api.engine.builder;
 
 import org.apache.flink.api.common.utility.StreamUtility;
+import org.apache.flink.configuration.ITupleDefinition;
+import org.apache.flink.configuration.ITupleVarDefinition;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,11 +80,27 @@ public class ReduceKernelBuilder extends KernelBuilder
 	
 	protected String getCopyToLocalCacheCode(HashMap<String, Iterable<KernelLogicalVariable>> pKernelLogicalVariables)
 	{
+		ITupleDefinition vDefinition = getTupleDefinitions().getTupleDefinition(getUserFunction().getInputTupleName());
+		byte vArity = vDefinition.getArity();
+		StringBuilder vTypes =
+			new StringBuilder()
+				.append("    unsigned char _types[")
+				.append(vArity)
+				.append("];\n");
+		for (int i = 0, j = 1; i < vArity; i++, j++)
+		{
+			vTypes
+				.append("    _types[")
+				.append(i)
+				.append("] = _data[")
+				.append(j)
+				.append("];\n");
+		}
+		
 		String vS1 = "//copy from global to local\n" +
-					 "    unsigned char _types[3];\n" +
-					 "    _types[0] = _data[1];\n" +
-					 "    _types[1] = _data[2];\n" +
-					 "    _types[2] = _data[3];\n" +
+					 "if(_i > -1)\n" +
+					 "{\n" +
+					 vTypes.toString() +
 					 "    for(int i = _i, k = _lId * _otd, j = 0; _tCounter < _arity; _tCounter++)\n" +
 					 "    {\n" +
 					 "        if(_types[_tCounter] < STRING)\n" +
@@ -134,10 +152,18 @@ public class ReduceKernelBuilder extends KernelBuilder
 		}
 		else
 		{
-			vResult += "\t}\n";
+			vResult += "\t}\n}\n";
 		}
-		
+		byte vStart = vArity;
+		vStart++;
 		return vResult +
+			   "else\n" +
+			   "{\n" +
+			   "    for(uint i = " + vStart + ", j = _lId * _otd; i < _otd; i++, j++)\n" +
+			   "    {\n" +
+			   "        _localCache[j] = _identity[i];\n" +
+			   "    }\n" +
+			   "}\n" +
 			   "\n" +
 			   "    barrier(CLK_LOCAL_MEM_FENCE);" +
 			   "\n\n";
@@ -161,16 +187,28 @@ public class ReduceKernelBuilder extends KernelBuilder
 		return "for(uint _currentStep = _steps; _currentStep > 0 && _grId < _outputCount; _currentStep--)\n" +
 			   "    {\n" +
 			   "        _outputCount = ceil((double)_outputCount/_grSize);\n" +
+			   "        if(_grId < _outputCount && _currentStep != _steps)\n" +
+			   "        {\n" +
+			   "            for(uint i = 0, j = _gId, k = _lId * _otd; i < _otd; i++, j++, k++)\n" +
+			   "            {\n" +
+			   "                _localCache[k] = _midResults[j];\n" +
+			   "            }\n" +
+			   "            barrier(CLK_LOCAL_MEM_FENCE);\n" +
+			   "        }\n" +
+			   "		if(_currentStep > LAST_STEP)\n" +
+			   "        {\n" +
+			   "            for(uint i = 0, j = _gId; i < _otd; i++, j++)\n" +
+			   "            {\n" +
+			   "                _midResults[j] = _identity[i];\n" +
+			   "//printf(\"_gId: %d - _midResults: %d\\n\", _gId, _midResults[j]);\n" +
+			   "            }\n" +
+			   "            barrier(CLK_GLOBAL_MEM_FENCE);\n" +
+			   "        }" +
 			   "\n" +
 			   getReduceLoop(pKernelLogicalVariables) +
 			   "\n" +
 			   "        if(_currentStep > LAST_STEP)\n" +
 			   "        {\n" +
-			   "            for(uint i = 0, j = _gId; i < _otd; i++, j++)\n" +
-			   "            {\n" +
-			   "                _midResults[j] = _identity[i];\n" +
-			   "            }\n" +
-			   "            barrier(CLK_GLOBAL_MEM_FENCE);\n" +
 			   "\n" +
 			   "            for(uint i = 0, j = _grId; i < _otd; i++, j++)\n" +
 			   "            {\n" +
@@ -184,14 +222,6 @@ public class ReduceKernelBuilder extends KernelBuilder
 			   "            barrier(CLK_LOCAL_MEM_FENCE);\n" +
 			   "        }\n" +
 			   "\n" +
-			   "        if(_grId < _outputCount)\n" +
-			   "        {\n" +
-			   "            for(uint i = 0, j = _gId, k = _lId * _otd; i < _otd; i++, j++, k++)\n" +
-			   "            {\n" +
-			   "                _localCache[k] = _midResults[j];\n" +
-			   "            }\n" +
-			   "            barrier(CLK_LOCAL_MEM_FENCE);\n" +
-			   "        }\n" +
 			   "    }\n";
 	}
 	
@@ -223,6 +253,7 @@ public class ReduceKernelBuilder extends KernelBuilder
 			   "        \n" +
 			   "	}   \n" +
 			   "    barrier(CLK_LOCAL_MEM_FENCE);\n" +
+			   "//printf(\"_local - %d\\n\", _localCache[3]);\n" +
 			   "}\n";
 	}
 	
@@ -230,11 +261,14 @@ public class ReduceKernelBuilder extends KernelBuilder
 	{
 		return "if(_gId == 0)\n" +
 			   "{\n" +
+			   "//printf(\"final result copy - %d\\n\", _ri);\n" +
 			   "	for(int i = 0, j = _ri; i < _otd; i++, j++)\n" +
 			   "    {\n" +
 			   "    	_finalResult[j] = _localCache[i];\n" +
+			   "		//printf(\"_lc - %d\\n\", _localCache[i]);\n" +
 			   "    }\n" +
-			   "}";
+			   "}" +
+			   "//printf(\"_finalResult - %d\\n\", _finalResult[5]);\n";
 	}
 	
 	private static class StringMaxBytesDefine

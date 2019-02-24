@@ -181,7 +181,7 @@ public class ReduceOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Ker
 		public String getUtilityVariables(IUserFunction pUserFunction, ITupleDefinitionRepository pRepository)
 		{
 			ITupleDefinition vTupleDefinition = pRepository.getTupleDefinition(pUserFunction.getInputTupleName());
-			return super.getUtilityVariables(pUserFunction, pRepository) +
+			return super.getUtilityVariables(pUserFunction, pRepository).replace("_dataIndexes[_gId]", "-1") +
 				   "\n\n" +
 				   getOclIndexes() +
 				   getAdditionalOclVariables() +
@@ -203,7 +203,11 @@ public class ReduceOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Ker
 				   "uint _gSize = get_global_size(0);\n" +
 				   "uint _outputCount = get_num_groups(0);\n" +
 				   "uint _steps = ceil(log2((double)_gSize)/log2((double)_grSize));\n" +
-				   "\n";
+				   "\n" +
+				   "if(_gId < _gSize)\n" +
+				   "{\n" +
+				   "    _i = _dataIndexes[_gId];\n" +
+				   "}\n";
 		}
 		
 		protected String getAdditionalVariables(ITupleDefinition pTupleDefinition)

@@ -4,7 +4,7 @@
     "name":"reduceTest",
     "input":"tupleTwo",
     "output":"tupleTwo",
-    "workGroupSize": 20,
+    "workGroupSize": 2,
     "function": [
       "_a0 = _a0 + _b0;"
     ]

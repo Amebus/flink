@@ -59,10 +59,19 @@ public class OclContextTest
 		
 		vTuples.add(new Tuple1Ocl<>(1));
 		vTuples.add(new Tuple1Ocl<>(5));
+		vTuples.add(new Tuple1Ocl<>(10));
+		vTuples.add(new Tuple1Ocl<>(-73));
+		
+//		vTuples = GetTestTuples();
 		
 		IOclTuple vResult = vContext.reduce("reduceTest", vTuples, vTuples.size());
 		
 		vContext.close();
+		
+		assertEquals(
+			vTuples.stream().mapToInt(pT -> pT.getField(0)).sum(),
+			(int)vResult.getField(0));
+		
 	}
 	
 //	@Test

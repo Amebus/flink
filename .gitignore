@@ -42,3 +42,5 @@ Cpp/Out/*
 oclinfo\.txt
 
 classes/
+
+.attach*
