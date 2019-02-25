@@ -184,7 +184,12 @@ public class ReduceKernelBuilder extends KernelBuilder
 	
 	protected String getStepsLoop(HashMap<String, Iterable<KernelLogicalVariable>> pKernelLogicalVariables)
 	{
-		return "for(uint _currentStep = _steps; _currentStep > 0 && _grId < _outputCount; _currentStep--)\n" +
+		return "if(_gId == 2){\n" +
+			   "for(int i = 0; i < 8; i++)" +
+			   "	printf(\"_lc: %d\\n\", _localCache[i]);" +
+			   "}\n" +
+			   "printf(\"------\\n\");" +
+			   "for(uint _currentStep = _steps; _currentStep > 0 && _grId < _outputCount; _currentStep--)\n" +
 			   "    {\n" +
 			   "        _outputCount = ceil((double)_outputCount/_grSize);\n" +
 			   "        if(_grId < _outputCount && _currentStep != _steps)\n" +
@@ -197,20 +202,24 @@ public class ReduceKernelBuilder extends KernelBuilder
 			   "        }\n" +
 			   "		if(_currentStep > LAST_STEP)\n" +
 			   "        {\n" +
-			   "            for(uint i = 0, j = _gId; i < _otd; i++, j++)\n" +
+			   "            for(uint i = 0, j = _gId * _otd; i < _otd; i++, j++)\n" +
 			   "            {\n" +
 			   "                _midResults[j] = _identity[i];\n" +
 			   "//printf(\"_gId: %d - _midResults: %d\\n\", _gId, _midResults[j]);\n" +
 			   "            }\n" +
 			   "            barrier(CLK_GLOBAL_MEM_FENCE);\n" +
-			   "        }" +
+			   "        }\n" +
 			   "\n" +
 			   getReduceLoop(pKernelLogicalVariables) +
 			   "\n" +
+			   "if(_gId == 2){\n" +
+			   "for(int i = 0; i < 8; i++)" +
+			   "	printf(\"_lc: %d\\n\", _localCache[i]);" +
+			   "}\n" +
 			   "        if(_currentStep > LAST_STEP)\n" +
 			   "        {\n" +
 			   "\n" +
-			   "            for(uint i = 0, j = _grId; i < _otd; i++, j++)\n" +
+			   "            for(uint i = 0, j = _grId * _otd; i < _otd; i++, j++)\n" +
 			   "            {\n" +
 			   "                _midResults[j] = _localCache[i];\n" +
 			   "            }\n" +

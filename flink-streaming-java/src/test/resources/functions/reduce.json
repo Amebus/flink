@@ -6,7 +6,10 @@
     "output":"tupleTwo",
     "workGroupSize": 2,
     "function": [
-      "_a0 = _a0 + _b0;"
+      "printf(\"_currentStep: %d - _gSize: %d - _grSize: %d\\n\", _currentStep, _gSize, _grSize);",
+      "printf(\"_gId: %d - _a0: %d - _b0: %d\\n\",_gId, _a0, _b0);",
+      "_a0 = _a0 + _b0;",
+      "printf(\"_gId: %d - _a0: %d - _b0: %d\\n\",_gId, _a0, _b0);"
     ]
   }]
 }
