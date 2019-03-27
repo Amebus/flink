@@ -59,8 +59,8 @@ public class OclContextTest
 		
 		vTuples.add(new Tuple1Ocl<>(1));
 		vTuples.add(new Tuple1Ocl<>(5));
-		vTuples.add(new Tuple1Ocl<>(10));
 		vTuples.add(new Tuple1Ocl<>(73));
+		vTuples.add(new Tuple1Ocl<>(10));
 		
 //		vTuples = GetTestTuples();
 		

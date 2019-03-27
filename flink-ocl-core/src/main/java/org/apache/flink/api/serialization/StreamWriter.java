@@ -4,32 +4,17 @@ package org.apache.flink.api.serialization;
 import org.apache.flink.api.engine.builder.options.DefaultsValues;
 import org.apache.flink.api.tuple.IOclTuple;
 
-public class StreamWriter
+public abstract class StreamWriter
 {
-	private Iterable<? extends IOclTuple> mTupleList;
-	private int mTupleListSize = -1;
+	protected Iterable<? extends IOclTuple> mTupleList;
+	protected int mTupleListSize = -1;
 	
-	private byte[] mVarTypes;
-	private int mIndex;
+	protected byte[] mVarTypes;
+	protected int mIndex;
 	
-	private int mTempInteger;
-	private Double mTempDouble;
-	private String mTempString;
-	
-	private static StreamWriter sStreamWriter = new StreamWriter();
-	
-	public static StreamWriter getStreamWriter()
-	{
-		return getStreamWriter(false);
-	}
-	
-	public static StreamWriter getStreamWriter(boolean forParallelComputation)
-	{
-		if(forParallelComputation)
-			return new StreamWriter();
-		else
-			return sStreamWriter;
-	}
+	protected int mTempInteger;
+	protected Double mTempDouble;
+	protected String mTempString;
 	
 	protected StreamWriter()
 	{
@@ -111,7 +96,7 @@ public class StreamWriter
 		return vResult;
 	}
 	
-	private int getBytesDim(IOclTuple pTuple)
+	protected int getBytesDim(IOclTuple pTuple)
 	{
 		byte vArity = pTuple.getArityOcl();
 		int vDim = 0;
@@ -162,28 +147,13 @@ public class StreamWriter
 		return vStartIndex;
 	}
 	
-	private void insertInt(byte[] pStream)
-	{
-		pStream[mIndex++] = (byte)(mTempInteger >> 24);
-		pStream[mIndex++] = (byte)(mTempInteger >> 16);
-		pStream[mIndex++] = (byte)(mTempInteger >> 8);
-		pStream[mIndex++] = (byte) mTempInteger;
-	}
 	
-	private void insertDouble(byte[] pStream)
-	{
-		long vL = Double.doubleToLongBits(mTempDouble);
-		pStream[mIndex++] = (byte)((vL >> 56) & 0xFF);
-		pStream[mIndex++] = (byte)((vL >> 48) & 0xFF);
-		pStream[mIndex++] = (byte)((vL >> 40) & 0xFF);
-		pStream[mIndex++] = (byte)((vL >> 32) & 0xFF);
-		pStream[mIndex++] = (byte)((vL >> 24) & 0xFF);
-		pStream[mIndex++] = (byte)((vL >> 16) & 0xFF);
-		pStream[mIndex++] = (byte)((vL >> 8) & 0xFF);
-		pStream[mIndex++] = (byte)(vL & 0xFF);
-	}
 	
-	private void insertString(byte[] pStream)
+	protected abstract void insertInt(byte[] pStream);
+	
+	protected abstract void insertDouble(byte[] pStream);
+	
+	protected void insertString(byte[] pStream)
 	{
 		byte[] vStream = mTempString.getBytes();
 		insertStringLength(pStream, vStream.length + 1);
@@ -200,11 +170,5 @@ public class StreamWriter
 		// }
 	}
 	
-	private void insertStringLength(byte[] pStream, int pValue)
-	{
-		pStream[mIndex++] = (byte)(pValue >> 24);
-		pStream[mIndex++] = (byte)(pValue >> 16);
-		pStream[mIndex++] = (byte)(pValue >> 8);
-		pStream[mIndex++] = (byte)pValue;
-	}
+	protected abstract void insertStringLength(byte[] pStream, int pValue);
 }

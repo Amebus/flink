@@ -2,7 +2,10 @@ package org.apache.flink.api.configuration;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import io.gsonfire.annotations.PostDeserialize;
 import org.apache.flink.configuration.IOclContextOptions;
+
+import java.nio.ByteOrder;
 
 public class OclContextOptions implements IOclContextOptions
 {
@@ -14,9 +17,16 @@ public class OclContextOptions implements IOclContextOptions
 	@Expose
 	private boolean mRemoveTempFoldersOnClose;
 	
+	@SerializedName("numbersByteOrdering")
+	@Expose
+	private String mJsonNumbersByteOrdering;
+	
+	private ByteOrder mNumbersByteOrdering;
+	
 	public OclContextOptions()
 	{
 		mRemoveTempFoldersOnClose = true;
+		mNumbersByteOrdering = ByteOrder.BIG_ENDIAN;
 	}
 	
 	public String getKernelsBuildFolder()
@@ -27,5 +37,24 @@ public class OclContextOptions implements IOclContextOptions
 	public boolean hasToRemoveTempFoldersOnClose()
 	{
 		return mRemoveTempFoldersOnClose;
+	}
+	
+	@Override
+	public ByteOrder getNumbersByteOrdering()
+	{
+		return mNumbersByteOrdering;
+	}
+	
+	@PostDeserialize
+	private void postDeserialize()
+	{
+		if(mJsonNumbersByteOrdering != null)
+		{
+			String vUpper = mJsonNumbersByteOrdering.toUpperCase();
+			if(vUpper.contains("BIG"))
+			{
+				mNumbersByteOrdering = ByteOrder.BIG_ENDIAN;
+			}
+		}
 	}
 }

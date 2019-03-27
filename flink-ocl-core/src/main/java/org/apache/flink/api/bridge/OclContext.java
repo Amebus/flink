@@ -1,15 +1,16 @@
 package org.apache.flink.api.bridge;
 
+import org.apache.flink.api.bridge.identity.IdentityValueToIdentityArrayConverter;
 import org.apache.flink.api.engine.*;
 import org.apache.flink.api.serialization.StreamReader;
 import org.apache.flink.api.tuple.IOclTuple;
-import org.apache.flink.api.tuple.Tuple1Ocl;
 import org.apache.flink.configuration.ISettingsRepository;
 import org.apache.flink.configuration.ITupleDefinition;
 import org.apache.flink.configuration.ITupleDefinitionRepository;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.ByteOrder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -18,11 +19,13 @@ import java.util.Objects;
 
 public class OclContext implements Serializable
 {
+	
 	transient private ISettingsRepository mSettingsRepository;
 	transient private ITupleDefinitionRepository mTupleDefinitionRepository;
 	transient private IUserFunctionsRepository mFunctionRepository;
 	transient private IOclContextMappings mOclContextMappings;
 	
+	transient private StreamReader mStreamReader;
 	transient private CppLibraryInfo mCppLibraryInfo;
 	
 	private OclBridge mOclBridgeContext;
@@ -36,7 +39,10 @@ public class OclContext implements Serializable
 		mTupleDefinitionRepository = pTupleDefinitionRepository;
 		mFunctionRepository = pUserFunctionsRepository;
 		mOclContextMappings = pOclContextMappings;
-		mOclBridgeContext = new OclBridge(mOclContextMappings.getStreamWriter());
+		
+		ByteOrder vByteOrder = mSettingsRepository.getContextOptions().getNumbersByteOrdering();
+		mOclBridgeContext = new OclBridge(mOclContextMappings.getNumbersByteOrderingStreamWriterMapper().resolve(vByteOrder));
+		mStreamReader = mOclContextMappings.getNumbersByteOrderingStreamReaderMapper().resolve(vByteOrder);
 	}
 	
 	public void open()
@@ -54,7 +60,7 @@ public class OclContext implements Serializable
 			deleteLocalFiles();
 	}
 	
-	private void generatesKernels()
+	protected void generatesKernels()
 	{
 		mCppLibraryInfo = new BuildEngine(mSettingsRepository,
 										  mOclContextMappings.getFunctionKernelBuilderMapper(),
@@ -63,7 +69,7 @@ public class OclContext implements Serializable
 			.getCppLibraryInfo();
 	}
 	
-	private void deleteLocalFiles()
+	protected void deleteLocalFiles()
 	{
 		Path vKernelsFolder = Paths.get(mCppLibraryInfo.getKernelsFolder());
 		
@@ -118,10 +124,9 @@ public class OclContext implements Serializable
 		OutputTupleInfo vOutputTupleInfo = getOutputTupleInfo(vOutputTuple);
 		
 		byte[] vStream = mOclBridgeContext.map(pUserFunctionName, pTuples, vTupleDim, vOutputTupleInfo, pInputTuplesCount);
-		return mOclContextMappings.getStreamReader().setStream(vStream);
+		return mStreamReader.setStream(vStream);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <R extends IOclTuple> R reduce(
 		String pUserFunctionName,
 		Iterable<R> pTuples,
@@ -139,16 +144,21 @@ public class OclContext implements Serializable
 			throw new IllegalArgumentException("The WorkGroupSize of the Reduce function must be specified");
 		}
 		
+		IdentityValueToIdentityArrayConverter vConverter =
+			mOclContextMappings
+				.getByteOrderingToIdentityValuesConverterMapper()
+				.resolve(mSettingsRepository.getContextOptions().getNumbersByteOrdering());
+		
 		byte[] vStream =
 			mOclBridgeContext
 				.reduce(
 					pUserFunctionName,
 					pTuples,
 					vTupleDim,
-					vIdentityValues.toIdentityArray(),
+					vConverter.toIdentityArray(vIdentityValues),
 					pInputTuplesCount,
 					vWorkGroupSize);
-		return (R) StreamReader.getStreamReader().setStream(vStream).iterator().next();
+		return mStreamReader.setStream(vStream).streamReaderIterator().nextTuple();
 //		return (R) new Tuple1Ocl<>();
 	}
 	

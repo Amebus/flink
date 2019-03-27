@@ -34,6 +34,7 @@ public class JsonSettingsRepository implements ISettingsRepository
 		mOclSettings = JsonLoader.loadJsonObject(new JsonLoaderOptions.JsonLoaderOptionsBuilder<OclSettings>()
 													 .setSource(mFileDirectory, mFileName)
 													 .setBeanClass(OclSettings.class)
+													 .shouldHookClass(OclContextOptions.class)
 													 .build());
 		mSettingsLoaded = true;
 	}

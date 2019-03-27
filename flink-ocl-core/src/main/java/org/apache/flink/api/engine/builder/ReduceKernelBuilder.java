@@ -2,7 +2,6 @@ package org.apache.flink.api.engine.builder;
 
 import org.apache.flink.api.common.utility.StreamUtility;
 import org.apache.flink.configuration.ITupleDefinition;
-import org.apache.flink.configuration.ITupleVarDefinition;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,6 +113,7 @@ public class ReduceKernelBuilder extends KernelBuilder
 					 "            while(j < _copyLength)\n" +
 					 "            {\n" +
 					 "                _localCache[k++] = _data[i++];\n" +
+					 "printf(\"_gId: %d - k: %d - _lc: %d\\n\", _gId, k-1, _localCache[k-1]);\n" +
 					 "                j++;\n" +
 					 "            }\n" +
 					 "            j = 0;\n" +
@@ -184,9 +184,14 @@ public class ReduceKernelBuilder extends KernelBuilder
 	
 	protected String getStepsLoop(HashMap<String, Iterable<KernelLogicalVariable>> pKernelLogicalVariables)
 	{
-		return "if(_gId == 2){\n" +
-			   "for(int i = 0; i < 8; i++)" +
-			   "	printf(\"_lc: %d\\n\", _localCache[i]);" +
+		return "if(_gId == 0) { \n" +
+			   "\tfor(int j = 0; j < _otd; j++) { \n" +
+			   "\t\tprintf(\"_gId: %d - _identity[%d]: %d\\n\", _gId, j, _identity[j]);\n" +
+			   "\t}\n" +
+			   "}\n" +
+			   "if(_gId == 2){\n" +
+			   "//for(int i = 0; i < 8; i++)" +
+			   "	//printf(\"_lc: %d\\n\", _localCache[i]);\n" +
 			   "}\n" +
 			   "printf(\"------\\n\");" +
 			   "for(uint _currentStep = _steps; _currentStep > 0 && _grId < _outputCount; _currentStep--)\n" +
@@ -194,7 +199,7 @@ public class ReduceKernelBuilder extends KernelBuilder
 			   "        _outputCount = ceil((double)_outputCount/_grSize);\n" +
 			   "        if(_grId < _outputCount && _currentStep != _steps)\n" +
 			   "        {\n" +
-			   "            for(uint i = 0, j = _gId, k = _lId * _otd; i < _otd; i++, j++, k++)\n" +
+			   "            for(uint i = 0, j = _gId * _otd, k = _lId * _otd; i < _otd; i++, j++, k++)\n" +
 			   "            {\n" +
 			   "                _localCache[k] = _midResults[j];\n" +
 			   "            }\n" +
@@ -206,15 +211,20 @@ public class ReduceKernelBuilder extends KernelBuilder
 			   "            {\n" +
 			   "                _midResults[j] = _identity[i];\n" +
 			   "//printf(\"_gId: %d - _midResults: %d\\n\", _gId, _midResults[j]);\n" +
+			   "if(_gId == 0) { \n" +
+			   "\tfor(int j = 0; j < 16; j++) { \n" +
+			   "\t\tprintf(\"_gId: %d - _midResults[%d]: %d\\n\", _gId, j, _midResults[j]);\n" +
+			   "\t}\n" +
 			   "            }\n" +
 			   "            barrier(CLK_GLOBAL_MEM_FENCE);\n" +
 			   "        }\n" +
+			   "}\n" +
 			   "\n" +
 			   getReduceLoop(pKernelLogicalVariables) +
 			   "\n" +
 			   "if(_gId == 2){\n" +
-			   "for(int i = 0; i < 8; i++)" +
-			   "	printf(\"_lc: %d\\n\", _localCache[i]);" +
+			   "//for(int i = 0; i < 16; i++)" +
+			   "//	printf(\"_lc: %d\\n\", _midResults[i]);\n" +
 			   "}\n" +
 			   "        if(_currentStep > LAST_STEP)\n" +
 			   "        {\n" +
@@ -245,17 +255,19 @@ public class ReduceKernelBuilder extends KernelBuilder
 			   "{\n" +
 			   "	if(_lId < _stride)\n" +
 			   "    {\n" +
-			   "        _iTemp = _lId;" +
+			   "        _iTemp = _lId * _otd;" +
 			   "\n\n" +
 			   getDeserialization(pKernelLogicalVariables, vToUse) +
-			   "		_iTemp = _lId + _stride * _otd;\n" +
+			   "		_iTemp = _lId * _otd + _stride * _otd;\n" +
+			   "printf(\"Des | _lId: %d - _stride: %d - _iTemp: %d\\n\", _lId, _stride, _iTemp);\n" +
 			   "\n" +
 			   getDeserialization(pKernelLogicalVariables, vToUse2) +
 			   "\n" +
 			   "        //user function\n" +
 			   getUserFunction().getFunction() +
 			   "\n\n\n" +
-			   "        _iTemp = _lId;\n" +
+			   "        _iTemp = _lId * _otd;\n" +
+//			   "printf(\"_gId: %d - _iTemp: %d\\n\", _gId, _iTemp);\n" +
 			   "\n" +
 			   getSerialization(pKernelLogicalVariables) +
 			   "\n" +

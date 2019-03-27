@@ -3,6 +3,8 @@ package org.apache.flink.streaming.helpers;
 import org.apache.flink.api.serialization.StreamReader;
 import org.apache.flink.api.serialization.StreamWriter;
 import org.apache.flink.api.serialization.StreamWriterResult;
+import org.apache.flink.api.serialization.bigendian.BigEndianStreamReader;
+import org.apache.flink.api.serialization.bigendian.BigEndianStreamWriter;
 import org.apache.flink.api.tuple.IOclTuple;
 
 import java.util.LinkedList;
@@ -45,7 +47,7 @@ public class StreamsGetter
 	
 	public static StreamWriter getStreamWriterFrom(List<? extends IOclTuple> pTupleList)
 	{
-		return StreamWriter.getStreamWriter().setTupleList(pTupleList).setTupleListSize(pTupleList.size());
+		return new BigEndianStreamWriter().setTupleList(pTupleList).setTupleListSize(pTupleList.size());
 	}
 	
 	public static StreamReader getStreamReaderFrom(IOclTuple pTuple)
@@ -55,6 +57,6 @@ public class StreamsGetter
 	
 	public static StreamReader getStreamReaderFrom(List<? extends IOclTuple> pTupleList)
 	{
-		return StreamReader.getStreamReader().setStream(getStreamWriterFrom(pTupleList).writeStream().getStream());
+		return new BigEndianStreamReader().setStream(getStreamWriterFrom(pTupleList).writeStream().getStream());
 	}
 }

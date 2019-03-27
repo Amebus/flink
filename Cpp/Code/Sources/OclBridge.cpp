@@ -384,15 +384,22 @@ class OclReduceExecutionInfo : public OclKernelExecutionInfoForOutputTuple
     protected:
         void SetUpResult()
         {
-            mInfoLength = 1 + mStream[0];
             mResultLength = mInfoLength + mOutputTupleDimension;
             mResultSize = sizeof(unsigned char) * mResultLength;
             mResult = new unsigned char[mResultLength];
         }
+        OclReduceExecutionInfo* SetUpInfoLength()
+        {
+            mInfoLength = 1 + (int)mStream[0];
+            return this;
+        }
         OclReduceExecutionInfo* SetUpMidResult()
         {
-            mMidResultLength = this->GetStreamLength();
-            mMidResultSize = this->GetStreamSize();
+            // std::cout << "arity - " << (int)mStream[0] << std::endl;
+            // std::cout << "mInfoLength - " << mInfoLength << std::endl;
+
+            mMidResultLength = this->GetStreamLength() - mInfoLength;
+            mMidResultSize = sizeof(unsigned char) * mMidResultLength;
             mMidResult = new unsigned char[mMidResultLength];
             return this;
         }
@@ -421,7 +428,7 @@ class OclReduceExecutionInfo : public OclKernelExecutionInfoForOutputTuple
             : OclKernelExecutionInfoForOutputTuple (pEnv, pObj, pKernelName, pStream, pIndexes, pOutputTupleDimension, pIdentity)
         {
             mWorkGroupSize = pWorkGroupSize;
-            this->SetUpMidResult()->SetUpIdentityAndLocalCache(pIdentity)->SetUpResult();
+            this->SetUpInfoLength()->SetUpMidResult()->SetUpIdentityAndLocalCache(pIdentity)->SetUpResult();
         }
 
         #pragma region getters
@@ -554,7 +561,7 @@ void RunKernel(OclReduceExecutionInfo* pKernelInfo)
 
         gCommandQueue.enqueueWriteBuffer(vStreamBuffer, CL_TRUE, 0, vStreamSize, pKernelInfo->GetStream());
         gCommandQueue.enqueueWriteBuffer(vIndexesBuffer, CL_TRUE, 0, vIndexesSize, pKernelInfo->GetIndexes());
-        gCommandQueue.enqueueWriteBuffer(vIdendityBuffer, CL_TRUE, 0, vIdentiySize, pKernelInfo->GetIndexes());
+        gCommandQueue.enqueueWriteBuffer(vIdendityBuffer, CL_TRUE, 0, vIdentiySize, pKernelInfo->GetIdentity());
         
         //gCommandQueue.enqueueWriteBuffer(vLocalCacheBuffer, CL_TRUE, 0, vLocalCacheSize, pKernelInfo->GetLocalCache());
 
@@ -580,6 +587,9 @@ void RunKernel(OclReduceExecutionInfo* pKernelInfo)
         // std::cout << "unsigned char - " << sizeof(unsigned char) << std::endl;
         // std::cout << "length - " << pKernelInfo->GetLocalCacheLength() << std::endl;
         // std::cout << "size - " << pKernelInfo->GetLocalCacheSize() << std::endl;
+        // std::cout << "stream - " << pKernelInfo->GetStreamLength() << std::endl;
+        // std::cout << "finalResult - " << pKernelInfo->GetResultLength() << std::endl;
+        // std::cout << "midResult - " << pKernelInfo->GetMidResultLength() << std::endl;
         vKernel.setArg(vArgIndex++, cl::Local(pKernelInfo->GetLocalCacheSize()));
         //std::cout << "Ok" << std::endl;
 

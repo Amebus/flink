@@ -1,10 +1,7 @@
 package org.apache.flink.api.engine;
 
 import org.apache.flink.api.common.mappers.StringKeyMapper;
-import org.apache.flink.api.engine.builder.mappers.FunctionKernelBuilderMapper;
-import org.apache.flink.api.engine.builder.mappers.FunctionKernelBuilderOptionMapper;
-import org.apache.flink.api.serialization.StreamReader;
-import org.apache.flink.api.serialization.StreamWriter;
+import org.apache.flink.api.engine.builder.mappers.*;
 
 public interface IOclContextMappings
 {
@@ -16,7 +13,10 @@ public interface IOclContextMappings
 	
 	ITupleBytesDimensionGetters getTupleBytesDimensionGetters();
 	
-	StreamWriter getStreamWriter();
+	NumbersByteOrderingStreamWriterMapper getNumbersByteOrderingStreamWriterMapper();
 	
-	StreamReader getStreamReader();
+	NumbersByteOrderingStreamReaderMapper getNumbersByteOrderingStreamReaderMapper();
+	
+	NumbersByteOrderingToIdentityValuesConverterMapper getByteOrderingToIdentityValuesConverterMapper();
+	
 }

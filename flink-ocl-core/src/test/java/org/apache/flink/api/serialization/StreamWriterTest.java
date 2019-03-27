@@ -1,6 +1,7 @@
 package org.apache.flink.api.serialization;
 
 import org.apache.flink.api.engine.builder.options.DefaultsValues;
+import org.apache.flink.api.serialization.bigendian.BigEndianStreamWriter;
 import org.apache.flink.api.tuple.Tuple1Ocl;
 import org.apache.flink.api.tuple.Tuple2Ocl;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class StreamWriterTest
 	@Test
 	public void Writer_EmptyStreamFromNullList_Ok()
 	{
-		StreamWriter vWriter = StreamWriter.getStreamWriter();
+		StreamWriter vWriter = new BigEndianStreamWriter();
 		StreamWriterResult vResult = vWriter.writeStream();
 		
 		assertEquals(0, vResult.getStream().length);
@@ -31,7 +32,7 @@ public class StreamWriterTest
 	@Test
 	public void Writer_EmptyStreamFormEmptyList_Ok()
 	{
-		StreamWriter vWriter = StreamWriter.getStreamWriter().setTupleList(getEmptyTupleList()).setTupleListSize(0);
+		StreamWriter vWriter = new BigEndianStreamWriter().setTupleList(getEmptyTupleList()).setTupleListSize(0);
 		StreamWriterResult vResult = vWriter.writeStream();
 		
 		assertEquals(0, vResult.getStream().length);
@@ -41,7 +42,7 @@ public class StreamWriterTest
 	@Test
 	public void Writer_StreamFormUnsupportedTuple_Error()
 	{
-		StreamWriter vWriter = StreamWriter.getStreamWriter().setTupleList(getListWithUnsupportedT()).setTupleListSize(1);
+		StreamWriter vWriter = new BigEndianStreamWriter().setTupleList(getListWithUnsupportedT()).setTupleListSize(1);
 		boolean vError = false;
 		
 		try

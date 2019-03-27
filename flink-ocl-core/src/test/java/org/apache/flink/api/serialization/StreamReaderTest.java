@@ -1,5 +1,8 @@
 package org.apache.flink.api.serialization;
 
+import org.apache.flink.api.serialization.bigendian.BigEndianStreamReader;
+import org.apache.flink.api.serialization.reader.IStreamReaderIterator;
+import org.apache.flink.api.serialization.reader.StreamIterator;
 import org.apache.flink.api.tuple.Tuple1Ocl;
 import org.apache.flink.api.tuple.Tuple2Ocl;
 import org.junit.Test;
@@ -21,7 +24,7 @@ public class StreamReaderTest
 		
 		try
 		{
-			StreamReader.getStreamReader().setStream(new byte[] { 100 }).getTupleList();
+			new BigEndianStreamReader().setStream(new byte[] {100 }).getTupleList();
 		}
 		catch (IllegalArgumentException ex)
 		{
@@ -39,11 +42,11 @@ public class StreamReaderTest
 		
 		try
 		{
-			StreamReader.getStreamReader().setStream(new byte[] { 1, 100, 1 }).getTupleList();
+			new BigEndianStreamReader().setStream(new byte[] { 1, 100, 1 }).getTupleList();
 		}
 		catch (IllegalArgumentException ex)
 		{
-			assertEquals(StreamReader.DESERIALIZATION_ERROR, ex.getMessage());
+			assertEquals(StreamIterator.DESERIALIZATION_ERROR, ex.getMessage());
 			vError = true;
 		}
 		
@@ -70,7 +73,7 @@ public class StreamReaderTest
 		Tuple1Ocl<Double> vTuple1Ocl = new Tuple1Ocl<>(DTV_0);
 		Tuple1Ocl<Double> vTuple2Ocl;
 		
-		StreamReader.IStreamReaderIterator vIterator = getStreamReaderFrom(vTuple1Ocl).streamReaderIterator();
+		IStreamReaderIterator vIterator = getStreamReaderFrom(vTuple1Ocl).streamReaderIterator();
 		assertTrue(vIterator.hasNext());
 		vTuple2Ocl = vIterator.nextTuple();
 		

@@ -1,5 +1,8 @@
 package org.apache.flink.api.engine.builder.options;
 
+import org.apache.flink.api.bridge.OclContext;
+import org.apache.flink.api.bridge.identity.BigEndianIdentityValuesConverter;
+import org.apache.flink.api.bridge.identity.LittleEndianIdentityValuesConverter;
 import org.apache.flink.api.common.comparers.StringKeyCaseInsenstiveComparer;
 import org.apache.flink.api.common.mappers.StringKeyMapper;
 import org.apache.flink.api.engine.IOclContextMappings;
@@ -7,12 +10,17 @@ import org.apache.flink.api.engine.ITupleBytesDimensionGetters;
 import org.apache.flink.api.engine.IUserFunction;
 import org.apache.flink.api.engine.builder.KernelBuilder;
 import org.apache.flink.api.engine.builder.ReduceKernelBuilder;
-import org.apache.flink.api.engine.builder.mappers.FunctionKernelBuilderMapper;
-import org.apache.flink.api.engine.builder.mappers.FunctionKernelBuilderOptionMapper;
-import org.apache.flink.api.engine.builder.mappers.TupleKindVarTypeToKernelTypeMapper;
+import org.apache.flink.api.engine.builder.mappers.*;
+import org.apache.flink.api.serialization.bigendian.BigEndianStreamReader;
+import org.apache.flink.api.serialization.bigendian.BigEndianStreamWriter;
+import org.apache.flink.api.serialization.littleendian.LittleEndianStreamReader;
+import org.apache.flink.api.serialization.littleendian.LittleEndianStreamWriter;
 import org.apache.flink.api.serialization.StreamReader;
 import org.apache.flink.api.serialization.StreamWriter;
+import org.apache.flink.configuration.ISettingsRepository;
 import org.apache.flink.configuration.ITupleDefinitionRepository;
+
+import java.nio.ByteOrder;
 
 import static org.apache.flink.api.common.utility.IterableHelper.getIterableFromArgs;
 import static org.apache.flink.api.common.utility.IterableHelper.getStringIterableFromArgs;
@@ -433,13 +441,58 @@ public class DefaultsValues
 		}
 	}
 	
+	public static class DefaultNumbersByteOrderingStreamWriterMapper extends NumbersByteOrderingStreamWriterMapper
+	{
+		public DefaultNumbersByteOrderingStreamWriterMapper()
+		{
+			setUpMappers();
+		}
+		
+		protected void setUpMappers()
+		{
+			register(ByteOrder.LITTLE_ENDIAN, LittleEndianStreamWriter::new);
+			register(ByteOrder.BIG_ENDIAN, BigEndianStreamWriter::new);
+		}
+	}
+	
+	public static class DefaultNumbersByteOrderingStreamReaderMapper extends NumbersByteOrderingStreamReaderMapper
+	{
+		public DefaultNumbersByteOrderingStreamReaderMapper()
+		{
+			setUpMappers();
+		}
+		
+		protected void setUpMappers()
+		{
+			register(ByteOrder.LITTLE_ENDIAN, LittleEndianStreamReader::new);
+			register(ByteOrder.BIG_ENDIAN, BigEndianStreamReader::new);
+		}
+	}
+	
+	public static class DefaultNumbersByteOrderingToIdentityValuesConverterMapper
+		extends NumbersByteOrderingToIdentityValuesConverterMapper
+	{
+		public DefaultNumbersByteOrderingToIdentityValuesConverterMapper()
+		{
+			setUpMappers();
+		}
+		
+		protected void setUpMappers()
+		{
+			register(ByteOrder.LITTLE_ENDIAN, new LittleEndianIdentityValuesConverter());
+			register(ByteOrder.BIG_ENDIAN, new BigEndianIdentityValuesConverter());
+		}
+	}
+	
 	public static class DefaultOclContextMappings implements IOclContextMappings
 	{
-		private FunctionKernelBuilderMapper mFunctionKernelBuilderMapping;
-		private FunctionKernelBuilderOptionMapper mFunctionKernelBuilderOptionMapper;
-		private ITupleBytesDimensionGetters mTupleBytesDimensionGetters;
-		private StreamWriter mStreamWriter;
-		private StreamReader mStreamReader;
+		protected FunctionKernelBuilderMapper mFunctionKernelBuilderMapping;
+		protected FunctionKernelBuilderOptionMapper mFunctionKernelBuilderOptionMapper;
+		protected ITupleBytesDimensionGetters mTupleBytesDimensionGetters;
+		
+		protected NumbersByteOrderingStreamWriterMapper mNumbersByteOrderingStreamWriterMapper;
+		protected NumbersByteOrderingStreamReaderMapper mNumbersByteOrderingStreamReaderMapper;
+		protected NumbersByteOrderingToIdentityValuesConverterMapper mNumbersByteOrderingToIdentityValuesConverterMapper;
 		
 		public DefaultOclContextMappings()
 		{
@@ -448,10 +501,11 @@ public class DefaultsValues
 			mFunctionKernelBuilderOptionMapper =
 				new DefaultFunctionKernelBuilderOptionMapper();
 			
-			mStreamWriter = StreamWriter.getStreamWriter();
-			mStreamReader = StreamReader.getStreamReader();
-			
 			mTupleBytesDimensionGetters = getDefaultTupleBytesDimensionGetters();
+			
+			mNumbersByteOrderingStreamWriterMapper = new DefaultNumbersByteOrderingStreamWriterMapper();
+			mNumbersByteOrderingStreamReaderMapper = new DefaultNumbersByteOrderingStreamReaderMapper();
+			mNumbersByteOrderingToIdentityValuesConverterMapper = new DefaultNumbersByteOrderingToIdentityValuesConverterMapper();
 		}
 		
 		@Override
@@ -485,15 +539,21 @@ public class DefaultsValues
 		}
 		
 		@Override
-		public StreamWriter getStreamWriter()
+		public NumbersByteOrderingStreamWriterMapper getNumbersByteOrderingStreamWriterMapper()
 		{
-			return mStreamWriter;
+			return mNumbersByteOrderingStreamWriterMapper;
 		}
 		
 		@Override
-		public StreamReader getStreamReader()
+		public NumbersByteOrderingStreamReaderMapper getNumbersByteOrderingStreamReaderMapper()
 		{
-			return mStreamReader;
+			return mNumbersByteOrderingStreamReaderMapper;
+		}
+		
+		@Override
+		public NumbersByteOrderingToIdentityValuesConverterMapper getByteOrderingToIdentityValuesConverterMapper()
+		{
+			return mNumbersByteOrderingToIdentityValuesConverterMapper;
 		}
 	}
 	
