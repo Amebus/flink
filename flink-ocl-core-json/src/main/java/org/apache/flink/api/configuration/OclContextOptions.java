@@ -26,7 +26,7 @@ public class OclContextOptions implements IOclContextOptions
 	public OclContextOptions()
 	{
 		mRemoveTempFoldersOnClose = true;
-		mNumbersByteOrdering = ByteOrder.BIG_ENDIAN;
+		mNumbersByteOrdering = ByteOrder.LITTLE_ENDIAN;
 	}
 	
 	public String getKernelsBuildFolder()

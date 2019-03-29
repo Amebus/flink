@@ -18,5 +18,4 @@ public interface IOclContextMappings
 	NumbersByteOrderingStreamReaderMapper getNumbersByteOrderingStreamReaderMapper();
 	
 	NumbersByteOrderingToIdentityValuesConverterMapper getByteOrderingToIdentityValuesConverterMapper();
-	
 }

@@ -255,7 +255,7 @@ public abstract class DefaultKernelBuilderOptionsBuilder<T extends KernelBuilder
 				.getKey(DefaultsValues.DefaultsTuplesKinds.INPUT_TUPLE, DefaultsValues.DefaultVarTypes.DOUBLE),
 			pKernelLogicalVariable ->
 			{
-				String vLine = "DESER_DOUBLE( _data, _i, # , _l);".replace("#", pKernelLogicalVariable.getVarName());
+				String vLine = "DESER_DOUBLE( _data, _i, # );".replace("#", pKernelLogicalVariable.getVarName());
 				return new KernelBuilder
 					.KernelDeserializationLine(vLine, pKernelLogicalVariable.getIndex());
 			});

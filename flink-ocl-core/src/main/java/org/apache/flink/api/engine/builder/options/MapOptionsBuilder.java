@@ -171,7 +171,7 @@ public class MapOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Kernel
 				.getKey(DefaultsValues.DefaultsTuplesKinds.OUTPUT_TUPLE, DefaultsValues.DefaultVarTypes.INT),
 			pKernelLogicalVariable ->
 			{
-				String vLine = "SER_INT( #, @, _result );"
+				String vLine = "SER_INT( #, @, _result, _serializationTemp );"
 					.replace("#", pKernelLogicalVariable.getVarName())
 					.replace("@","_ri" + pKernelLogicalVariable.getIndex());
 				return new KernelBuilder
@@ -186,7 +186,7 @@ public class MapOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Kernel
 				.getKey(DefaultsValues.DefaultsTuplesKinds.OUTPUT_TUPLE, DefaultsValues.DefaultVarTypes.DOUBLE),
 			pKernelLogicalVariable ->
 			{
-				String vLine = "SER_DOUBLE( #, @, _result, _l)"
+				String vLine = "SER_DOUBLE( #, @, _result, _serializationTemp)"
 					.replace("#", pKernelLogicalVariable.getVarName())
 					.replace("@", "_ri" + pKernelLogicalVariable.getIndex());
 				return new KernelBuilder
@@ -201,11 +201,11 @@ public class MapOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Kernel
 				.getKey(DefaultsValues.DefaultsTuplesKinds.OUTPUT_TUPLE, DefaultsValues.DefaultVarTypes.STRING),
 			pKernelLogicalVariable ->
 			{
-				//SER_STRING( _r0, _ri0, 12, _result );
-				String vLine = "SER_STRING( #, @, -, _result );"
+				//SER_STRING( _r0, _ri0, 12, _result, _serializationTemp );
+				String vLine = "SER_STRING( #, @, -, _result, _serializationTemp );"
 					.replace("#", pKernelLogicalVariable.getVarName())
 					.replace("@", "_ri" + pKernelLogicalVariable.getIndex())
-					.replace("-", "" + pKernelLogicalVariable.getBytesDim());
+					.replace("-", "_rsl" + pKernelLogicalVariable.getIndex());
 				
 				return new KernelBuilder
 					.KernelSerializationLine(vLine, pKernelLogicalVariable.getIndex());

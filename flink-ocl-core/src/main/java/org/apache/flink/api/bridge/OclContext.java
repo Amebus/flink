@@ -41,7 +41,10 @@ public class OclContext implements Serializable
 		mOclContextMappings = pOclContextMappings;
 		
 		ByteOrder vByteOrder = mSettingsRepository.getContextOptions().getNumbersByteOrdering();
-		mOclBridgeContext = new OclBridge(mOclContextMappings.getNumbersByteOrderingStreamWriterMapper().resolve(vByteOrder));
+		mOclBridgeContext = new OclBridge(
+			mOclContextMappings
+				.getNumbersByteOrderingStreamWriterMapper()
+				.resolve(vByteOrder));
 		mStreamReader = mOclContextMappings.getNumbersByteOrderingStreamReaderMapper().resolve(vByteOrder);
 	}
 	

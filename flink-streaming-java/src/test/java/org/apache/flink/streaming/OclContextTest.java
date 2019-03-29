@@ -48,7 +48,7 @@ public class OclContextTest
 	public ExpectedException expectedException = ExpectedException.none();
 	
 	
-	@Test
+//	@Test
 	public void OclReduceSimple()
 	{
 		OclContext vContext = getOclContext("reduce.json");
@@ -62,7 +62,7 @@ public class OclContextTest
 		vTuples.add(new Tuple1Ocl<>(73));
 		vTuples.add(new Tuple1Ocl<>(10));
 		
-//		vTuples = GetTestTuples();
+//		vTuples = GetIntegerTestTuples();
 		
 		IOclTuple vResult = vContext.reduce("reduceTest", vTuples, vTuples.size());
 		
@@ -81,7 +81,12 @@ public class OclContextTest
 		
 		vContext.open();
 		
-		List<IOclTuple> vTuples = GetTestTuples();
+		List<IOclTuple> vTuples =
+			 GetIntegerTestTuples();
+//			new ArrayList<>(2);
+//		vTuples.add(new Tuple1Ocl<>(-1679099059));
+//		vTuples.add(new Tuple1Ocl<>(528136394));
+		
 		
 		Iterable<? extends IOclTuple> vResult
 			= vContext.map("mapIntToString", vTuples, vTuples.size());
@@ -120,7 +125,7 @@ public class OclContextTest
 		
 		vContext.open();
 		
-		List<IOclTuple> vTuples = GetTestTuples()
+		List<IOclTuple> vTuples = GetIntegerTestTuples()
 			.stream()
 			.map(pIOclTuple -> new Tuple1Ocl<>(pIOclTuple.<Integer>getField(0).toString()))
 			.collect(Collectors.toList());
@@ -138,13 +143,13 @@ public class OclContextTest
 		
 	}
 	
-//	@Test
+	@Test
 	public void OclFilterSimple()
 	{
 		OclContext vContext = getOclContext("filterFunction2.json");
 		vContext.open();
 		
-		List<IOclTuple> vTuples = GetTestTuples();
+		List<IOclTuple> vTuples = GetDoubleTestTuples();
 		TupleListInfo vListInfo = new TupleListInfo(vTuples);
 		
 		Iterable<? extends IOclTuple> vResult;
@@ -155,15 +160,15 @@ public class OclContextTest
 		AtomicInteger vResultCount = new AtomicInteger();
 		vResult.forEach(pO -> vResultCount.getAndIncrement());
 		
-		int vExpectedCount = vListInfo.countGreaterThan(2);
+		int vExpectedCount = vListInfo.countGreaterThan(2.0);
 		System.out.println("OclFilterSimple - Expected: " + vExpectedCount + " - Actual: " + vResultCount);
 		assertEquals(vExpectedCount, vResultCount.get());
-		assertEquals(vListInfo.countLessOrEqualThan(2), vTuples.size() - vResultCount.get());
+		assertEquals(vListInfo.countLessOrEqualThan(2.0), vTuples.size() - vResultCount.get());
 		
 		List<IOclTuple> vGreaterThanTwo =
 			vTuples
 				.stream()
-				.filter(pIOclTuple -> pIOclTuple.<Integer>getField(0) > 2)
+				.filter(pIOclTuple -> pIOclTuple.<Integer>getField(0) > 2.0)
 				.collect(Collectors.toList());
 		
 		Iterator<IOclTuple> vIterator = vGreaterThanTwo.iterator();
@@ -298,7 +303,7 @@ public class OclContextTest
 		}
 	}
 	
-	private List<IOclTuple> GetTestTuples()
+	private List<IOclTuple> GetIntegerTestTuples()
 	{
 		List<IOclTuple> vConstTuples = new ArrayList<>();
 		vConstTuples.add(new Tuple1Ocl<>(-1679099059));
@@ -307,17 +312,47 @@ public class OclContextTest
 		vConstTuples.add(new Tuple1Ocl<>(-1348335996));
 		
 		Random vRnd = new Random();
-		int vMaxConstDiff = vConstTuples.size();
 		int vMax = 50000;
-//		int vMax = 1;
-		List<IOclTuple> vTuples = new ArrayList<>(vMax);
-		vTuples.addAll(vConstTuples);
 		
-		for (int vI = 0; vI < vMax - vMaxConstDiff; vI++)
+		return GetTestTuple1OclList(vConstTuples, vMax, vRnd::nextInt);
+	}
+	
+	private List<IOclTuple> GetDoubleTestTuples()
+	{
+//		List<IOclTuple> vConstTuples = new ArrayList<>();
+		
+		Random vRnd = new Random();
+		int vMax = 50000;
+		return GetTestTuple1OclList(vMax, vRnd::nextDouble);
+	}
+	
+	private <R> List<IOclTuple> GetTestTuple1OclList(
+		int pMax,
+		Tuple1ValueGetter<R> pTuple1ValueGetter)
+	{
+		return GetTestTuple1OclList(new ArrayList<>(), pMax, pTuple1ValueGetter);
+	}
+	
+	private <R> List<IOclTuple> GetTestTuple1OclList(
+		List<IOclTuple> pConstTuples,
+		int pMax,
+		Tuple1ValueGetter<R> pTuple1ValueGetter)
+	{
+		List<IOclTuple> vTuples = new ArrayList<>(pMax);
+		vTuples.addAll(pConstTuples);
+		
+		int vMaxConstDiff = pConstTuples.size();
+		for (int vI = 0; vI < pMax - vMaxConstDiff; vI++)
 		{
-			vTuples.add(new Tuple1Ocl<>(vRnd.nextInt()));
+			vTuples.add(new Tuple1Ocl<>(pTuple1ValueGetter.getValue()));
 		}
 		return vTuples;
+	}
+	
+	@FunctionalInterface
+	private interface Tuple1ValueGetter<R>
+	{
+		R getValue();
 	}
 	
 	class TupleListInfo
@@ -341,7 +376,7 @@ public class OclContextTest
 		
 		public int count(java.util.function.Predicate< ? super IOclTuple> filter)
 		{
-			return (int) mOclTuples.stream().filter(filter::test).count();
+			return (int) mOclTuples.stream().filter(filter).count();
 		}
 		
 		public int countEvenNumbers()
@@ -359,7 +394,17 @@ public class OclContextTest
 			return count( pIOclTuple -> pIOclTuple.<Integer>getField(0) > pLimit);
 		}
 		
+		public int countGreaterThan(double pLimit)
+		{
+			return count( pIOclTuple -> pIOclTuple.<Double>getField(0) > pLimit);
+		}
+		
 		public int countLessOrEqualThan(int pLimit)
+		{
+			return size() - countGreaterThan(pLimit);
+		}
+		
+		public int countLessOrEqualThan(double pLimit)
 		{
 			return size() - countGreaterThan(pLimit);
 		}
