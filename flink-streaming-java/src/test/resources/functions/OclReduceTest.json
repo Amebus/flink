@@ -1,9 +1,8 @@
 {
   "functions": [{
     "type":"reduce",
-    "name":"reduceTest",
-    "input":"tupleTwo",
-    "output":"tupleTwo",
+    "name":"reduceInteger",
+    "input":"tuple1Integer",
     "workGroupSize": 2,
     "function": [
       "printf(\"_currentStep: %d - _gSize: %d - _grSize: %d\\n\", _currentStep, _gSize, _grSize);",

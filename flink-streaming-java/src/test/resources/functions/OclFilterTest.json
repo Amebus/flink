@@ -1,0 +1,20 @@
+{
+  "functions": [
+    {
+      "type":"filter",
+      "name":"filterInteger",
+      "input":"tuple1Integer",
+      "function": [
+        "_r0 = _t0 > 2;"
+      ]
+    },
+    {
+      "type":"filter",
+      "name":"filterDouble",
+      "input":"tuple1Double",
+      "function": [
+        "_r0 = _t0 > 2;"
+      ]
+    }
+  ]
+}

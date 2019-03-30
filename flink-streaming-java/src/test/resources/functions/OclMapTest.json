@@ -1,0 +1,20 @@
+{
+  "functions": [{
+    "type":"map",
+    "name":"mapIntToString",
+    "input":"tuple1Integer",
+    "output":"tuple1String",
+    "function": [
+      "integerToString(_t0, _r0, _rsl0);"
+    ]
+  }, {
+    "type":"map",
+    "name":"mapStringToInt",
+    "input":"tuple1String",
+    "output":"tuple1Integer",
+    "function": [
+      "_r0 = globalStringToInteger(_t0);"
+    ]
+  }
+  ]
+}

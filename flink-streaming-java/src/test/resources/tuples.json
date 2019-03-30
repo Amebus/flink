@@ -6,7 +6,7 @@
     "t3": "int"
   },
   "tupleTwo": {
-    "t0": "int::I0"
+    "t0": "double::I0"
   },
   "tupleThree": {
     "t0": "string::D12"

@@ -4,6 +4,7 @@ public class Constants
 {
 	public static final String RESOURCES_DIR = "src/test/resources";
 	public static final String FUNCTIONS_DIR = RESOURCES_DIR + "/functions";
+	public static final String TUPLES_DIR = RESOURCES_DIR + "/tuples";
 	
 	public static final Integer ITV_0 = -12;
 	public static final Double DTV_0 = -12.57;

@@ -321,54 +321,18 @@ public class DefaultsValues
 	{
 		public static final int DESERIALIZATION_MACROS_COUNT = 3;
 		
-		public static final String DESER_INT = "#define DESER_INT(d, si, r) 		\\\n" +
+		public static final String DESER_INT = "#define DESER_INT(d, si, r) 				\\\n" +
 											   "			r = (*(__global int*) &d[si]);	\\\n" +
-											   "			si+=4;					\\\n" +
+											   "			si+=4;							\\\n" +
 											   "";
-//											   "            r <<= 8;        \\\n" +
-//											   "            r |= d[si];     \\\n" +
-//											   "            si++;           \\\n" +
-//											   "            r <<= 8;        \\\n" +
-//											   "            r |= d[si];     \\\n" +
-//											   "            si++;           \\\n" +
-//											   "            r <<= 8;        \\\n" +
-//											   "            r |= d[si];     \\\n" +
-//											   "            si++;           \\\n" +
-//											   "            r <<= 8;        \\\n" +
-//											   "            r |= d[si];     \\\n";
 		
-		public static final String DESER_DOUBLE = "#define DESER_DOUBLE(d, si, r)   	\\\n" +
-												  "				r = (*(double*) &d[0]);	\\\n" +
-												  "				si+=8;" +
+		public static final String DESER_DOUBLE = "#define DESER_DOUBLE(d, si, r)  				\\\n" +
+												  "			r = (*(__global double*) &d[si]);	\\\n" +
+												  "			si+=8;								\\\n" +
 												  "";
-//												  "            t <<= 8;                \\\n" +
-//												  "            t |= d[si];             \\\n" +
-//												  "            si++;                   \\\n" +
-//												  "            t <<= 8;                \\\n" +
-//												  "            t |= d[si];             \\\n" +
-//												  "            si++;                   \\\n" +
-//												  "            t <<= 8;                \\\n" +
-//												  "            t |= d[si];             \\\n" +
-//												  "            si++;                   \\\n" +
-//												  "            t <<= 8;                \\\n" +
-//												  "            t |= d[si];             \\\n" +
-//												  "            si++;                   \\\n" +
-//												  "            t <<= 8;                \\\n" +
-//												  "            t |= d[si];             \\\n" +
-//												  "            si++;                   \\\n" +
-//												  "            t <<= 8;                \\\n" +
-//												  "            t |= d[si];             \\\n" +
-//												  "            si++;                   \\\n" +
-//												  "            t <<= 8;                \\\n" +
-//												  "            t |= d[si];             \\\n" +
-//												  "            si++;                   \\\n" +
-//												  "            t <<= 8;                \\\n" +
-//												  "            t |= d[si];             \\\n" +
-//												  "            r = (double)t;          \\\n";
 		
 		public static final String DESER_STRING = "#define DESER_STRING(d, si, rs, ri) 			\\\n" +
 												  "            DESER_INT(d, si, ri);   			\\\n" +
-//												  "            si++;                   			\\\n" +
 												  "            rs = (__global char *)&d[si]; 	\\\n" +
 												  "            si+=ri;                 			\\\n";
 	}
@@ -384,13 +348,6 @@ public class DefaultsValues
 											 "            r[si] = t[_ser_i];							\\\n" +
 											 "        }													\\\n" +
 											 "";
-//											 "        r[si] = (i >> 24) & 0xFF;  \\\n" +
-//											 "        si++;                      \\\n" +
-//											 "        r[si] = (i >> 16) & 0xFF;  \\\n" +
-//											 "        si++;                      \\\n" +
-//											 "        r[si] = (i >> 8) & 0xFF;   \\\n" +
-//											 "        si++;                      \\\n" +
-//											 "        r[si] = i & 0xFF;          \\\n";
 		
 		public static final String SER_DOUBLE = "#define SER_DOUBLE(d, si, r, t)							\\\n" +
 												"        t = (unsigned char*) &d;							\\\n" +
@@ -399,27 +356,9 @@ public class DefaultsValues
 												"            r[si] = t[_ser_i];								\\\n" +
 												"        }													\\\n" +
 												"";
-//												"#define SER_DOUBLE(d, si, r, t)     \\\n" +
-//												"        t = (long) d;               \\\n" +
-//												"        r[si] = (t >> 56) & 0xFF;   \\\n" +
-//												"        si++;                       \\\n" +
-//												"        r[si] = (t >> 48) & 0xFF;   \\\n" +
-//												"        si++;                       \\\n" +
-//												"        r[si] = (t >> 40) & 0xFF;   \\\n" +
-//												"        si++;                       \\\n" +
-//												"        r[si] = (t >> 32) & 0xFF;   \\\n" +
-//												"        si++;                       \\\n" +
-//												"        r[si] = (t >> 24) & 0xFF;   \\\n" +
-//												"        si++;                       \\\n" +
-//												"        r[si] = (t >> 16) & 0xFF;   \\\n" +
-//												"        si++;                       \\\n" +
-//												"        r[si] = (t >> 8) & 0xFF;    \\\n" +
-//												"        si++;                       \\\n" +
-//												"        r[si] = t & 0xFF;           \\\n";
 		
 		public static final String SER_STRING = "#define SER_STRING(s, si, l, r, t)             \\\n" +
 												"        SER_INT(l, si, r, t);					\\\n" +
-//												"        si++;                                  \\\n" +
 												"        for(int _ii = 0; _ii < l; _ii++, si++) \\\n" +
 												"        {                                      \\\n" +
 												"            r[si] = s[_ii];                    \\\n" +
