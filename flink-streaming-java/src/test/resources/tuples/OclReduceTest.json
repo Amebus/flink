@@ -1,11 +1,11 @@
 {
   "tuple1Integer": {
-    "t0": "int"
+    "t0": "int::I0"
   },
   "tuple1Double": {
-    "t0": "double"
+    "t0": "double::I0"
   },
   "tuple1String": {
-    "t0": "string::D12"
+    "t0": "string::D12::I\"\","
   }
 }

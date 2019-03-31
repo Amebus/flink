@@ -88,6 +88,51 @@ public class OclFilterTest extends OclContextHelpers.OclTestClass
 		vResult.forEach(pO -> assertEquals(vIterator.next(), pO));
 	}
 	
+	@Test
+	public void OclFilterString()
+	{
+		List<IOclTuple> vTuples = GetStringTestTuples();
+		OclContextHelpers.TupleListInfo vListInfo = new OclContextHelpers.TupleListInfo(vTuples);
+		
+		Iterable<? extends IOclTuple> vResult = getFilterResult(vTuples, "filterString");
+		
+		long vResultCount = StreamUtility.streamFrom(vResult).count();
+		
+		java.util.function.Predicate< ? super IOclTuple> vFilter
+			= pIOclTuple ->
+		{
+			String vString = pIOclTuple.getField(0);
+			
+			boolean vIsStringAlphanumeric = false;
+			char vChar;
+			
+			for (int i = 0; i < vString.length() && !vIsStringAlphanumeric; i++)
+			{
+				vChar = vString.charAt(i);
+				vIsStringAlphanumeric = vChar > '0' && vChar < '9';
+			}
+			
+			return vIsStringAlphanumeric;
+		};
+		
+		int vExpectedCount = vListInfo.count(vFilter);
+		
+		System.out.println("OclFilterString - Expected: " + vExpectedCount + " - Actual: " + vResultCount);
+		assertEquals(vExpectedCount, vResultCount);
+		assertEquals(vListInfo.count(pIOclTuple -> !vFilter.test(pIOclTuple)), vTuples.size() - vResultCount);
+		
+		List<IOclTuple> vAlphaNumericStrings =
+			vTuples
+				.stream()
+				.filter(vFilter)
+				.collect(Collectors.toList());
+		
+		Iterator<IOclTuple> vIterator = vAlphaNumericStrings.iterator();
+		
+		vResult.forEach(pO -> assertEquals(vIterator.next(), pO));
+		
+	}
+	
 	private Iterable<? extends IOclTuple> getFilterResult(List<IOclTuple> pTuples, String pFilterFunctionName)
 	{
 		return getWithCurrentContext(pOclContext ->

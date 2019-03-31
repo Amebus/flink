@@ -170,6 +170,14 @@ public class DefaultsValues
 											 IDENTITY_TUPLE);
 		}
 		
+		public static Iterable<String> getDefaultDeserializationMacrosList()
+		{
+			return getIterableFromArgs(
+				DefaultDeserializationMacros.DESER_INT.replace("__global", "__local"),
+				DefaultDeserializationMacros.DESER_DOUBLE.replace("__global", "__local"),
+				DefaultDeserializationMacros.DESER_STRING.replace("__global", "__local"));
+		}
+		
 		public static TupleKindVarTypeToKernelTypeMapper getTupleKindVarTypeToKernelTypeMapper(
 			KernelBuilder.ITupleKindVariableTypeKeyCalculator pKeyCalculator)
 		{

@@ -39,35 +39,8 @@ public class OclContextTest
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
 	
-	
-//	@Test
-	public void OclReduceSimple()
-	{
-		OclContext vContext = null;//getOclContext("OclReduceTest.json");
-		
-		vContext.open();
-		
-		List<IOclTuple> vTuples = new ArrayList<>(2);
-		
-		vTuples.add(new Tuple1Ocl<>(1));
-		vTuples.add(new Tuple1Ocl<>(5));
-		vTuples.add(new Tuple1Ocl<>(73));
-		vTuples.add(new Tuple1Ocl<>(10));
-		
-//		vTuples = GetIntegerTestTuples();
-		
-		IOclTuple vResult = vContext.reduce("reduceTest", vTuples, vTuples.size());
-		
-		vContext.close();
-		
-		assertEquals(
-			vTuples.stream().mapToInt(pT -> pT.getField(0)).sum(),
-			(int)vResult.getField(0));
-		
-	}
-	
-//	@Test
-	public void simpleMapTest() throws  Exception
+	@Test
+	public void simpleFlinkOclTest() throws  Exception
 	{
 		ISettingsRepository a = new JsonSettingsRepository(Constants.RESOURCES_DIR);
 		ITupleDefinitionRepository b = new JsonTupleRepository.Builder(Constants.RESOURCES_DIR).build();

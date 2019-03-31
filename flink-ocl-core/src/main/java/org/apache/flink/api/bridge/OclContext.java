@@ -136,7 +136,7 @@ public class OclContext implements Serializable
 		int pInputTuplesCount)
 	{
 		IUserFunction vUserFunction = mFunctionRepository.getUserFunctionByName(pUserFunctionName);
-		String vOutputTupleName = vUserFunction.getOutputTupleName();
+		String vOutputTupleName = vUserFunction.getInputTupleName();
 		ITupleDefinition vOutputTuple = mTupleDefinitionRepository.getTupleDefinition(vOutputTupleName);
 		int vTupleDim = mOclContextMappings.getTupleBytesDimensionGetters().getTupleDimension(vOutputTuple);
 		IdentityValues vIdentityValues = new IdentityValues(vOutputTuple, vTupleDim);

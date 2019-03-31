@@ -81,6 +81,12 @@ public class ReduceOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Ker
 	}
 	
 	@Override
+	protected void setDeserializationMacroList()
+	{
+		setDeserializationMacroList(DefaultsValues.Reduce.getDefaultDeserializationMacrosList());
+	}
+	
+	@Override
 	protected void setTupleKindVarTypeToKernelTypeMapping()
 	{
 		TupleKindVarTypeToKernelTypeMapper vMapping =
@@ -433,7 +439,7 @@ public class ReduceOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Ker
 				.getKey(DefaultsValues.Reduce.LOCAL_TUPLE_A, DefaultsValues.DefaultVarTypes.INT),
 			pKernelLogicalVariable ->
 			{
-				String vLine = "SER_INT( #, _iTemp, _localCache );"
+				String vLine = "SER_INT( #, _iTemp, _localCache, _serializationTemp );"
 					.replace("#", pKernelLogicalVariable.getVarName());
 				return new KernelBuilder
 					.KernelSerializationLine(vLine, pKernelLogicalVariable.getIndex());
@@ -447,7 +453,7 @@ public class ReduceOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Ker
 				.getKey(DefaultsValues.Reduce.LOCAL_TUPLE_A, DefaultsValues.DefaultVarTypes.DOUBLE),
 			pKernelLogicalVariable ->
 			{
-				String vLine = "SER_DOUBLE( #, _iTemp, _localCache, _l)"
+				String vLine = "SER_DOUBLE( #, _iTemp, _localCache, _serializationTemp)"
 					.replace("#", pKernelLogicalVariable.getVarName());
 				return new KernelBuilder
 					.KernelSerializationLine(null, pKernelLogicalVariable.getIndex());
@@ -462,7 +468,7 @@ public class ReduceOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Ker
 			pKernelLogicalVariable ->
 			{
 				//SER_STRING( _r0, _ri0, 12, _result );
-				String vLine = "SER_STRING( #, _iTemp, -, _localCache );"
+				String vLine = "SER_STRING( #, _iTemp, -, _localCache, _serializationTemp );"
 					.replace("#", pKernelLogicalVariable.getVarName())
 					.replace("-", "" + pKernelLogicalVariable.getBytesDim());
 				
