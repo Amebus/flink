@@ -1,5 +1,6 @@
 package org.apache.flink.streaming.helpers;
 
+import org.apache.commons.io.IOCase;
 import org.apache.flink.api.bridge.OclContext;
 import org.apache.flink.api.configuration.JsonSettingsRepository;
 import org.apache.flink.api.configuration.JsonTupleRepository;
@@ -9,10 +10,7 @@ import org.apache.flink.api.tuple.IOclTuple;
 import org.apache.flink.api.tuple.Tuple1Ocl;
 import org.junit.Before;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class OclContextHelpers
@@ -75,6 +73,42 @@ public class OclContextHelpers
 			vResult = pFunction.getInContext(vOclContext);
 			vOclContext.close();
 			return vResult;
+		}
+		
+		protected void test(
+			FITuplesGetter pOclTuplesGetter,
+			FIResultGetter pResultGetter,
+			FIAssertionAction pAction)
+		{
+			List<IOclTuple> vTuples = pOclTuplesGetter.getTutples();
+			
+			Iterable<? extends IOclTuple> vResult = pResultGetter.getResult(vTuples);
+			
+			Iterator<IOclTuple> vIterator = vTuples.iterator();
+			vResult.forEach(pOclTuple ->
+							{
+								IOclTuple vTuple = vIterator.next();
+								pAction.doAssert(vTuple, pOclTuple);
+							});
+			
+		}
+		
+		@FunctionalInterface
+		public interface FITuplesGetter
+		{
+			List<IOclTuple> getTutples();
+		}
+		
+		@FunctionalInterface
+		public interface FIResultGetter
+		{
+			Iterable<? extends IOclTuple> getResult(List<IOclTuple> pTuples);
+		}
+		
+		@FunctionalInterface
+		public interface FIAssertionAction
+		{
+			void doAssert(IOclTuple pExpected, IOclTuple pActual);
 		}
 		
 		@FunctionalInterface

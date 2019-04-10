@@ -5,7 +5,10 @@
   "tuple1Double": {
     "t0": "double"
   },
-  "tuple1String": {
+  "tuple1String12": {
     "t0": "string::D12"
+  },
+  "tuple1String32": {
+    "t0": "string::D32"
   }
 }

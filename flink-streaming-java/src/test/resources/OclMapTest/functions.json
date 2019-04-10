@@ -3,18 +3,17 @@
     "type":"map",
     "name":"mapIntToString",
     "input":"tuple1Integer",
-    "output":"tuple1String",
+    "output":"tuple1String12",
     "function": [
       "integerToString(_t0, _r0, _rsl0);"
     ]
   }, {
     "type":"map",
     "name":"mapStringToInt",
-    "input":"tuple1String",
+    "input":"tuple1String12",
     "output":"tuple1Integer",
     "function": [
       "_r0 = globalStringToInteger(_t0);"
     ]
-  }
-  ]
+  }]
 }

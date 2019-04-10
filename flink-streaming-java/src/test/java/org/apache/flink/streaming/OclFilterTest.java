@@ -144,6 +144,14 @@ public class OclFilterTest extends OclContextHelpers.OclTestClass
 		
 	}
 	
+	protected void test(
+		FITuplesGetter pOclTuplesGetter,
+		String pFunctionName,
+		FIAssertionAction pAction)
+	{
+		test(pOclTuplesGetter, (pTuples) -> getFilterResult(pTuples, pFunctionName), pAction);
+	}
+	
 	private Iterable<? extends IOclTuple> getFilterResult(List<IOclTuple> pTuples, String pFilterFunctionName)
 	{
 		return getWithCurrentContext(pOclContext ->
