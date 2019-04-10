@@ -48,6 +48,7 @@ import org.apache.flink.runtime.testingUtils.TestingTaskManagerMessages;
 import org.apache.flink.runtime.testingUtils.TestingUtils;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.ocl.bridge.OclContext;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OptionalFailure;
 import org.apache.flink.util.TestLogger;
@@ -373,7 +374,12 @@ public class LegacyAccumulatorLiveITCase extends TestLogger {
 	 * only use this to call {@link #getStreamGraph()}.
 	 */
 	private static class DummyStreamExecutionEnvironment extends StreamExecutionEnvironment {
-
+		
+		public DummyStreamExecutionEnvironment()
+		{
+			super(null);
+		}
+		
 		@Override
 		public JobExecutionResult execute() throws Exception {
 			return execute("default");

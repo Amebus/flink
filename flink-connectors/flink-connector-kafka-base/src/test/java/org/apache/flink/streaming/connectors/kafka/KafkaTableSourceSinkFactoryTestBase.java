@@ -28,6 +28,7 @@ import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
+import org.apache.flink.streaming.api.ocl.bridge.OclContext;
 import org.apache.flink.streaming.api.operators.ChainingStrategy;
 import org.apache.flink.streaming.api.transformations.StreamTransformation;
 import org.apache.flink.streaming.connectors.kafka.config.StartupMode;
@@ -231,7 +232,12 @@ public abstract class KafkaTableSourceSinkFactoryTestBase extends TestLogger {
 	private static class StreamExecutionEnvironmentMock extends StreamExecutionEnvironment {
 
 		public SourceFunction<?> sourceFunction;
-
+		
+		public StreamExecutionEnvironmentMock()
+		{
+			super(null);
+		}
+		
 		@Override
 		public <OUT> DataStreamSource<OUT> addSource(SourceFunction<OUT> sourceFunction) {
 			this.sourceFunction = sourceFunction;

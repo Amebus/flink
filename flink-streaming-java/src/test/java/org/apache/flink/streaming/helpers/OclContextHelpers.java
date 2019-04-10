@@ -1,13 +1,12 @@
 package org.apache.flink.streaming.helpers;
 
-import org.apache.commons.io.IOCase;
-import org.apache.flink.api.bridge.OclContext;
-import org.apache.flink.api.configuration.JsonSettingsRepository;
-import org.apache.flink.api.configuration.JsonTupleRepository;
-import org.apache.flink.api.engine.JsonUserFunctionRepository;
-import org.apache.flink.api.engine.builder.options.DefaultsValues;
-import org.apache.flink.api.tuple.IOclTuple;
-import org.apache.flink.api.tuple.Tuple1Ocl;
+import org.apache.flink.streaming.api.ocl.bridge.OclContext;
+import org.apache.flink.streaming.api.ocl.configuration.JsonSettingsRepository;
+import org.apache.flink.streaming.api.ocl.configuration.JsonTupleRepository;
+import org.apache.flink.streaming.api.ocl.engine.JsonUserFunctionRepository;
+import org.apache.flink.streaming.api.ocl.engine.builder.options.DefaultsValues;
+import org.apache.flink.streaming.api.ocl.tuple.IOclTuple;
+import org.apache.flink.streaming.api.ocl.tuple.Tuple1Ocl;
 import org.junit.Before;
 
 import java.util.*;

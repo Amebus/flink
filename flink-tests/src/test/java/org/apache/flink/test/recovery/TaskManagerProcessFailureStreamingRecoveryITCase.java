@@ -69,6 +69,7 @@ public class TaskManagerProcessFailureStreamingRecoveryITCase extends AbstractTa
 		final Configuration configuration = new Configuration();
 		configuration.setString(CoreOptions.MODE, CoreOptions.LEGACY_MODE);
 		StreamExecutionEnvironment env = StreamExecutionEnvironment.createRemoteEnvironment(
+			null,
 			"localhost",
 			jobManagerPort,
 			configuration);

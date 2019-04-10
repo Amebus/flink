@@ -69,6 +69,12 @@ under the License.
 			<version>3.5</version>
 		</dependency>
 
+		<dependency>
+			<groupId>io.gsonfire</groupId>
+			<artifactId>gson-fire</artifactId>
+			<version>1.8.2</version>
+		</dependency>
+
 		<!-- test dependencies -->
 
 		<dependency>

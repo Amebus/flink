@@ -776,7 +776,7 @@ object StreamExecutionEnvironment {
    */
   def createLocalEnvironment(parallelism: Int = JavaEnv.getDefaultLocalParallelism):
       StreamExecutionEnvironment = {
-    new StreamExecutionEnvironment(JavaEnv.createLocalEnvironment(parallelism))
+    new StreamExecutionEnvironment(JavaEnv.createLocalEnvironment(null, parallelism))
   }
 
   /**
@@ -788,7 +788,7 @@ object StreamExecutionEnvironment {
    */
   def createLocalEnvironment(parallelism: Int, configuration: Configuration):
   StreamExecutionEnvironment = {
-    new StreamExecutionEnvironment(JavaEnv.createLocalEnvironment(parallelism, configuration))
+    new StreamExecutionEnvironment(JavaEnv.createLocalEnvironment(null, parallelism, configuration))
   }
 
   /**
@@ -808,7 +808,7 @@ object StreamExecutionEnvironment {
   @PublicEvolving
   def createLocalEnvironmentWithWebUI(config: Configuration = null): StreamExecutionEnvironment = {
     val conf: Configuration = if (config == null) new Configuration() else config
-    new StreamExecutionEnvironment(JavaEnv.createLocalEnvironmentWithWebUI(conf))
+    new StreamExecutionEnvironment(JavaEnv.createLocalEnvironmentWithWebUI(null, conf))
   }
 
   // --------------------------------------------------------------------------
@@ -832,7 +832,7 @@ object StreamExecutionEnvironment {
    */
   def createRemoteEnvironment(host: String, port: Int, jarFiles: String*):
   StreamExecutionEnvironment = {
-    new StreamExecutionEnvironment(JavaEnv.createRemoteEnvironment(host, port, jarFiles: _*))
+    new StreamExecutionEnvironment(JavaEnv.createRemoteEnvironment(null, host, port, jarFiles: _*))
   }
 
   /**
@@ -856,7 +856,7 @@ object StreamExecutionEnvironment {
       parallelism: Int,
       jarFiles: String*): StreamExecutionEnvironment = {
 
-    val javaEnv = JavaEnv.createRemoteEnvironment(host, port, jarFiles: _*)
+    val javaEnv = JavaEnv.createRemoteEnvironment(null, host, port, jarFiles: _*)
     javaEnv.setParallelism(parallelism)
     new StreamExecutionEnvironment(javaEnv)
   }

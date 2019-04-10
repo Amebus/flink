@@ -25,7 +25,6 @@ import org.apache.flink.api.common.io.FileOutputFormat;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.typeutils.InputTypeConfigurable;
-import org.apache.flink.api.tuple.IOclTuple;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.types.StringValue;
 

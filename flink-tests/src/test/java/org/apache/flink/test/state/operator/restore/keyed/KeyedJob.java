@@ -61,7 +61,7 @@ public class KeyedJob {
 		Configuration config = new Configuration();
 		config.setString(CheckpointingOptions.SAVEPOINT_DIRECTORY, savepointsPath);
 
-		StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(config);
+		StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(null, config);
 		env.enableCheckpointing(500, CheckpointingMode.EXACTLY_ONCE);
 		env.setRestartStrategy(RestartStrategies.noRestart());
 

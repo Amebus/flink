@@ -1,13 +1,13 @@
 package org.apache.flink.streaming.api.serialization;
 
 
-import org.apache.flink.api.engine.builder.options.DefaultsValues;
-import org.apache.flink.api.serialization.Dimensions;
-import org.apache.flink.api.serialization.StreamWriter;
-import org.apache.flink.api.serialization.StreamWriterResult;
-import org.apache.flink.api.serialization.bigendian.BigEndianStreamWriter;
-import org.apache.flink.api.tuple.Tuple1Ocl;
-import org.apache.flink.api.tuple.Tuple2Ocl;
+import org.apache.flink.streaming.api.ocl.engine.builder.options.DefaultsValues;
+import org.apache.flink.streaming.api.ocl.serialization.Dimensions;
+import org.apache.flink.streaming.api.ocl.serialization.StreamWriter;
+import org.apache.flink.streaming.api.ocl.serialization.StreamWriterResult;
+import org.apache.flink.streaming.api.ocl.serialization.bigendian.BigEndianStreamWriter;
+import org.apache.flink.streaming.api.ocl.tuple.Tuple1Ocl;
+import org.apache.flink.streaming.api.ocl.tuple.Tuple2Ocl;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;

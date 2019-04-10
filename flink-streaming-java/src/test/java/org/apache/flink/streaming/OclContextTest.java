@@ -1,36 +1,24 @@
 package org.apache.flink.streaming;
 
-import org.apache.flink.api.bridge.OclContext;
+import org.apache.flink.streaming.api.ocl.bridge.OclContext;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
-import org.apache.flink.api.configuration.JsonSettingsRepository;
-import org.apache.flink.api.engine.CppLibraryInfo;
-import org.apache.flink.api.engine.IUserFunctionsRepository;
-import org.apache.flink.api.engine.JsonUserFunctionRepository;
-import org.apache.flink.api.engine.KernelCodeBuilderEngine;
-import org.apache.flink.api.engine.builder.options.DefaultsValues;
-import org.apache.flink.api.configuration.JsonTupleRepository;
-import org.apache.flink.api.tuple.IOclTuple;
-import org.apache.flink.api.tuple.Tuple1Ocl;
-import org.apache.flink.api.typeutils.OclTupleTypeInfo;
-import org.apache.flink.configuration.ISettingsRepository;
-import org.apache.flink.configuration.ITupleDefinitionRepository;
+import org.apache.flink.streaming.api.ocl.configuration.JsonSettingsRepository;
+import org.apache.flink.streaming.api.ocl.engine.IUserFunctionsRepository;
+import org.apache.flink.streaming.api.ocl.engine.JsonUserFunctionRepository;
+import org.apache.flink.streaming.api.ocl.engine.builder.options.DefaultsValues;
+import org.apache.flink.streaming.api.ocl.configuration.JsonTupleRepository;
+import org.apache.flink.streaming.api.ocl.tuple.Tuple1Ocl;
+import org.apache.flink.streaming.api.ocl.typeutils.OclTupleTypeInfo;
+import org.apache.flink.streaming.configuration.ISettingsRepository;
+import org.apache.flink.streaming.configuration.ITupleDefinitionRepository;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.helpers.Constants;
-import org.apache.flink.streaming.helpers.OclContextHelpers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
-import static org.apache.flink.streaming.helpers.OclContextHelpers.*;
 import static org.junit.Assert.assertEquals;
 
 public class OclContextTest

@@ -1,9 +1,9 @@
 package org.apache.flink.streaming.helpers;
 
-import org.apache.flink.api.serialization.Dimensions;
-import org.apache.flink.api.tuple.IOclTuple;
-import org.apache.flink.api.tuple.Tuple1Ocl;
-import org.apache.flink.api.tuple.Tuple2Ocl;
+import org.apache.flink.streaming.api.ocl.serialization.Dimensions;
+import org.apache.flink.streaming.api.ocl.tuple.IOclTuple;
+import org.apache.flink.streaming.api.ocl.tuple.Tuple1Ocl;
+import org.apache.flink.streaming.api.ocl.tuple.Tuple2Ocl;
 
 import java.util.ArrayList;
 import java.util.List;

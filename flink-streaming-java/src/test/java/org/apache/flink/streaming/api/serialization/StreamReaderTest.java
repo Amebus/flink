@@ -1,11 +1,11 @@
 package org.apache.flink.streaming.api.serialization;
 
-import org.apache.flink.api.serialization.StreamReader;
-import org.apache.flink.api.serialization.bigendian.BigEndianStreamReader;
-import org.apache.flink.api.serialization.reader.IStreamReaderIterator;
-import org.apache.flink.api.serialization.reader.StreamIterator;
-import org.apache.flink.api.tuple.Tuple1Ocl;
-import org.apache.flink.api.tuple.Tuple2Ocl;
+import org.apache.flink.streaming.api.ocl.serialization.StreamReader;
+import org.apache.flink.streaming.api.ocl.serialization.bigendian.BigEndianStreamReader;
+import org.apache.flink.streaming.api.ocl.serialization.reader.IStreamReaderIterator;
+import org.apache.flink.streaming.api.ocl.serialization.reader.StreamIterator;
+import org.apache.flink.streaming.api.ocl.tuple.Tuple1Ocl;
+import org.apache.flink.streaming.api.ocl.tuple.Tuple2Ocl;
 import org.junit.Test;
 
 import static org.apache.flink.streaming.helpers.Constants.*;

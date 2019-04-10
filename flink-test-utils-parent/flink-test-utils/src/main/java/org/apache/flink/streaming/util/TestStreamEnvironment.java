@@ -26,6 +26,7 @@ import org.apache.flink.runtime.minicluster.LocalFlinkMiniCluster;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironmentFactory;
 import org.apache.flink.streaming.api.graph.StreamGraph;
+import org.apache.flink.streaming.api.ocl.bridge.OclContext;
 import org.apache.flink.util.Preconditions;
 
 import java.net.URL;
@@ -46,11 +47,12 @@ public class TestStreamEnvironment extends StreamExecutionEnvironment {
 	private final Collection<URL> classPaths;
 
 	public TestStreamEnvironment(
-			JobExecutor jobExecutor,
-			int parallelism,
-			Collection<Path> jarFiles,
-			Collection<URL> classPaths) {
-
+		JobExecutor jobExecutor,
+		int parallelism,
+		Collection<Path> jarFiles,
+		Collection<URL> classPaths,
+		OclContext pOclContext) {
+		super(pOclContext);
 		this.jobExecutor = Preconditions.checkNotNull(jobExecutor);
 		this.jarFiles = Preconditions.checkNotNull(jarFiles);
 		this.classPaths = Preconditions.checkNotNull(classPaths);
@@ -61,7 +63,7 @@ public class TestStreamEnvironment extends StreamExecutionEnvironment {
 	public TestStreamEnvironment(
 			JobExecutor jobExecutor,
 			int parallelism) {
-		this(jobExecutor, parallelism, Collections.emptyList(), Collections.emptyList());
+		this(jobExecutor, parallelism, Collections.emptyList(), Collections.emptyList(), null);
 	}
 
 	@Override
@@ -104,7 +106,8 @@ public class TestStreamEnvironment extends StreamExecutionEnvironment {
 					jobExecutor,
 					parallelism,
 					jarFiles,
-					classpaths);
+					classpaths,
+					null);
 			}
 		};
 

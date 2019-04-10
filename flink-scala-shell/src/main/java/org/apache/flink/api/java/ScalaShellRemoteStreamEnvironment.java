@@ -64,7 +64,7 @@ public class ScalaShellRemoteStreamEnvironment extends RemoteStreamEnvironment {
 		Configuration configuration,
 		String... jarFiles) {
 
-		super(host, port, configuration, jarFiles);
+		super(null, host, port, configuration, jarFiles);
 		this.flinkILoop = flinkILoop;
 	}
 

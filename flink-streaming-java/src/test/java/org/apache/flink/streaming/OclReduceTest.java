@@ -1,7 +1,7 @@
 package org.apache.flink.streaming;
 
-import org.apache.flink.api.tuple.IOclTuple;
-import org.apache.flink.api.tuple.Tuple1Ocl;
+import org.apache.flink.streaming.api.ocl.tuple.IOclTuple;
+import org.apache.flink.streaming.api.ocl.tuple.Tuple1Ocl;
 import org.apache.flink.streaming.helpers.Constants;
 import org.apache.flink.streaming.helpers.OclContextHelpers;
 import org.junit.Rule;
