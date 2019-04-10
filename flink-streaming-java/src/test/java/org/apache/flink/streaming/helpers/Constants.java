@@ -6,6 +6,10 @@ public class Constants
 	public static final String FUNCTIONS_DIR = RESOURCES_DIR + "/functions";
 	public static final String TUPLES_DIR = RESOURCES_DIR + "/tuples";
 	
+	public static final String OCL_FILTER_TEST_DIR = RESOURCES_DIR + "/OclFilterTest";
+	public static final String OCL_MAP_TEST_DIR = RESOURCES_DIR + "/OclMapTest";
+	public static final String OCL_REDUCE_TEST_DIR = RESOURCES_DIR + "/OclReduceTest";
+	
 	public static final Integer ITV_0 = -12;
 	public static final Double DTV_0 = -12.57;
 	public static final String STV_0 = "string";

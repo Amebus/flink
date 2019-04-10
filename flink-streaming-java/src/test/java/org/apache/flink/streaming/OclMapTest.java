@@ -2,6 +2,7 @@ package org.apache.flink.streaming;
 
 import org.apache.flink.api.tuple.IOclTuple;
 import org.apache.flink.api.tuple.Tuple1Ocl;
+import org.apache.flink.streaming.helpers.Constants;
 import org.apache.flink.streaming.helpers.OclContextHelpers;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,18 +17,28 @@ import static org.junit.Assert.assertEquals;
 
 public class OclMapTest extends OclContextHelpers.OclTestClass
 {
-	private final String FILE_NAME = "OclMapTest.json";
-	
 	@Override
-	protected String getFunctionsFileName()
+	protected String getResourcesDirectory()
 	{
-		return FILE_NAME;
+		return Constants.OCL_MAP_TEST_DIR;
 	}
 	
 	@Override
-	protected String getTuplesFileName()
+	protected String getOclSettingsDirectory()
 	{
-		return FILE_NAME;
+		return getResourcesDirectory();
+	}
+	
+	@Override
+	protected String getFunctionsDirectory()
+	{
+		return getResourcesDirectory();
+	}
+	
+	@Override
+	protected String getTuplesDirectory()
+	{
+		return getResourcesDirectory();
 	}
 	
 	@Rule

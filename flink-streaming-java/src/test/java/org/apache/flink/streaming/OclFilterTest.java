@@ -2,8 +2,8 @@ package org.apache.flink.streaming;
 
 import org.apache.flink.api.common.utility.StreamUtility;
 import org.apache.flink.api.tuple.IOclTuple;
+import org.apache.flink.streaming.helpers.Constants;
 import org.apache.flink.streaming.helpers.OclContextHelpers;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -18,19 +18,30 @@ import static org.junit.Assert.assertEquals;
 public class OclFilterTest extends OclContextHelpers.OclTestClass
 {
 	
-	private final String FILE_NAME = "OclFilterTest.json";
-	
 	@Override
-	protected String getFunctionsFileName()
+	protected String getResourcesDirectory()
 	{
-		return FILE_NAME;
+		return Constants.OCL_FILTER_TEST_DIR;
 	}
 	
 	@Override
-	protected String getTuplesFileName()
+	protected String getOclSettingsDirectory()
 	{
-		return FILE_NAME;
+		return getResourcesDirectory();
 	}
+	
+	@Override
+	protected String getFunctionsDirectory()
+	{
+		return getResourcesDirectory();
+	}
+	
+	@Override
+	protected String getTuplesDirectory()
+	{
+		return getResourcesDirectory();
+	}
+	
 	
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();

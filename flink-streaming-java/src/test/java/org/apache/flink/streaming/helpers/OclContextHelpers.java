@@ -27,22 +27,10 @@ public class OclContextHelpers
 			setOclContext();
 		}
 		
-		protected String getResourcesDirectory()
-		{
-			return Constants.RESOURCES_DIR;
-		}
-		
-		protected String getFunctionsDirectory()
-		{
-			return Constants.FUNCTIONS_DIR;
-		}
-		protected abstract String getFunctionsFileName();
-		
-		protected String getTuplesDirectory()
-		{
-			return Constants.TUPLES_DIR;
-		}
-		protected abstract String getTuplesFileName();
+		protected abstract String getResourcesDirectory();
+		protected abstract String getOclSettingsDirectory();
+		protected abstract String getFunctionsDirectory();
+		protected abstract String getTuplesDirectory();
 		
 		protected OclContext getCurrentOclContext()
 		{
@@ -61,14 +49,12 @@ public class OclContextHelpers
 		
 		public OclContext getNewOclContext()
 		{
-			return new OclContext(new JsonSettingsRepository(getResourcesDirectory()),
+			return new OclContext(new JsonSettingsRepository(getOclSettingsDirectory()),
 								  new JsonTupleRepository
 									  .Builder(getTuplesDirectory())
-									  .setFileName(getFunctionsFileName())
 									  .build(),
 								  new JsonUserFunctionRepository
 									  .Builder(getFunctionsDirectory())
-									  .setFileName(getTuplesFileName())
 									  .build(),
 								  new DefaultsValues.DefaultOclContextMappings());
 		}
