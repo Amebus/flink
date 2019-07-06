@@ -2,11 +2,13 @@ package org.apache.flink.streaming.api.ocl.engine.builder.mappers;
 
 import org.apache.flink.streaming.api.ocl.common.comparers.StringKeyCaseInsensitiveComparer;
 import org.apache.flink.streaming.api.ocl.common.mappers.StringKeyMapper;
+import org.apache.flink.streaming.api.ocl.engine.builder.IPDAKernelBuilderPlugin;
 
-public class TupleKindVarTypeToKernelTypeMapper extends StringKeyMapper<String>
+public class TemplatePluginMapper
+	extends StringKeyMapper<IPDAKernelBuilderPlugin>
 {
-	public TupleKindVarTypeToKernelTypeMapper()
+	public TemplatePluginMapper()
 	{
-		super(new StringKeyCaseInsensitiveComparer(""));
+		super(new StringKeyCaseInsensitiveComparer());
 	}
 }

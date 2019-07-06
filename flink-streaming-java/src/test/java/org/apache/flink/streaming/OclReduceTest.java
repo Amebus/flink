@@ -1,5 +1,6 @@
 package org.apache.flink.streaming;
 
+import org.apache.flink.streaming.api.ocl.engine.OclKernel;
 import org.apache.flink.streaming.api.ocl.engine.builder.IKernelTemplatesRepository;
 import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilder;
 import org.apache.flink.streaming.api.ocl.tuple.IOclTuple;
@@ -94,7 +95,13 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 						vResult = "--repo kernel args--";
 						break;
 					case "<[kernel-code]>":
-						vResult = "--repo kernel code--";
+						vResult = "<[kernel-code-a]><[kernel-code-b]>";
+						break;
+					case "<[kernel-code-a]>":
+						vResult = "--repo kernel code a--";
+						break;
+					case "<[kernel-code-b]>":
+						vResult = "--repo kernel code b--";
 						break;
 					default:
 						vResult = "--";
@@ -102,29 +109,14 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 				return vResult;
 			}
 		};
-		PDAKernelBuilder vPDAKernelBuilder = new PDAKernelBuilder(vRepository)
-		{
-			@Override
-			protected String getHelperFunctions()
-			{
-				return "--hf--";
-			}
-			
-			@Override
-			protected String getDefines()
-			{
-				return "--defines--";
-			}
-			
-			@Override
-			protected String getKernelCode()
-			{
-				return "--kernel--";
-			}
-		};
+//		PDAKernelBuilder vPDAKernelBuilder = new PDAKernelBuilder(vTemplate)
+//		{
+//		};
+//
+//
+//		OclKernel vRe = vPDAKernelBuilder.build();
 		
-		
-		String vRe = vPDAKernelBuilder.build();
+//		System.out.println(vRe.getCode());
 		
 		int i = 10 + 7;
 	}

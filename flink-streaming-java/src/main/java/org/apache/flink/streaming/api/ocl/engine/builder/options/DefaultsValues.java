@@ -2,11 +2,12 @@ package org.apache.flink.streaming.api.ocl.engine.builder.options;
 
 import org.apache.flink.streaming.api.ocl.bridge.identity.BigEndianIdentityValuesConverter;
 import org.apache.flink.streaming.api.ocl.bridge.identity.LittleEndianIdentityValuesConverter;
-import org.apache.flink.streaming.api.ocl.common.comparers.StringKeyCaseInsenstiveComparer;
+import org.apache.flink.streaming.api.ocl.common.comparers.StringKeyCaseInsensitiveComparer;
 import org.apache.flink.streaming.api.ocl.common.mappers.StringKeyMapper;
 import org.apache.flink.streaming.api.ocl.engine.IOclContextMappings;
 import org.apache.flink.streaming.api.ocl.engine.ITupleBytesDimensionGetters;
 import org.apache.flink.streaming.api.ocl.engine.IUserFunction;
+import org.apache.flink.streaming.api.ocl.engine.builder.IPDAKernelBuilderPlugin;
 import org.apache.flink.streaming.api.ocl.engine.builder.KernelBuilder;
 import org.apache.flink.streaming.api.ocl.engine.builder.ReduceKernelBuilder;
 import org.apache.flink.streaming.api.ocl.engine.builder.mappers.*;
@@ -23,6 +24,27 @@ import static org.apache.flink.streaming.api.ocl.common.utility.IterableHelper.g
 
 public class DefaultsValues
 {
+	public static IPDAKernelBuilderPlugin getHelperFunctionsDefaultPlugin()
+	{
+		return (pOptions, pCodeBuilder) ->
+			getDefaultUtilityFunctions().forEach(p -> pCodeBuilder.append(p).append("\n"));
+	}
+	
+	public static IPDAKernelBuilderPlugin getDefinesDefaultPlugin()
+	{
+		return (pOptions, pCodeBuilder) ->
+		{
+			getDefaultDeserializationMacrosList().forEach(p -> pCodeBuilder.append(p).append("\n"));
+			getDefaultSerializationMacrosList().forEach(p -> pCodeBuilder.append(p).append("\n"));
+		};
+	}
+	
+	public static IPDAKernelBuilderPlugin getKernelArgsDefaultPlugin()
+	{
+		return (pOptions, pCodeBuilder) ->
+			getDefaultKernelParameterList().forEach(p -> pCodeBuilder.append(p).append("\n"));
+	}
+	
 	public static Iterable<String> getDefaultKernelParameterList()
 	{
 		return getStringIterableFromArgs("__global unsigned char *_data",
@@ -373,7 +395,7 @@ public class DefaultsValues
 	{
 		public DefaultFunctionKernelBuilderMapping()
 		{
-			super(new StringKeyCaseInsenstiveComparer(""));
+			super(new StringKeyCaseInsensitiveComparer(""));
 			setUpMappers();
 		}
 		
@@ -389,7 +411,7 @@ public class DefaultsValues
 	{
 		public DefaultFunctionKernelBuilderOptionMapper()
 		{
-			super(new StringKeyCaseInsenstiveComparer(""));
+			super(new StringKeyCaseInsensitiveComparer(""));
 			setUpMappers();
 		}
 		
@@ -485,7 +507,7 @@ public class DefaultsValues
 		@Override
 		public StringKeyMapper<Byte> getVarTypeToSerializationTypeMapper()
 		{
-			StringKeyMapper<Byte> vMapper = new StringKeyMapper<>(new StringKeyCaseInsenstiveComparer(""));
+			StringKeyMapper<Byte> vMapper = new StringKeyMapper<>(new StringKeyCaseInsensitiveComparer(""));
 			
 			vMapper.register(DefaultVarTypes.INT, DefaultsSerializationTypes.INT);
 			vMapper.register(DefaultVarTypes.DOUBLE, DefaultsSerializationTypes.DOUBLE);

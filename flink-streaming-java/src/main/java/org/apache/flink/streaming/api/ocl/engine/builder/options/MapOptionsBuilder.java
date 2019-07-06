@@ -190,7 +190,7 @@ public class MapOptionsBuilder extends DefaultKernelBuilderOptionsBuilder<Kernel
 					.replace("#", pKernelLogicalVariable.getVarName())
 					.replace("@", "_ri" + pKernelLogicalVariable.getIndex());
 				return new KernelBuilder
-					.KernelSerializationLine(null, pKernelLogicalVariable.getIndex());
+					.KernelSerializationLine(vLine, pKernelLogicalVariable.getIndex());
 			});
 	}
 	

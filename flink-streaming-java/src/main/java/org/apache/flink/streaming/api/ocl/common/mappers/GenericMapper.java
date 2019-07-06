@@ -66,4 +66,9 @@ public abstract class GenericMapper<K, V, F> implements IMapper<K, V, F>
 	{
 		return mComparer;
 	}
+	
+	public void clear()
+	{
+		mMap.clear();
+	}
 }

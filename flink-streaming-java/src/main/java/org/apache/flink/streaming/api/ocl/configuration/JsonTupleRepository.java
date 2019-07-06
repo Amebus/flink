@@ -5,7 +5,7 @@ import org.apache.flink.streaming.api.ocl.common.IBuilder;
 import org.apache.flink.streaming.api.ocl.common.IMapperKeyComparerWrapper;
 import org.apache.flink.streaming.api.ocl.common.JsonLoader;
 import org.apache.flink.streaming.api.ocl.common.JsonLoaderOptions;
-import org.apache.flink.streaming.api.ocl.common.comparers.StringKeyCaseInsenstiveComparer;
+import org.apache.flink.streaming.api.ocl.common.comparers.StringKeyCaseInsensitiveComparer;
 import org.apache.flink.streaming.api.ocl.common.mappers.StringKeyMapper;
 import org.apache.flink.streaming.configuration.ITupleDefinition;
 import org.apache.flink.streaming.configuration.ITupleDefinitionRepository;
@@ -43,7 +43,7 @@ public class JsonTupleRepository implements ITupleDefinitionRepository
 	
 	protected void setUpVariableExtractors()
 	{
-		setUpVariableExtractors(new StringKeyCaseInsenstiveComparer(""));
+		setUpVariableExtractors(new StringKeyCaseInsensitiveComparer(""));
 	}
 	
 	protected void setUpVariableExtractors(IMapperKeyComparerWrapper<String> pKeyComparerWrapper)
