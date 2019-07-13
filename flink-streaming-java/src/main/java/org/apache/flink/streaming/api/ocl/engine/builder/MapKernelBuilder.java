@@ -1,7 +1,6 @@
 package org.apache.flink.streaming.api.ocl.engine.builder;
 
 import org.apache.flink.streaming.api.ocl.engine.builder.mappers.TemplatePluginMapper;
-import org.apache.flink.streaming.configuration.ITupleDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,11 +11,13 @@ public class MapKernelBuilder extends PDAKernelBuilder
 	public MapKernelBuilder(String pRootTemplate)
 	{
 		super(pRootTemplate);
+		setUpExtras();
 	}
 	
 	public MapKernelBuilder(String pRootTemplate, TemplatePluginMapper pTemplatePluginMapper)
 	{
 		super(pRootTemplate, pTemplatePluginMapper);
+		setUpExtras();
 	}
 	
 	@Override
@@ -28,12 +29,6 @@ public class MapKernelBuilder extends PDAKernelBuilder
 	
 	protected void setUpMapTemplatePluginMapper()
 	{
-		PDAKernelBuilderOptions vOptions = getPDAKernelBuilderOptions();
-		
-		vOptions.setExtra("input-var-int", "int")
-				.setExtra("input-var-double", "double")
-				.setExtra("input-var-string", "__global char*");
-		
 		this.registerPlugin("<[utility-vars]>", getUtilityVarsPlugin())
 			.registerPlugin("<[output-utility-vars]>", getOutputUtilityVarsPlugin())
 			.registerPlugin("<[deserialization]>", getDeserializationPlugin())
@@ -41,6 +36,16 @@ public class MapKernelBuilder extends PDAKernelBuilder
 			.registerPlugin("<[serialization]>", getSerializationPlugin())
 			.registerPlugin("<[input-vars]>", getInputVarsPlugin())
 			.registerPlugin("<[output-vars]>", getOutputVarsPlugin());
+	}
+	
+	protected void setUpExtras()
+	{
+		this.setExtra("input-var-int", "int")
+			.setExtra("input-var-double", "double")
+			.setExtra("input-var-string", "__global char*")
+			.setExtra("output-var-int", "int")
+			.setExtra("output-var-double", "double")
+			.setExtra("output-var-string", "char");
 	}
 	
 	@Override
@@ -52,6 +57,7 @@ public class MapKernelBuilder extends PDAKernelBuilder
 				.append("\t<[utility-vars]>\n")
 				.append("\t<[output-utility-vars]>\n")
 				.append("\t<[input-vars]>\n")
+				.append("\t<[output-vars]>\n")
 				.append("\t<[deserialization]>\n")
 				.append("\t<[user-function]>\n")
 				.append("\t<[serialization]>")
@@ -124,7 +130,7 @@ public class MapKernelBuilder extends PDAKernelBuilder
 						 {
 							 String vLine = "DESER_STRING( _data, _i, #, @ );"
 											.replace("#", pLVar.getVarName())
-											.replace("@", "_sl" + pLVar.getIndex());
+											.replace("@", "_tsl" + pLVar.getIndex());
 							 return new KernelDeserializationLine(vLine, pLVar.getIndex());
 						 });
 				
@@ -159,7 +165,7 @@ public class MapKernelBuilder extends PDAKernelBuilder
 		return (pBuilder, pCodeBuilder) ->
 			pCodeBuilder
 				.append("\n")
-				.append("// user function")
+				.append("// user function\n")
 				.append(pBuilder.getPDAKernelBuilderOptions().getUserFunction().getFunction())
 				.append("\n");
 	}
@@ -247,11 +253,6 @@ public class MapKernelBuilder extends PDAKernelBuilder
 				removeExtra("ser-" + getStringType());
 			}
 		};
-	}
-	
-	protected IPDAKernelBuilderPlugin getOutputVarsPlugin()
-	{
-		return new OutputVarPlugin();
 	}
 	
 	public static class KernelSerializationLine

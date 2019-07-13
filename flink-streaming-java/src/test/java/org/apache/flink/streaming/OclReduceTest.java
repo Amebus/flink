@@ -1,8 +1,11 @@
 package org.apache.flink.streaming;
 
-import org.apache.flink.streaming.api.ocl.engine.OclKernel;
+import org.apache.flink.streaming.api.ocl.bridge.OclContext;
+import org.apache.flink.streaming.api.ocl.common.mappers.StringKeyMapper;
+import org.apache.flink.streaming.api.ocl.engine.BuildEngine;
 import org.apache.flink.streaming.api.ocl.engine.builder.IKernelTemplatesRepository;
-import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilder;
+import org.apache.flink.streaming.api.ocl.engine.builder.IPDAKernelBuilder;
+import org.apache.flink.streaming.api.ocl.engine.builder.MapKernelBuilder;
 import org.apache.flink.streaming.api.ocl.tuple.IOclTuple;
 import org.apache.flink.streaming.api.ocl.tuple.Tuple1Ocl;
 import org.apache.flink.streaming.helpers.Constants;
@@ -23,7 +26,7 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 	@Override
 	protected String getResourcesDirectory()
 	{
-		return Constants.OCL_REDUCE_TEST_DIR;
+		return Constants.OCL_MAP_TEST_DIR;
 	}
 	
 	@Override
@@ -58,7 +61,7 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 						   "\n" +
 						   "<[defines]>\n" +
 						   "\n" +
-						   "__kernel void <[kernel-name/]>(\n" +
+						   "__kernel void <[kernel-name-dfp]>(\n" +
 						   "    <[kernel-args]>)\n" +
 						   "{\n" +
 						   "    <[kernel-code]>\n" +
@@ -109,15 +112,28 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 				return vResult;
 			}
 		};
-//		PDAKernelBuilder vPDAKernelBuilder = new PDAKernelBuilder(vTemplate)
-//		{
-//		};
+		
+		OclContext vHelper = getNewOclContext();
+		
+		
+		StringKeyMapper<IPDAKernelBuilder> vMapper = new StringKeyMapper<>();
+		vMapper.register("map", new MapKernelBuilder(vTemplate));
+		BuildEngine a = new BuildEngine(
+			vHelper.getSettingsRepository(),
+			vMapper);
+		
+		
+//		PDAKernelBuilder vPDAKernelBuilder =
+//			new MapKernelBuilder(vTemplate)
+//				.setPDAKernelBuilderOptions(new PDAKernelBuilderOptions(
+//					vHelper.get
+//				));
 //
 //
 //		OclKernel vRe = vPDAKernelBuilder.build();
 		
 //		System.out.println(vRe.getCode());
-		
+		a.generateKernels2(vHelper.getTupleDefinitionRepository(), vHelper.getFunctionRepository().getUserFunctions());
 		int i = 10 + 7;
 	}
 	

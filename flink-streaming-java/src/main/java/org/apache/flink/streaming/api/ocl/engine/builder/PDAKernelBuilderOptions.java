@@ -14,20 +14,23 @@ public class PDAKernelBuilderOptions
 	private IOclContextOptions mContextOptions;
 	private IOclKernelsOptions mKernelOptions;
 	
-	private StringKeyMapper<Object> mExtras;
 	
-	public PDAKernelBuilderOptions()
-	{
-		this(null, null, null, null);
-	}
 	
-	public PDAKernelBuilderOptions(IUserFunction pUserFunction, ITupleDefinitionRepository pTupleDefinitionsRepository, IOclContextOptions pContextOptions, IOclKernelsOptions pKernelOptions)
+//	public PDAKernelBuilderOptions()
+//	{
+//		this(null, null, null, null);
+//	}
+	
+	public PDAKernelBuilderOptions(
+		IUserFunction pUserFunction,
+		ITupleDefinitionRepository pTupleDefinitionsRepository,
+		IOclContextOptions pContextOptions,
+		IOclKernelsOptions pKernelOptions)
 	{
 		mUserFunction = pUserFunction;
 		mTupleDefinitionsRepository = pTupleDefinitionsRepository;
 		mContextOptions = pContextOptions;
 		mKernelOptions = pKernelOptions;
-		mExtras = new StringKeyMapper<>();
 	}
 	
 	public IUserFunction getUserFunction()
@@ -92,35 +95,6 @@ public class PDAKernelBuilderOptions
 	public PDAKernelBuilderOptions setKernelOptions(IOclKernelsOptions pKernelOptions)
 	{
 		mKernelOptions = pKernelOptions;
-		return this;
-	}
-	
-	protected StringKeyMapper<Object> getExtrasContainer()
-	{
-		return mExtras;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <T> T getExtra(String pKey)
-	{
-		return (T) getExtrasContainer().resolve(pKey);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <T> T removeExtra(String pKey)
-	{
-		return (T) getExtrasContainer().unregister(pKey);
-	}
-	
-	public PDAKernelBuilderOptions setExtra(String pKey, Object pExtra)
-	{
-		getExtrasContainer().register(pKey, pExtra);
-		return this;
-	}
-	
-	public PDAKernelBuilderOptions clearExtras()
-	{
-		getExtrasContainer().clear();
 		return this;
 	}
 }

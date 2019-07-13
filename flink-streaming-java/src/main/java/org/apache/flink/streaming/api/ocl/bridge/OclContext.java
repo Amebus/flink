@@ -48,6 +48,21 @@ public class OclContext implements Serializable
 		mStreamReader = mOclContextMappings.getNumbersByteOrderingStreamReaderMapper().resolve(vByteOrder);
 	}
 	
+	public ISettingsRepository getSettingsRepository()
+	{
+		return mSettingsRepository;
+	}
+	
+	public ITupleDefinitionRepository getTupleDefinitionRepository()
+	{
+		return mTupleDefinitionRepository;
+	}
+	
+	public IUserFunctionsRepository getFunctionRepository()
+	{
+		return mFunctionRepository;
+	}
+	
 	public void open()
 	{
 		generatesKernels();

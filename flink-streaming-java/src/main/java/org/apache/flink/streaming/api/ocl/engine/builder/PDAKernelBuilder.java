@@ -1,6 +1,7 @@
 package org.apache.flink.streaming.api.ocl.engine.builder;
 
 import org.apache.flink.streaming.api.ocl.common.IBuilder;
+import org.apache.flink.streaming.api.ocl.common.mappers.StringKeyMapper;
 import org.apache.flink.streaming.api.ocl.engine.OclKernel;
 import org.apache.flink.streaming.api.ocl.engine.builder.mappers.TemplatePluginMapper;
 import org.apache.flink.streaming.configuration.ITupleDefinition;
@@ -15,7 +16,7 @@ import java.util.regex.Pattern;
 import static org.apache.flink.streaming.api.ocl.common.utility.IterableHelper.getIterableFromArgs;
 import static org.apache.flink.streaming.api.ocl.engine.builder.options.DefaultsValues.*;
 
-public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
+public abstract class PDAKernelBuilder implements IPDAKernelBuilder
 {
 	public String getKernelNameTemplate()
 	{
@@ -53,6 +54,7 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 	private final String mRootTemplate;
 	private final TemplatePluginMapper mTemplatePluginMapper;
 	private PDAKernelBuilderOptions mPDAKernelBuilderOptions;
+	private StringKeyMapper<Object> mExtras;
 	
 	public PDAKernelBuilder(String pRootTemplate)
 	{
@@ -67,6 +69,7 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 		}
 		mRootTemplate = pRootTemplate;
 		mTemplatePluginMapper = pTemplatePluginMapper;
+		mExtras = new StringKeyMapper<>();
 		setUpTemplatePluginMapper();
 	}
 	
@@ -81,7 +84,37 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 	
 	protected IPDAKernelBuilderPlugin getKernelNamePlugin()
 	{
-		return (pBuilder, pCodeBuilder) -> pBuilder.getKernelName() ;
+		return (pBuilder, pCodeBuilder)
+			-> pCodeBuilder.append(pBuilder.getKernelName());
+	}
+	
+	protected StringKeyMapper<Object> getExtrasContainer()
+	{
+		return mExtras;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getExtra(String pKey)
+	{
+		return (T) getExtrasContainer().resolve(pKey);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T removeExtra(String pKey)
+	{
+		return (T) getExtrasContainer().unregister(pKey);
+	}
+	
+	public PDAKernelBuilder setExtra(String pKey, Object pExtra)
+	{
+		getExtrasContainer().register(pKey, pExtra);
+		return this;
+	}
+	
+	public PDAKernelBuilder clearExtras()
+	{
+		getExtrasContainer().clear();
+		return this;
 	}
 	
 	protected abstract IPDAKernelBuilderPlugin getKernelCodePlugin();
@@ -123,7 +156,7 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 	{
 		return mPDAKernelBuilderOptions;
 	}
-	public PDAKernelBuilder setPDAKernelBuilderOptions(PDAKernelBuilderOptions pPDAKernelBuilderOptions)
+	public IPDAKernelBuilder setPDAKernelBuilderOptions(PDAKernelBuilderOptions pPDAKernelBuilderOptions)
 	{
 		mPDAKernelBuilderOptions = pPDAKernelBuilderOptions;
 		return this;
@@ -167,6 +200,11 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 	protected IPDAKernelBuilderPlugin getInputVarsPlugin()
 	{
 		return new InputVarPlugin();
+	}
+	
+	protected IPDAKernelBuilderPlugin getOutputVarsPlugin()
+	{
+		return new OutputVarPlugin();
 	}
 	
 	protected IPDAKernelBuilderPlugin getOutputUtilityVarsPlugin()
@@ -306,7 +344,7 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 		
 		public <T> T getExtra(String pKey)
 		{
-			return getOptions().getExtra(pKey);
+			return getKernelBuilder().getExtra(pKey);
 		}
 		public <T> T getExtra(String pKey, FIGenerateExtra<T> pGenerateExtra)
 		{
@@ -323,12 +361,12 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 		}
 		public PDAKernelBuilderPlugin setExtra(String pKey, Object pExtra)
 		{
-			getOptions().setExtra(pKey, pExtra);
+			getKernelBuilder().setExtra(pKey, pExtra);
 			return this;
 		}
 		public <T> T removeExtra(String pKey)
 		{
-			return getOptions().removeExtra(pKey);
+			return getKernelBuilder().removeExtra(pKey);
 		}
 		
 		public PDAKernelBuilderPlugin setKernelBuilder(PDAKernelBuilder pKernelBuilder)
@@ -445,6 +483,7 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 				.forEach(pVar ->
 						 {
 							 String vVarType = pVar.getVarType();
+							 String vVarName = pVar.getVarName();
 							 int vIndex = 0;
 							 if (vVarType.equals(DefaultVarTypes.DOUBLE))
 							 {
@@ -455,7 +494,7 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 								 vIndex = 2;
 								 getInputLines()[3].addVarDef("_tsl" + pVar.getIndex());
 							 }
-							 getInputLines()[vIndex].addVarDef(pVar.getVarName());
+							 getInputLines()[vIndex].addVarDef(vVarName);
 						 });
 		}
 		
@@ -471,7 +510,7 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 					continue;
 				}
 				
-				String vType = getExtra("input-vars-" + vLine.getVarType());
+				String vType = getExtra("input-var-" + vLine.getVarType());
 				
 				vCodeBuilder.append(vType)
 							.append(" ");
@@ -504,7 +543,8 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 			
 			pCodeBuilder
 				.append("\n")
-				.append("// input-tuple");
+				.append("// input-tuple")
+				.append("\n");
 			
 			setInputLines();
 			
@@ -573,6 +613,7 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 				.forEach(pVar ->
 						 {
 							 String vVarType = pVar.getVarType();
+							 String vVarName = pVar.getVarName();
 							 int vIndex = 0;
 							 if (vVarType.equals(DefaultVarTypes.DOUBLE))
 							 {
@@ -582,8 +623,9 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 							 {
 								 vIndex = 2;
 								 getOutputLines()[3].addVarDef("_rsl" + pVar.getIndex());
+								 vVarName += "[" + pVar.getBytesDim() + "]";
 							 }
-							 getOutputLines()[vIndex].addVarDef(pVar.getVarName());
+							 getOutputLines()[vIndex].addVarDef(vVarName);
 						 });
 		}
 		
@@ -599,7 +641,7 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 					continue;
 				}
 				
-				String vType = getExtra("output-vars-" + vLine.getVarType());
+				String vType = getExtra("output-var-" + vLine.getVarType());
 				
 				vCodeBuilder.append(vType)
 							.append(" ");
@@ -632,7 +674,8 @@ public abstract class PDAKernelBuilder implements IBuilder<OclKernel>
 			
 			pCodeBuilder
 				.append("\n")
-				.append("// output-tuple");
+				.append("// output-tuple")
+				.append("\n");
 			
 			setOutputLines();
 			
