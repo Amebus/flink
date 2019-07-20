@@ -14,8 +14,6 @@ public class PDAKernelBuilderOptions
 	private IOclContextOptions mContextOptions;
 	private IOclKernelsOptions mKernelOptions;
 	
-	
-	
 //	public PDAKernelBuilderOptions()
 //	{
 //		this(null, null, null, null);

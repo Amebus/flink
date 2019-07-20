@@ -91,7 +91,7 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 					case "<[defines]>":
 						vResult = "--repo defines--";
 						break;
-					case "<[kernel-name/]>":
+					case "<[kernel-name]>":
 						vResult = "--repo kernel name--";
 						break;
 					case "<[kernel-args]>":
@@ -118,22 +118,11 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 		
 		StringKeyMapper<IPDAKernelBuilder> vMapper = new StringKeyMapper<>();
 		vMapper.register("map", new MapKernelBuilder(vTemplate));
-		BuildEngine a = new BuildEngine(
+		BuildEngine vBuildEngine = new BuildEngine(
 			vHelper.getSettingsRepository(),
 			vMapper);
 		
-		
-//		PDAKernelBuilder vPDAKernelBuilder =
-//			new MapKernelBuilder(vTemplate)
-//				.setPDAKernelBuilderOptions(new PDAKernelBuilderOptions(
-//					vHelper.get
-//				));
-//
-//
-//		OclKernel vRe = vPDAKernelBuilder.build();
-		
-//		System.out.println(vRe.getCode());
-		a.generateKernels2(vHelper.getTupleDefinitionRepository(), vHelper.getFunctionRepository().getUserFunctions());
+		vBuildEngine.generateKernels2(vHelper.getTupleDefinitionRepository(), vHelper.getFunctionRepository().getUserFunctions());
 		int i = 10 + 7;
 	}
 	

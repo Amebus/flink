@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.flink.streaming.api.ocl.common.utility.IterableHelper.getIterableFromArgs;
+import static org.apache.flink.streaming.api.ocl.engine.builder.plugins.PDAKernelBuilderPlugin.Defaults.*;
 
 public abstract class DefaultKernelBuilderOptionsBuilder<T extends KernelBuilderOptions> extends KernelBuilderOptionsBuilder<T>
 {
@@ -45,22 +46,22 @@ public abstract class DefaultKernelBuilderOptionsBuilder<T extends KernelBuilder
 	
 	protected void setKernelParametersList()
 	{
-		setKernelParametersList(DefaultsValues.getDefaultKernelParameterList());
+		setKernelParametersList(getDefaultKernelParameterList());
 	}
 	
 	protected void setUtilityFunctions()
 	{
-		setUtilityFunctionList(DefaultsValues.getDefaultUtilityFunctions());
+		setUtilityFunctionList(getDefaultUtilityFunctions());
 	}
 	
 	protected void setDeserializationMacroList()
 	{
-		setDeserializationMacroList(DefaultsValues.getDefaultDeserializationMacrosList());
+		setDeserializationMacroList(getDefaultDeserializationMacrosList());
 	}
 	
 	protected void setSerializationMacroList()
 	{
-		setSerializationMacroList(DefaultsValues.getDefaultSerializationMacrosList());
+		setSerializationMacroList(getDefaultSerializationMacrosList());
 	}
 	
 	protected void setTupleKinds()

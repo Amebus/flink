@@ -24,63 +24,12 @@ import static org.apache.flink.streaming.api.ocl.common.utility.IterableHelper.g
 
 public class DefaultsValues
 {
-	public static IPDAKernelBuilderPlugin getHelperFunctionsDefaultPlugin()
-	{
-		return (pOptions, pCodeBuilder) ->
-			getDefaultUtilityFunctions().forEach(p -> pCodeBuilder.append(p).append("\n"));
-	}
-	
-	public static IPDAKernelBuilderPlugin getDefinesDefaultPlugin()
-	{
-		return (pOptions, pCodeBuilder) ->
-		{
-			getDefaultDeserializationMacrosList().forEach(p -> pCodeBuilder.append(p).append("\n"));
-			getDefaultSerializationMacrosList().forEach(p -> pCodeBuilder.append(p).append("\n"));
-		};
-	}
-	
-	public static IPDAKernelBuilderPlugin getKernelArgsDefaultPlugin()
-	{
-		return (pOptions, pCodeBuilder) ->
-			getDefaultKernelParameterList().forEach(p -> pCodeBuilder.append(p).append("\n"));
-	}
-	
-	public static Iterable<String> getDefaultKernelParameterList()
-	{
-		return getStringIterableFromArgs("__global unsigned char *_data",
-										 "__global int *_dataIndexes",
-										 "__global unsigned char *_result");
-	}
 	
 	public static Iterable<String> getDefaultFunctionEngineTypes()
 	{
 		return getStringIterableFromArgs(DefaultFunctionsNames.FILTER,
 										 DefaultFunctionsNames.MAP,
 										 DefaultFunctionsNames.REDUCE);
-	}
-	
-	public static Iterable<String> getDefaultUtilityFunctions()
-	{
-		return getStringIterableFromArgs(DefaultUtilityFunctions.FILL_STRING_WITH,
-										 DefaultUtilityFunctions.INTEGER_TO_STRING,
-										 DefaultUtilityFunctions.STRING_TO_INTEGER,
-										 DefaultUtilityFunctions.GLOABL_STRING_TO_INTEGER);
-	}
-	
-	public static Iterable<String> getDefaultDeserializationMacrosList()
-	{
-		return getIterableFromArgs(
-			DefaultDeserializationMacros.DESER_INT,
-			DefaultDeserializationMacros.DESER_DOUBLE,
-			DefaultDeserializationMacros.DESER_STRING);
-	}
-	
-	public static Iterable<String> getDefaultSerializationMacrosList()
-	{
-		return getIterableFromArgs(
-			DefaultSerializationMacros.SER_INT,
-			DefaultSerializationMacros.SER_DOUBLE,
-			DefaultSerializationMacros.SER_STRING);
 	}
 	
 	public static Iterable<String> getDefaultTuplesEngineKinds()
@@ -127,11 +76,6 @@ public class DefaultsValues
 						  });
 			return vResult[0];
 		};
-	}
-	
-	public static DefaultOclContextMappings getDefaultOclContextMappings()
-	{
-		return new DefaultOclContextMappings();
 	}
 	
 	public static class Map
@@ -230,92 +174,15 @@ public class DefaultsValues
 		}
 	}
 	
-	public static class DefaultUtilityFunctions
-	{
-		public static final int UTILITY_FUNCTION_COUNT = 4;
-		
-		public static final String INTEGER_TO_STRING = "void integerToString(int n, char *s, int sl)\n" +
-													   "{\n" +
-													   "    fillStringWith(0, sl, '\\0', s);\n" +
-													   "    char const digit[] = \"0123456789\";\n" +
-													   "    char* p = s;\n" +
-													   "    if(n<0){\n" +
-													   "        *p++ = '-';\n" +
-													   "        n *= -1;\n" +
-													   "    }\n" +
-													   "    int shifter = n;\n" +
-													   "    do{\n" +
-													   "        ++p;\n" +
-													   "        shifter = shifter/10;\n" +
-													   "    }while(shifter);\n" +
-													   "    *p = '\\0';\n" +
-													   "    do{\n" +
-													   "        *--p = digit[n%10];\n" +
-													   "        n = n/10;\n" +
-													   "    }while(n);\n" +
-													   "}\n";
-		
-		public static final String STRING_TO_INTEGER = "int stringToInteger(char *s)\n" +
-													   "{\n" +
-													   "    const char z = '0';\n" +
-													   "    int r = 0, st = 0, p = 1;\n" +
-													   "    \n" +
-													   "    while(s[st] != '\\0')\n" +
-													   "    {\n" +
-													   "        st++;\n" +
-													   "    }\n" +
-													   "    for(int i = st-1; i >= 0 && s[i] != '-' ; i--)\n" +
-													   "    {\n" +
-													   "        r+=((s[i]-z)*p);\n" +
-													   "        p*=10;\n" +
-													   "    }\n" +
-													   "    if(s[0]=='-')\n" +
-													   "    {\n" +
-													   "        r*=-1;\n" +
-													   "    }\n" +
-													   "    return r;\n" +
-													   "}\n";
-		
-		public static final String GLOABL_STRING_TO_INTEGER = "int globalStringToInteger(__global char *s)\n" +
-															  "{\n" +
-															  "    const char z = '0';\n" +
-															  "    int r = 0, st = 0, p = 1;\n" +
-															  "    \n" +
-															  "    while(s[st] != '\\0')\n" +
-															  "    {\n" +
-															  "        st++;\n" +
-															  "    }\n" +
-															  "    for(int i = st-1; i >= 0 && s[i] != '-' ; i--)\n" +
-															  "    {\n" +
-															  "        r+=((s[i]-z)*p);\n" +
-															  "        p*=10;\n" +
-															  "    }\n" +
-															  "    if(s[0]=='-')\n" +
-															  "    {\n" +
-															  "        r*=-1;\n" +
-															  "    }\n" +
-															  "    return r;\n" +
-															  "}\n";
-		
-		public static final String FILL_STRING_WITH = "void fillStringWith(int si,int sl, char c, char *s)\n" +
-													  "{\n" +
-													  "    for (; si < sl; si++) {\n" +
-													  "        s[si] = c;\n" +
-													  "    }\n" +
-													  "}\n";
-	}
 	
 	public static class DefaultsTuplesKinds
 	{
-		public static final int SUPPORTED_TUPLE_KINDS_COUNT = 2;
-		
 		public static final String INPUT_TUPLE = "input-tuple";
 		public static final String OUTPUT_TUPLE = "output-tuple";
 	}
 	
 	public static class DefaultVarTypes
 	{
-		public static final int SUPPORTED_TUPLE_VAR_TYPES_COUNT = 3;
 		
 		public static final String INT = "int";
 		public static final String DOUBLE = "double";
@@ -345,7 +212,6 @@ public class DefaultsValues
 	
 	public static class DefaultDeserializationMacros
 	{
-		public static final int DESERIALIZATION_MACROS_COUNT = 3;
 		
 		public static final String DESER_INT = "#define DESER_INT(d, si, r) 				\\\n" +
 											   "			r = (*(__global int*) &d[si]);	\\\n" +
@@ -363,33 +229,6 @@ public class DefaultsValues
 												  "            si+=ri;                 			\\\n";
 	}
 	
-	public static class DefaultSerializationMacros
-	{
-		public static final int SERIALIZATION_MACROS_COUNT = 3;
-		
-		public static final String SER_INT = "#define SER_INT(i, si, r, t)								\\\n" +
-											 "        t = (unsigned char*) &i;							\\\n" +
-											 "        for(int _ser_i = 0; _ser_i < 4; _ser_i++, si++)	\\\n" +
-											 "        {													\\\n" +
-											 "            r[si] = t[_ser_i];							\\\n" +
-											 "        }													\\\n" +
-											 "";
-		
-		public static final String SER_DOUBLE = "#define SER_DOUBLE(d, si, r, t)							\\\n" +
-												"        t = (unsigned char*) &d;							\\\n" +
-												"        for(int _ser_i = 0; _ser_i < 8; _ser_i++, si++)	\\\n" +
-												"        {													\\\n" +
-												"            r[si] = t[_ser_i];								\\\n" +
-												"        }													\\\n" +
-												"";
-		
-		public static final String SER_STRING = "#define SER_STRING(s, si, l, r, t)             \\\n" +
-												"        SER_INT(l, si, r, t);					\\\n" +
-												"        for(int _ii = 0; _ii < l; _ii++, si++) \\\n" +
-												"        {                                      \\\n" +
-												"            r[si] = s[_ii];                    \\\n" +
-												"        }                                      \\\n";
-	}
 	
 	public static class DefaultFunctionKernelBuilderMapping extends FunctionKernelBuilderMapper
 	{
