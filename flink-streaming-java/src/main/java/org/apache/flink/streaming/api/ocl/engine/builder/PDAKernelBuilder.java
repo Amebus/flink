@@ -15,7 +15,7 @@ public abstract class PDAKernelBuilder implements IPDAKernelBuilder
 											   "\n" +
 											   "<[defines]>\n" +
 											   "\n" +
-											   "__kernel void <[kernel-name-dfp]>(\n" +
+											   "__kernel void <[kernel-name]>(\n" +
 											   "    <[kernel-args]>)\n" +
 											   "{\n" +
 											   "    <[kernel-code]>\n" +
@@ -79,8 +79,7 @@ public abstract class PDAKernelBuilder implements IPDAKernelBuilder
 		mTemplatePluginMapper = pTemplatePluginMapper;
 		mExtras = new StringKeyMapper<>();
 		
-		this.setUpExtras()
-			.setUpTemplatePluginMapper();
+		this.setUpTemplatePluginMapper();
 	}
 	
 	protected PDAKernelBuilder setUpExtras()
@@ -174,7 +173,8 @@ public abstract class PDAKernelBuilder implements IPDAKernelBuilder
 	public IPDAKernelBuilder setPDAKernelBuilderOptions(PDAKernelBuilderOptions pPDAKernelBuilderOptions)
 	{
 		mPDAKernelBuilderOptions = pPDAKernelBuilderOptions;
-		return this;
+		return clearExtras()
+			.setUpExtras();
 	}
 	
 	public TemplatePluginMapper getTemplatePluginMapper()

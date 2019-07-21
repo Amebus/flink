@@ -46,19 +46,19 @@ public class DeserializationPlugin extends PDAKernelBuilderPlugin
 		List<KernelDeserializationLine> vLines = new ArrayList<>();
 		List<KernelLogicalVariable> vLogicalVariables = getKernelLogicalVariables();
 		
-		setExtra("deser-" + getIntType(),
+		setExtra("deser-" + getIntLogicalType(),
 				 (Function<KernelLogicalVariable, KernelDeserializationLine>)(pLVar) ->
 				 {
 					 String vLine = "DESER_INT( _data, _i, # );".replace("#", pLVar.getVarName());
 					 return new KernelDeserializationLine(vLine, pLVar.getIndex());
 				 })
-			.setExtra("deser-" + getDoubleType(),
+			.setExtra("deser-" + getDoubleLogicalType(),
 					  (Function<KernelLogicalVariable, KernelDeserializationLine>)(pLVar) ->
 					  {
 						  String vLine = "DESER_DOUBLE( _data, _i, # );".replace("#", pLVar.getVarName());
 						  return new KernelDeserializationLine(vLine, pLVar.getIndex());
 					  })
-			.setExtra("deser-" + getStringType(),
+			.setExtra("deser-" + getStringLogicalType(),
 					  (Function<KernelLogicalVariable, KernelDeserializationLine>)(pLVar) ->
 					  {
 						  String vLine = "DESER_STRING( _data, _i, #, @ );"
@@ -86,8 +86,8 @@ public class DeserializationPlugin extends PDAKernelBuilderPlugin
 		vLines.forEach(pLine -> pCodeBuilder.append(pLine.getDeserLine()).append("\n"));
 		pCodeBuilder.append("\n");
 		
-		removeExtra("deser-" + getIntType());
-		removeExtra("deser-" + getDoubleType());
-		removeExtra("deser-" + getStringType());
+		removeExtra("deser-" + getIntLogicalType());
+		removeExtra("deser-" + getDoubleLogicalType());
+		removeExtra("deser-" + getStringLogicalType());
 	}
 }

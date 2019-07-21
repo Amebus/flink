@@ -19,19 +19,6 @@ public class MapKernelBuilder extends PDAKernelBuilder
 	}
 	
 	@Override
-	protected PDAKernelBuilder setUpExtras()
-	{
-		return this.setExtra("input-var-int", PDAKernelBuilderPlugin.Defaults.VarTypes.INT)
-				   .setExtra("input-var-double", PDAKernelBuilderPlugin.Defaults.VarTypes.DOUBLE)
-				   .setExtra("input-var-string", "__global " +
-												 PDAKernelBuilderPlugin.Defaults.VarTypes.STRING +
-												 "*")
-				   .setExtra("output-var-int", PDAKernelBuilderPlugin.Defaults.VarTypes.INT)
-				   .setExtra("output-var-double", PDAKernelBuilderPlugin.Defaults.VarTypes.DOUBLE)
-				   .setExtra("output-var-string", PDAKernelBuilderPlugin.Defaults.VarTypes.STRING);
-	}
-	
-	@Override
 	protected PDAKernelBuilder setUpTemplatePluginMapper()
 	{
 		return super.setUpTemplatePluginMapper()

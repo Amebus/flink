@@ -35,15 +35,15 @@ public class OutputVarPlugin extends PDAKernelBuilderPlugin
 					
 							 if(vType.startsWith("i"))
 							 {
-								 vType = Defaults.VarTypes.INT;
+								 vType = getIntLogicalType();
 							 }
 							 else if(vType.startsWith("d"))
 							 {
-								 vType = Defaults.VarTypes.DOUBLE;
+								 vType = getDoubleLogicalType();
 							 }
 							 else if(vType.startsWith("s"))
 							 {
-								 vType = Defaults.VarTypes.STRING;
+								 vType = getStringLogicalType();
 							 }
 							 vResult.add(
 								 new KernelLogicalVariable(vType, vName, vVar.getIndex(), vVar.getMaxReservedBytes()));
@@ -57,10 +57,10 @@ public class OutputVarPlugin extends PDAKernelBuilderPlugin
 	{
 		return getExtra(getOutputLinesKey(),
 						() -> new KernelVariablesLine[] {
-							new KernelVariablesLine(Defaults.VarTypes.INT),
-							new KernelVariablesLine(Defaults.VarTypes.DOUBLE),
-							new KernelVariablesLine(Defaults.VarTypes.STRING),
-							new KernelVariablesLine(Defaults.VarTypes.INT)
+							new KernelVariablesLine(getIntLogicalType()),
+							new KernelVariablesLine(getDoubleLogicalType()),
+							new KernelVariablesLine(getStringLogicalType()),
+							new KernelVariablesLine(getIntLogicalType())
 						});
 	}
 	
@@ -72,11 +72,11 @@ public class OutputVarPlugin extends PDAKernelBuilderPlugin
 						 String vVarType = pVar.getVarType();
 						 String vVarName = pVar.getVarName();
 						 int vIndex = 0;
-						 if (vVarType.equals(Defaults.VarTypes.DOUBLE))
+						 if (vVarType.equals(getDoubleLogicalType()))
 						 {
 							 vIndex = 1;
 						 }
-						 else if(vVarType.equals(Defaults.VarTypes.STRING))
+						 else if(vVarType.equals(getStringLogicalType()))
 						 {
 							 vIndex = 2;
 							 getOutputLines()[3].addVarDef("_rsl" + pVar.getIndex());
@@ -120,14 +120,22 @@ public class OutputVarPlugin extends PDAKernelBuilderPlugin
 					vCodeBuilder.append(";\n");
 				}
 			}
-			vCodeBuilder.append("\n");
 		}
+		vCodeBuilder.append("\n");
+	}
+	
+	protected void setUpExtra()
+	{
+		this.setExtra("output-var-" + getIntLogicalType(), getIntType())
+			.setExtra("output-var-" + getDoubleLogicalType(), getDoubleType())
+			.setExtra("output-var-" + getStringLogicalType(), getStringType());
 	}
 	
 	@Override
 	public void parseTemplateCode(PDAKernelBuilder pKernelBuilder, StringBuilder pCodeBuilder)
 	{
 		setKernelAndCodeBuilder(pKernelBuilder, pCodeBuilder);
+		setUpExtra();
 		
 		pCodeBuilder
 			.append("\n")

@@ -45,7 +45,7 @@ public class SerializationPlugin extends PDAKernelBuilderPlugin
 		List<KernelSerializationLine> vLines = new ArrayList<>();
 		List<KernelLogicalVariable> vLogicalVariables = getKernelLogicalVariables();
 		
-		setExtra("ser-" + getIntType(),
+		setExtra("ser-" + getIntLogicalType(),
 				 (Function<KernelLogicalVariable, KernelSerializationLine>)(pLVar) ->
 				 {
 					 String vLine = "SER_INT( #, @, _result, _serializationTemp );"
@@ -53,7 +53,7 @@ public class SerializationPlugin extends PDAKernelBuilderPlugin
 						 .replace("@","_ri" + pLVar.getIndex());
 					 return new KernelSerializationLine(vLine, pLVar.getIndex());
 				 })
-			.setExtra("ser-" + getDoubleType(),
+			.setExtra("ser-" + getDoubleLogicalType(),
 					  (Function<KernelLogicalVariable, KernelSerializationLine>)(pLVar) ->
 					  {
 						  String vLine = "SER_DOUBLE( #, @, _result, _serializationTemp)"
@@ -61,7 +61,7 @@ public class SerializationPlugin extends PDAKernelBuilderPlugin
 							  .replace("@","_ri" + pLVar.getIndex());
 						  return new KernelSerializationLine(vLine, pLVar.getIndex());
 					  })
-			.setExtra("ser-" + getStringType(),
+			.setExtra("ser-" + getStringLogicalType(),
 					  (Function<KernelLogicalVariable, KernelSerializationLine>)(pLVar) ->
 					  {
 						  String vLine = "SER_STRING( #, @, -, _result, _serializationTemp );"

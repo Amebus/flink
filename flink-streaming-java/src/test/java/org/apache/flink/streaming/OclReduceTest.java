@@ -61,7 +61,7 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 						   "\n" +
 						   "<[defines]>\n" +
 						   "\n" +
-						   "__kernel void <[kernel-name-dfp]>(\n" +
+						   "__kernel void <[kernel-name]>(\n" +
 						   "    <[kernel-args]>)\n" +
 						   "{\n" +
 						   "    <[kernel-code]>\n" +
@@ -117,7 +117,7 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 		
 		
 		StringKeyMapper<IPDAKernelBuilder> vMapper = new StringKeyMapper<>();
-		vMapper.register("map", new MapKernelBuilder(vTemplate));
+		vMapper.register("map", new MapKernelBuilder());
 		BuildEngine vBuildEngine = new BuildEngine(
 			vHelper.getSettingsRepository(),
 			vMapper);

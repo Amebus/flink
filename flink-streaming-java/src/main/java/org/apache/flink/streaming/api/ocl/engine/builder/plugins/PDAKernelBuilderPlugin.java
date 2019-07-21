@@ -88,6 +88,19 @@ public abstract class PDAKernelBuilderPlugin implements IPDAKernelBuilderPlugin
 		return Defaults.VarTypes.STRING;
 	}
 	
+	protected String getIntLogicalType()
+	{
+		return Defaults.LogicalVarTypes.INT;
+	}
+	protected String getDoubleLogicalType()
+	{
+		return Defaults.LogicalVarTypes.DOUBLE;
+	}
+	protected String getStringLogicalType()
+	{
+		return Defaults.LogicalVarTypes.STRING;
+	}
+	
 	protected Iterable<String> getTypes()
 	{
 		return getIterableFromArgs(
@@ -168,7 +181,15 @@ public abstract class PDAKernelBuilderPlugin implements IPDAKernelBuilderPlugin
 			public static final String INT = "int";
 			public static final String STRING = "char";
 			public static final String DOUBLE = "double";
-			public static final String BOOL = "unsigned char";
+			public static final String BOOLEAN = "unsigned char";
+		}
+		
+		public static final class LogicalVarTypes
+		{
+			public static final String INT = "int";
+			public static final String STRING = "string";
+			public static final String DOUBLE = "double";
+			public static final String BOOLEAN = "unsigned char";
 		}
 		
 		public static final class Templates

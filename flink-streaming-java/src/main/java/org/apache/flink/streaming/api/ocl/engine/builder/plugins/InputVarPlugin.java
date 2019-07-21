@@ -11,6 +11,7 @@ import java.util.List;
 
 public class InputVarPlugin extends PDAKernelBuilderPlugin
 {
+	
 	protected String getInputLogicalVarsKey()
 	{
 		return "input-logical-vars";
@@ -33,15 +34,15 @@ public class InputVarPlugin extends PDAKernelBuilderPlugin
 				
 							   if(vType.startsWith("i"))
 							   {
-								   vType = getIntType();
+								   vType = getIntLogicalType();
 							   }
 							   else if(vType.startsWith("d"))
 							   {
-								   vType = getDoubleType();
+								   vType = getDoubleLogicalType();
 							   }
 							   else if(vType.startsWith("s"))
 							   {
-								   vType = getStringType();
+								   vType = getStringLogicalType();
 							   }
 				
 							   vResult.add(
@@ -59,10 +60,10 @@ public class InputVarPlugin extends PDAKernelBuilderPlugin
 	{
 		return getExtra(getInputLinesKey(),
 						() -> new KernelVariablesLine[] {
-							new KernelVariablesLine(Defaults.VarTypes.INT),
-							new KernelVariablesLine(Defaults.VarTypes.DOUBLE),
-							new KernelVariablesLine(Defaults.VarTypes.STRING),
-							new KernelVariablesLine(Defaults.VarTypes.INT)
+							new KernelVariablesLine(getIntLogicalType()),
+							new KernelVariablesLine(getDoubleLogicalType()),
+							new KernelVariablesLine(getStringLogicalType()),
+							new KernelVariablesLine(getIntLogicalType())
 						});
 	}
 	
@@ -74,11 +75,11 @@ public class InputVarPlugin extends PDAKernelBuilderPlugin
 						 String vVarType = pVar.getVarType();
 						 String vVarName = pVar.getVarName();
 						 int vIndex = 0;
-						 if (vVarType.equals(Defaults.VarTypes.DOUBLE))
+						 if (vVarType.equals(getDoubleLogicalType()))
 						 {
 							 vIndex = 1;
 						 }
-						 else if(vVarType.equals(Defaults.VarTypes.STRING))
+						 else if(vVarType.equals(getStringLogicalType()))
 						 {
 							 vIndex = 2;
 							 getInputLines()[3].addVarDef("_tsl" + pVar.getIndex());
@@ -121,14 +122,28 @@ public class InputVarPlugin extends PDAKernelBuilderPlugin
 					vCodeBuilder.append(";\n");
 				}
 			}
-			vCodeBuilder.append("\n");
 		}
+		vCodeBuilder.append("\n");
+	}
+	
+	@Override
+	protected String getStringType()
+	{
+		return super.getStringType() + "* ";
+	}
+	
+	protected void setUpExtra()
+	{
+		this.setExtra("input-var-" + getIntLogicalType(), getIntType())
+			.setExtra("input-var-" + getDoubleLogicalType(), getDoubleType())
+			.setExtra("input-var-" + getStringLogicalType(), "__global " + getStringType());
 	}
 	
 	@Override
 	public void parseTemplateCode(PDAKernelBuilder pKernelBuilder, StringBuilder pCodeBuilder)
 	{
 		setKernelAndCodeBuilder(pKernelBuilder, pCodeBuilder);
+		setUpExtra();
 		
 		pCodeBuilder
 			.append("\n")
