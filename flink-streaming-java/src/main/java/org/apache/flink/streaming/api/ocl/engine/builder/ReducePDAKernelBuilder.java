@@ -3,11 +3,17 @@ package org.apache.flink.streaming.api.ocl.engine.builder;
 import org.apache.flink.streaming.api.ocl.engine.builder.mappers.TemplatePluginMapper;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 public class ReducePDAKernelBuilder extends PDAKernelBuilder
 {
+	public static final String ROOT_TEMPLATE = "<[reduce]>";
+	
 	public ReducePDAKernelBuilder()
 	{
-		super();
+		super(ROOT_TEMPLATE);
 	}
 	
 	public ReducePDAKernelBuilder(String pRootTemplate)
@@ -24,12 +30,13 @@ public class ReducePDAKernelBuilder extends PDAKernelBuilder
 	protected PDAKernelBuilder setUpTemplatePluginMapper()
 	{
 		return super.setUpTemplatePluginMapper()
+					.registerPlugin("<[reduce]>", getKernelCodePlugin())
 					.registerPlugin("<[utility-vars]>", getUtilityVarsPlugin())
-					.registerPlugin("<[output-utility-vars]>", new OutputUtilityVarsPlugin())
-					.registerPlugin("<[deserialization]>", new DeserializationPlugin())
-					.registerPlugin("<[serialization]>", new SerializationPlugin())
-					.registerPlugin("<[input-vars]>", new InputVarPlugin())
-					.registerPlugin("<[output-vars]>", new OutputVarPlugin())
+					.registerPlugin("<[local-a]>", )
+					.registerPlugin("<[local-b]>", )
+					.registerPlugin("<[deser-a]>", )
+					.registerPlugin("<[deser-b]>", )
+					.registerPlugin("<[serialize-to-local]>", )
 					.registerPlugin("<[user-function]>", PDAKernelBuilderPlugin.USER_FUNCTION);
 		
 	}
@@ -38,16 +45,18 @@ public class ReducePDAKernelBuilder extends PDAKernelBuilder
 	protected IPDAKernelBuilderPlugin getKernelCodePlugin()
 	{
 		return (pBuilder, pCodeBuilder) ->
-			pCodeBuilder
-				.append("\t\n")
-				.append("\t<[utility-vars]>\n")
-				.append("\t<[output-utility-vars]>\n")
-				.append("\t<[input-vars]>\n")
-				.append("\t<[output-vars]>\n")
-				.append("\t<[deserialization]>\n")
-				.append("\t<[user-function]>\n")
-				.append("\t<[serialization]>")
-				.append("\t\n");
+		{
+			String vFile = "$/Documents/reduce.template";
+			// retrieve code from file
+			try
+			{
+				Files.lines(Paths.get(vFile)).forEach(pCodeBuilder::append);
+			}
+			catch (IOException pE)
+			{
+				throw new IllegalArgumentException("Unable to use the file \"" + vFile +"\"", pE);
+			}
+		};
 	}
 	
 	protected IPDAKernelBuilderPlugin getUtilityVarsPlugin()
@@ -56,13 +65,8 @@ public class ReducePDAKernelBuilder extends PDAKernelBuilder
 			pCodeBuilder
 				.append("\n")
 				.append("// utility variables\n")
-				.append("\tuint _gId = get_global_id(0);\n")
-				.append("\tunsigned char _arity = ")
-				.append(pBuilder.getPDAKernelBuilderOptions().getInputTuple().getArity())
-				.append(";\n")
-				.append("\tint _i = _dataIndexes[_gId];\n")
-				.append("\tint _userIndex = _i;\n")
-				.append("\tunsigned char* _serializationTemp;\n");
+				.append("uint _roff = 2;\n" + // values to be computed
+						"    uint _otd = 4;");
 		
 	}
 }
