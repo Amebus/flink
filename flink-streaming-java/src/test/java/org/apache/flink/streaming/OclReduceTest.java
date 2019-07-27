@@ -27,7 +27,7 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 	@Override
 	protected String getResourcesDirectory()
 	{
-		return Constants.OCL_FILTER_TEST_DIR;
+		return Constants.OCL_REDUCE_TEST_DIR;
 	}
 	
 	@Override
