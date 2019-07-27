@@ -3,6 +3,7 @@ package org.apache.flink.streaming;
 import org.apache.flink.streaming.api.ocl.bridge.OclContext;
 import org.apache.flink.streaming.api.ocl.common.mappers.StringKeyMapper;
 import org.apache.flink.streaming.api.ocl.engine.BuildEngine;
+import org.apache.flink.streaming.api.ocl.engine.builder.FilterKernelBuilder;
 import org.apache.flink.streaming.api.ocl.engine.builder.IKernelTemplatesRepository;
 import org.apache.flink.streaming.api.ocl.engine.builder.IPDAKernelBuilder;
 import org.apache.flink.streaming.api.ocl.engine.builder.MapKernelBuilder;
@@ -26,7 +27,7 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 	@Override
 	protected String getResourcesDirectory()
 	{
-		return Constants.OCL_MAP_TEST_DIR;
+		return Constants.OCL_FILTER_TEST_DIR;
 	}
 	
 	@Override
@@ -118,6 +119,7 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 		
 		StringKeyMapper<IPDAKernelBuilder> vMapper = new StringKeyMapper<>();
 		vMapper.register("map", new MapKernelBuilder());
+		vMapper.register("filter", new FilterKernelBuilder());
 		BuildEngine vBuildEngine = new BuildEngine(
 			vHelper.getSettingsRepository(),
 			vMapper);

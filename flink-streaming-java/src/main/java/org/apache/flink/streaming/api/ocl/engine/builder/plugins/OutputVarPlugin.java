@@ -1,17 +1,15 @@
 package org.apache.flink.streaming.api.ocl.engine.builder.plugins;
 
 import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilder;
-import org.apache.flink.streaming.api.ocl.engine.builder.plugins.utility.KernelLogicalVariable;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.utility.KernelVariablesLine;
 import org.apache.flink.streaming.configuration.ITupleDefinition;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
-public class OutputVarPlugin extends PDAKernelBuilderPlugin
+public class OutputVarPlugin extends PDAKernelBuilderPlugin implements IPluginWithLogicalVariables
 {
-	protected String getOutputLogicalVarsKey()
+	@Override
+	public String getLogicalVarsKey()
 	{
 		return "output-logical-vars";
 	}
@@ -20,37 +18,16 @@ public class OutputVarPlugin extends PDAKernelBuilderPlugin
 		return "output-lines";
 	}
 	
-	protected List<KernelLogicalVariable> getKernelLogicalVariables()
+	@Override
+	public ITupleDefinition getTuple()
 	{
-		return getExtra(getOutputLogicalVarsKey(), () ->
-		{
-			ITupleDefinition vTuple = getOptions().getOutputTuple();
-			List<KernelLogicalVariable> vResult = new ArrayList<>(vTuple.getArity());
-			
-			vTuple
-				.forEach(vVar ->
-						 {
-							 String vName = "_r" + vVar.getIndex();
-							 String vType = vVar.getType().toLowerCase();
-					
-							 if(vType.startsWith("i"))
-							 {
-								 vType = getIntLogicalType();
-							 }
-							 else if(vType.startsWith("d"))
-							 {
-								 vType = getDoubleLogicalType();
-							 }
-							 else if(vType.startsWith("s"))
-							 {
-								 vType = getStringLogicalType();
-							 }
-							 vResult.add(
-								 new KernelLogicalVariable(vType, vName, vVar.getIndex(), vVar.getMaxReservedBytes()));
-						 });
-			
-			return vResult;
-		});
+		return getOptions().getOutputTuple();
+	}
+	
+	@Override
+	public String getVarNamePrefix()
+	{
+		return "_r";
 	}
 	
 	protected KernelVariablesLine[] getOutputLines()

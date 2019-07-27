@@ -1,7 +1,6 @@
 package org.apache.flink.streaming.api.ocl.engine.builder.plugins;
 
 import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilder;
-import org.apache.flink.streaming.api.ocl.engine.builder.plugins.PDAKernelBuilderPlugin;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.utility.KernelDeserializationLine;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.utility.KernelLogicalVariable;
 
@@ -9,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class DeserializationPlugin extends PDAKernelBuilderPlugin
+public class DeserializationPlugin extends PDAKernelBuilderPlugin implements IPluginWithVarTypes
 {
 	protected String getInputLogicalVarsKey()
 	{

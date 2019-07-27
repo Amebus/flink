@@ -1,5 +1,6 @@
 package org.apache.flink.streaming.api.ocl.engine.builder.plugins;
 
+import org.apache.flink.streaming.api.ocl.engine.builder.FIGenerateExtra;
 import org.apache.flink.streaming.api.ocl.engine.builder.IPDAKernelBuilderPlugin;
 import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilder;
 import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilderOptions;
@@ -7,7 +8,7 @@ import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilderOptions
 import static org.apache.flink.streaming.api.ocl.common.utility.IterableHelper.getIterableFromArgs;
 import static org.apache.flink.streaming.api.ocl.common.utility.IterableHelper.getStringIterableFromArgs;
 
-public abstract class PDAKernelBuilderPlugin implements IPDAKernelBuilderPlugin
+public abstract class PDAKernelBuilderPlugin implements IPluginWithExtra
 {
 	private PDAKernelBuilder mKernelBuilder;
 	private StringBuilder mCodeBuilder;
@@ -31,7 +32,7 @@ public abstract class PDAKernelBuilderPlugin implements IPDAKernelBuilderPlugin
 	{
 		return getKernelBuilder().getExtra(pKey);
 	}
-	public <T> T getExtra(String pKey, PDAKernelBuilderPlugin.FIGenerateExtra<T> pGenerateExtra)
+	public <T> T getExtra(String pKey, FIGenerateExtra<T> pGenerateExtra)
 	{
 		if(pGenerateExtra == null)
 			throw new IllegalArgumentException(("can't be null"));
@@ -44,7 +45,7 @@ public abstract class PDAKernelBuilderPlugin implements IPDAKernelBuilderPlugin
 		setExtra(pKey, vResult);
 		return vResult;
 	}
-	public PDAKernelBuilderPlugin setExtra(String pKey, Object pExtra)
+	public IPluginWithExtra setExtra(String pKey, Object pExtra)
 	{
 		getKernelBuilder().setExtra(pKey, pExtra);
 		return this;
@@ -73,46 +74,6 @@ public abstract class PDAKernelBuilderPlugin implements IPDAKernelBuilderPlugin
 	{
 		return setKernelBuilder(pKernelBuilder)
 			.setCodeBuilder(pCodeBuilder);
-	}
-	
-	protected String getIntType()
-	{
-		return Defaults.VarTypes.INT;
-	}
-	protected String getDoubleType()
-	{
-		return Defaults.VarTypes.DOUBLE;
-	}
-	protected String getStringType()
-	{
-		return Defaults.VarTypes.STRING;
-	}
-	
-	protected String getIntLogicalType()
-	{
-		return Defaults.LogicalVarTypes.INT;
-	}
-	protected String getDoubleLogicalType()
-	{
-		return Defaults.LogicalVarTypes.DOUBLE;
-	}
-	protected String getStringLogicalType()
-	{
-		return Defaults.LogicalVarTypes.STRING;
-	}
-	
-	protected Iterable<String> getTypes()
-	{
-		return getIterableFromArgs(
-			getIntType(),
-			getDoubleType(),
-			getStringType());
-	}
-	
-	@FunctionalInterface
-	public interface FIGenerateExtra<T>
-	{
-		T generateExtra();
 	}
 	
 	public static final IPDAKernelBuilderPlugin HELPER_FUNCTIONS =

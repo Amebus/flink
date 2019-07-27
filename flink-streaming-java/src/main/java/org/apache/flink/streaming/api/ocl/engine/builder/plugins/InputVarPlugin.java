@@ -1,59 +1,33 @@
 package org.apache.flink.streaming.api.ocl.engine.builder.plugins;
 
 import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilder;
-import org.apache.flink.streaming.api.ocl.engine.builder.plugins.utility.KernelLogicalVariable;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.utility.KernelVariablesLine;
 import org.apache.flink.streaming.configuration.ITupleDefinition;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
-public class InputVarPlugin extends PDAKernelBuilderPlugin
+public class InputVarPlugin extends PDAKernelBuilderPlugin implements IPluginWithLogicalVariables
 {
 	
-	protected String getInputLogicalVarsKey()
+	@Override
+	public ITupleDefinition getTuple()
+	{
+		return getOptions().getInputTuple();
+	}
+	
+	@Override
+	public String getVarNamePrefix()
+	{
+		return "_t";
+	}
+	@Override
+	public String getLogicalVarsKey()
 	{
 		return "input-logical-vars";
 	}
 	protected String getInputLinesKey()
 	{
 		return "input-lines";
-	}
-	
-	protected List<KernelLogicalVariable> getKernelLogicalVariables()
-	{
-		return getExtra(getInputLogicalVarsKey(), () ->
-		{
-			ITupleDefinition vTuple = getOptions().getInputTuple();
-			List<KernelLogicalVariable> vResult = new ArrayList<>(vTuple.getArity());
-			vTuple.forEach(pVar ->
-						   {
-							   String vName = "_t" + pVar.getIndex();
-							   String vType = pVar.getType().toLowerCase();
-				
-							   if(vType.startsWith("i"))
-							   {
-								   vType = getIntLogicalType();
-							   }
-							   else if(vType.startsWith("d"))
-							   {
-								   vType = getDoubleLogicalType();
-							   }
-							   else if(vType.startsWith("s"))
-							   {
-								   vType = getStringLogicalType();
-							   }
-				
-							   vResult.add(
-								   new KernelLogicalVariable(
-									   vType,
-									   vName,
-									   pVar.getIndex(),
-									   pVar.getMaxReservedBytes()));
-						   });
-			return vResult;
-		});
 	}
 	
 	protected KernelVariablesLine[] getInputLines()
@@ -127,9 +101,9 @@ public class InputVarPlugin extends PDAKernelBuilderPlugin
 	}
 	
 	@Override
-	protected String getStringType()
+	public String getStringType()
 	{
-		return super.getStringType() + "* ";
+		return IPluginWithLogicalVariables.super.getStringType() + "* ";
 	}
 	
 	protected void setUpExtra()

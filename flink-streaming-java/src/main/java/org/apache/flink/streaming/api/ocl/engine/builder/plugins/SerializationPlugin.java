@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class SerializationPlugin extends PDAKernelBuilderPlugin
+public class SerializationPlugin extends PDAKernelBuilderPlugin implements IPluginWithVarTypes
 {
 	protected String getOutputLogicalVarsKey()
 	{
