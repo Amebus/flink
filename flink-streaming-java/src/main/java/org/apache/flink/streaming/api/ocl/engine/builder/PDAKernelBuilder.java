@@ -147,7 +147,7 @@ public abstract class PDAKernelBuilder implements IPDAKernelBuilder
 	
 	public String getKernelName()
 	{
-		return getPDAKernelBuilderOptions().getUserFunction().getName();
+		return getKernelBuilderOptions().getUserFunction().getName();
 	}
 	
 	public String getRootTemplateCode()
@@ -166,7 +166,7 @@ public abstract class PDAKernelBuilder implements IPDAKernelBuilder
 		return vBuilder.toString();
 	}
 	
-	public PDAKernelBuilderOptions getPDAKernelBuilderOptions()
+	public PDAKernelBuilderOptions getKernelBuilderOptions()
 	{
 		return mPDAKernelBuilderOptions;
 	}
@@ -214,7 +214,7 @@ public abstract class PDAKernelBuilder implements IPDAKernelBuilder
 	
 	protected void checkKernelBuilderOptions()
 	{
-		if(getPDAKernelBuilderOptions() == null)
+		if(getKernelBuilderOptions() == null)
 		{
 			throw new IllegalArgumentException("The KernelBuilderOptions must be set to build the kernel successfully");
 		}

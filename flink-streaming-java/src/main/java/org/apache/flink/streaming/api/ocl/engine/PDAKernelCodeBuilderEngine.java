@@ -1,8 +1,7 @@
 package org.apache.flink.streaming.api.ocl.engine;
 
-import org.apache.flink.streaming.api.ocl.common.mappers.StringKeyMapper;
-import org.apache.flink.streaming.api.ocl.engine.builder.IPDAKernelBuilder;
 import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilderOptions;
+import org.apache.flink.streaming.api.ocl.engine.builder.mappers.PDAKernelBuilderMapper;
 import org.apache.flink.streaming.configuration.ISettingsRepository;
 import org.apache.flink.streaming.configuration.ITupleDefinitionRepository;
 
@@ -19,13 +18,13 @@ public class PDAKernelCodeBuilderEngine
 	private ISettingsRepository mSettingsRepository;
 	private ITupleDefinitionRepository mTupleDefinitionRepository;
 	private Iterable<? extends IUserFunction> mUserFunctions;
-	private StringKeyMapper<IPDAKernelBuilder> mKernelBuilders;
+	private PDAKernelBuilderMapper mKernelBuilders;
 	
 	public PDAKernelCodeBuilderEngine(
 		ISettingsRepository pSettingsRepository,
 		ITupleDefinitionRepository pTupleDefinitionRepository,
 		Iterable<? extends IUserFunction> pUserFunctions,
-		StringKeyMapper<IPDAKernelBuilder> pKernelBuilderMapper)
+		PDAKernelBuilderMapper pKernelBuilderMapper)
 	{
 		mSettingsRepository = pSettingsRepository;
 		mTupleDefinitionRepository = pTupleDefinitionRepository;
@@ -45,7 +44,7 @@ public class PDAKernelCodeBuilderEngine
 	{
 		return mUserFunctions;
 	}
-	public StringKeyMapper<IPDAKernelBuilder> getKernelBuilders()
+	public PDAKernelBuilderMapper getKernelBuilders()
 	{
 		return mKernelBuilders;
 	}

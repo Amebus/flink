@@ -123,9 +123,6 @@ __kernel void <[kernel-name]>(
 
 {
     uint _gId = get_global_id(0);
-    unsigned char _arity = 1;
-    int _i = -1;
-    int _userIndex = _i;
     unsigned char* _serializationTemp;
 
     uint _lId = get_local_id(0);
@@ -135,15 +132,10 @@ __kernel void <[kernel-name]>(
     uint _outputCount = get_num_groups(0);
     uint _steps = ceil(log2((double)_gSize)/log2((double)_grSize));
 
-    if(_gId < _gSize)
-    {
-        _i = _dataIndexes[_gId];
-        _userIndex = _i;
-    }
-
+    int _i = _gId < _gSize ? _dataIndexes[_gId] : -1;
+    int _userIndex = _i;
 
     // <[utility-vars]>
-
 
     uint _uiTemp = 0;
     int _iTemp = 0;
@@ -155,12 +147,11 @@ __kernel void <[kernel-name]>(
 
     // <[local-b]>
 
-    //identity
     //copy from global to local
     if(_i > -1)
     {
-        unsigned char _types[1];
-        _types[0] = _data[1];
+        // <[types-copy]>
+
         for(int i = _i, k = _lId * _otd, j = 0; _tCounter < _arity; _tCounter++)
         {
             if(_types[_tCounter] < STRING)
@@ -290,4 +281,3 @@ __kernel void <[kernel-name]>(
     //printf("_finalResult - %d\n", _finalResult[5]);
 
 };
-

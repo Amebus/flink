@@ -7,9 +7,7 @@ import org.apache.flink.streaming.api.ocl.common.mappers.StringKeyMapper;
 import org.apache.flink.streaming.api.ocl.engine.IOclContextMappings;
 import org.apache.flink.streaming.api.ocl.engine.ITupleBytesDimensionGetters;
 import org.apache.flink.streaming.api.ocl.engine.IUserFunction;
-import org.apache.flink.streaming.api.ocl.engine.builder.IPDAKernelBuilderPlugin;
-import org.apache.flink.streaming.api.ocl.engine.builder.KernelBuilder;
-import org.apache.flink.streaming.api.ocl.engine.builder.ReduceKernelBuilder;
+import org.apache.flink.streaming.api.ocl.engine.builder.*;
 import org.apache.flink.streaming.api.ocl.engine.builder.mappers.*;
 import org.apache.flink.streaming.api.ocl.serialization.bigendian.BigEndianStreamReader;
 import org.apache.flink.streaming.api.ocl.serialization.bigendian.BigEndianStreamWriter;
@@ -264,6 +262,24 @@ public class DefaultsValues
 		}
 	}
 	
+	
+	
+	
+	public static class DefaultKernelBuilderMapper extends PDAKernelBuilderMapper
+	{
+		public DefaultKernelBuilderMapper()
+		{
+			setUpMappers();
+		}
+		
+		protected void setUpMappers()
+		{
+			register("map", new MapKernelBuilder());
+			register("filter", new FilterKernelBuilder());
+			register("reduce", new ReducePDAKernelBuilder());
+		}
+	}
+	
 	public static class DefaultNumbersByteOrderingStreamWriterMapper extends NumbersByteOrderingStreamWriterMapper
 	{
 		public DefaultNumbersByteOrderingStreamWriterMapper()
@@ -313,6 +329,7 @@ public class DefaultsValues
 		protected FunctionKernelBuilderOptionMapper mFunctionKernelBuilderOptionMapper;
 		protected ITupleBytesDimensionGetters mTupleBytesDimensionGetters;
 		
+		protected PDAKernelBuilderMapper mKernelBuilderMapper;
 		protected NumbersByteOrderingStreamWriterMapper mNumbersByteOrderingStreamWriterMapper;
 		protected NumbersByteOrderingStreamReaderMapper mNumbersByteOrderingStreamReaderMapper;
 		protected NumbersByteOrderingToIdentityValuesConverterMapper mNumbersByteOrderingToIdentityValuesConverterMapper;
@@ -326,6 +343,8 @@ public class DefaultsValues
 			
 			mTupleBytesDimensionGetters = getDefaultTupleBytesDimensionGetters();
 			
+			
+			mKernelBuilderMapper = new DefaultKernelBuilderMapper();
 			mNumbersByteOrderingStreamWriterMapper = new DefaultNumbersByteOrderingStreamWriterMapper();
 			mNumbersByteOrderingStreamReaderMapper = new DefaultNumbersByteOrderingStreamReaderMapper();
 			mNumbersByteOrderingToIdentityValuesConverterMapper = new DefaultNumbersByteOrderingToIdentityValuesConverterMapper();
@@ -359,6 +378,12 @@ public class DefaultsValues
 		public ITupleBytesDimensionGetters getTupleBytesDimensionGetters()
 		{
 			return mTupleBytesDimensionGetters;
+		}
+		
+		@Override
+		public PDAKernelBuilderMapper getKernelBuilderMapper()
+		{
+			return mKernelBuilderMapper;
 		}
 		
 		@Override

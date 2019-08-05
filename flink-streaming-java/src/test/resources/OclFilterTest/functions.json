@@ -5,7 +5,7 @@
       "name":"filterInteger",
       "input":"tuple1Integer",
       "function": [
-        "_r0 = _t0 > 2;"
+        "_r = _t0 > 2;"
       ]
     },
     {
@@ -13,7 +13,7 @@
       "name":"filterDouble",
       "input":"tuple1Double",
       "function": [
-        "_r0 = _t0 > 2;"
+        "_r = _t0 > 2;"
       ]
     },
     {
@@ -27,7 +27,7 @@
         "\tnumberFound = _t0[i] > '0' && _t0[i] < '9';",
         "\tstop = numberFound || _t0[i] == '\\0';",
         "}",
-        "_r0 = numberFound;"
+        "_r = numberFound;"
       ]
     }
   ]

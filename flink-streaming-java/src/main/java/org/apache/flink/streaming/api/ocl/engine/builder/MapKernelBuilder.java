@@ -56,7 +56,7 @@ public class MapKernelBuilder extends PDAKernelBuilder
 				.append("// utility variables\n")
 				.append("\tuint _gId = get_global_id(0);\n")
 				.append("\tunsigned char _arity = ")
-				.append(pBuilder.getPDAKernelBuilderOptions().getInputTuple().getArity())
+				.append(pBuilder.getKernelBuilderOptions().getInputTuple().getArity())
 				.append(";\n")
 				.append("\tint _i = _dataIndexes[_gId];\n")
 				.append("\tint _userIndex = _i;\n")

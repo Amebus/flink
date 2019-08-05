@@ -7,7 +7,7 @@ public class OutputUtilityVarsPlugin extends PDAKernelBuilderPlugin
 {
 	protected ITupleDefinition getOutputTuple()
 	{
-		return getKernelBuilder().getPDAKernelBuilderOptions().getOutputTuple();
+		return getKernelBuilder().getKernelBuilderOptions().getOutputTuple();
 	}
 	
 	protected byte getOutputOffset()
@@ -46,6 +46,7 @@ public class OutputUtilityVarsPlugin extends PDAKernelBuilderPlugin
 			.append(";\n")
 			.append("uint _otd = ")
 			.append(getOutputTupleDimension())
-			.append(";\n");
+			.append(";\n")
+			.append("uint _ri = _roff + _gId * _otd;\n");
 	}
 }

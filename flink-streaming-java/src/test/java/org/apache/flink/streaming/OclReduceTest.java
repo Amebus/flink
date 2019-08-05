@@ -4,6 +4,7 @@ import org.apache.flink.streaming.api.ocl.bridge.OclContext;
 import org.apache.flink.streaming.api.ocl.common.mappers.StringKeyMapper;
 import org.apache.flink.streaming.api.ocl.engine.BuildEngine;
 import org.apache.flink.streaming.api.ocl.engine.builder.*;
+import org.apache.flink.streaming.api.ocl.engine.builder.mappers.PDAKernelBuilderMapper;
 import org.apache.flink.streaming.api.ocl.tuple.IOclTuple;
 import org.apache.flink.streaming.api.ocl.tuple.Tuple1Ocl;
 import org.apache.flink.streaming.helpers.Constants;
@@ -51,7 +52,7 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 	
 	private final String TEMPLATE_STRING_PATTERN = "<\\[.+]>";
 	private final Pattern TEMPLATE_PATTERN = Pattern.compile(TEMPLATE_STRING_PATTERN);
-	@Test
+//	@Test
 	public void AAAAAAAAAAAAAAAA()
 	{
 		String vTemplate = "\n" +
@@ -114,7 +115,7 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 		OclContext vHelper = getNewOclContext();
 		
 		
-		StringKeyMapper<IPDAKernelBuilder> vMapper = new StringKeyMapper<>();
+		PDAKernelBuilderMapper vMapper = new PDAKernelBuilderMapper();
 		vMapper.register("map", new MapKernelBuilder());
 		vMapper.register("filter", new FilterKernelBuilder());
 		vMapper.register("reduce", new ReducePDAKernelBuilder());
@@ -122,11 +123,11 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 			vHelper.getSettingsRepository(),
 			vMapper);
 		
-		vBuildEngine.generateKernels2(vHelper.getTupleDefinitionRepository(), vHelper.getFunctionRepository().getUserFunctions());
+		vBuildEngine.generateKernels(vHelper.getTupleDefinitionRepository(), vHelper.getFunctionRepository().getUserFunctions());
 		int i = 10 + 7;
 	}
 	
-	//@Test
+	@Test
 	public void OclReduceInteger()
 	{
 		List<IOclTuple> vTuples = new ArrayList<>(2);

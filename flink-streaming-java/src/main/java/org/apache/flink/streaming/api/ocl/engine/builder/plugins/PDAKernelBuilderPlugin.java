@@ -7,6 +7,7 @@ import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilderOptions
 
 import static org.apache.flink.streaming.api.ocl.common.utility.IterableHelper.getIterableFromArgs;
 import static org.apache.flink.streaming.api.ocl.common.utility.IterableHelper.getStringIterableFromArgs;
+import static org.apache.flink.streaming.api.ocl.common.utility.StreamUtility.streamFrom;
 
 public abstract class PDAKernelBuilderPlugin implements IPluginWithExtra
 {
@@ -20,7 +21,7 @@ public abstract class PDAKernelBuilderPlugin implements IPluginWithExtra
 	
 	public PDAKernelBuilderOptions getOptions()
 	{
-		return getKernelBuilder().getPDAKernelBuilderOptions();
+		return getKernelBuilder().getKernelBuilderOptions();
 	}
 	
 	public StringBuilder getCodeBuilder()
@@ -91,7 +92,12 @@ public abstract class PDAKernelBuilderPlugin implements IPluginWithExtra
 	
 	public static final IPDAKernelBuilderPlugin KERNEL_ARGS =
 		(pOptions, pCodeBuilder) ->
-			Defaults.getDefaultKernelParameterList().forEach(p -> pCodeBuilder.append(p).append("\n"));
+		{
+//			Defaults.getDefaultKernelParameterList().forEach(p -> pCodeBuilder.append(p).append(",").append("\n"));
+			String vArgs = streamFrom(Defaults.getDefaultKernelParameterList())
+				.reduce((a, b) -> a + ",\n" + b).orElse("");
+			pCodeBuilder.append(vArgs);
+		};
 	
 	
 	public static IPDAKernelBuilderPlugin USER_FUNCTION =
@@ -99,7 +105,7 @@ public abstract class PDAKernelBuilderPlugin implements IPluginWithExtra
 			pCodeBuilder
 				.append("\n")
 				.append("// user function\n")
-				.append(pBuilder.getPDAKernelBuilderOptions().getUserFunction().getFunction())
+				.append(pBuilder.getKernelBuilderOptions().getUserFunction().getFunction())
 				.append("\n");
 	
 	public static final class Defaults

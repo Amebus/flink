@@ -1,12 +1,12 @@
 package org.apache.flink.streaming.api.ocl.bridge;
 
 import org.apache.flink.streaming.api.ocl.bridge.identity.IdentityValueToIdentityArrayConverter;
+import org.apache.flink.streaming.api.ocl.engine.*;
 import org.apache.flink.streaming.api.ocl.serialization.StreamReader;
 import org.apache.flink.streaming.api.ocl.tuple.IOclTuple;
 import org.apache.flink.streaming.configuration.ISettingsRepository;
 import org.apache.flink.streaming.configuration.ITupleDefinition;
 import org.apache.flink.streaming.configuration.ITupleDefinitionRepository;
-import org.apache.flink.streaming.api.ocl.engine.*;
 
 import java.io.File;
 import java.io.Serializable;
@@ -80,9 +80,11 @@ public class OclContext implements Serializable
 	
 	protected void generatesKernels()
 	{
+//		mCppLibraryInfo = new BuildEngine(mSettingsRepository,
+//										  mOclContextMappings.getFunctionKernelBuilderMapper(),
+//										  mOclContextMappings.getFunctionKernelBuilderOptionMapper())
 		mCppLibraryInfo = new BuildEngine(mSettingsRepository,
-										  mOclContextMappings.getFunctionKernelBuilderMapper(),
-										  mOclContextMappings.getFunctionKernelBuilderOptionMapper())
+										  mOclContextMappings.getKernelBuilderMapper())
 			.generateKernels(mTupleDefinitionRepository, mFunctionRepository.getUserFunctions())
 			.getCppLibraryInfo();
 	}

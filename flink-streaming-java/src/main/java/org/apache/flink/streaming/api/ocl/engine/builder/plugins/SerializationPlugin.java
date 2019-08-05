@@ -33,6 +33,58 @@ public class SerializationPlugin extends PDAKernelBuilderPlugin implements IPlug
 		return vF.apply(pLVar);
 	}
 	
+	protected String getResultVariableName()
+	{
+		return "_result";
+	}
+	protected String getIndexVariableName()
+	{
+		return "_ri";
+	}
+	protected String getStringLengthVarPrefix()
+	{
+		return "_rsl";
+	}
+	
+	protected void setUpExtras()
+	{
+		setExtra("ser-" + getIntLogicalType(),
+				 (Function<KernelLogicalVariable, KernelSerializationLine>)(pLVar) ->
+				 {
+					 String vLine = "SER_INT( #1, #2, #3, _serializationTemp );"
+						 .replace("#1", pLVar.getVarName())
+						 .replace("#2", getIndexVariableName())
+						 .replace("#3", getResultVariableName());
+					 return new KernelSerializationLine(vLine, pLVar.getIndex());
+				 })
+			.setExtra("ser-" + getDoubleLogicalType(),
+					  (Function<KernelLogicalVariable, KernelSerializationLine>)(pLVar) ->
+					  {
+						  String vLine = "SER_DOUBLE( #1, #2, #3, _serializationTemp)"
+							  .replace("#1", pLVar.getVarName())
+							  .replace("#2", getIndexVariableName())
+							  .replace("#3", getResultVariableName());
+						  return new KernelSerializationLine(vLine, pLVar.getIndex());
+					  })
+			.setExtra("ser-" + getStringLogicalType(),
+					  (Function<KernelLogicalVariable, KernelSerializationLine>)(pLVar) ->
+					  {
+						  String vLine = "SER_STRING( #1,#2, #3, #4, _serializationTemp );"
+							  .replace("#1", pLVar.getVarName())
+							  .replace("#2",getIndexVariableName())
+							  .replace("#3", getStringLengthVarPrefix() + pLVar.getIndex())
+							  .replace("#4", getResultVariableName());
+						  return new KernelSerializationLine(vLine, pLVar.getIndex());
+					  });
+	}
+	
+	protected void removeExtras()
+	{
+		removeExtra("ser-" + getIntType());
+		removeExtra("ser-" + getDoubleType());
+		removeExtra("ser-" + getStringType());
+	}
+	
 	@Override
 	public void parseTemplateCode(PDAKernelBuilder pKernelBuilder, StringBuilder pCodeBuilder)
 	{
@@ -45,31 +97,7 @@ public class SerializationPlugin extends PDAKernelBuilderPlugin implements IPlug
 		List<KernelSerializationLine> vLines = new ArrayList<>();
 		List<KernelLogicalVariable> vLogicalVariables = getKernelLogicalVariables();
 		
-		setExtra("ser-" + getIntLogicalType(),
-				 (Function<KernelLogicalVariable, KernelSerializationLine>)(pLVar) ->
-				 {
-					 String vLine = "SER_INT( #, @, _result, _serializationTemp );"
-						 .replace("#", pLVar.getVarName())
-						 .replace("@","_ri" + pLVar.getIndex());
-					 return new KernelSerializationLine(vLine, pLVar.getIndex());
-				 })
-			.setExtra("ser-" + getDoubleLogicalType(),
-					  (Function<KernelLogicalVariable, KernelSerializationLine>)(pLVar) ->
-					  {
-						  String vLine = "SER_DOUBLE( #, @, _result, _serializationTemp)"
-							  .replace("#", pLVar.getVarName())
-							  .replace("@","_ri" + pLVar.getIndex());
-						  return new KernelSerializationLine(vLine, pLVar.getIndex());
-					  })
-			.setExtra("ser-" + getStringLogicalType(),
-					  (Function<KernelLogicalVariable, KernelSerializationLine>)(pLVar) ->
-					  {
-						  String vLine = "SER_STRING( #, @, -, _result, _serializationTemp );"
-							  .replace("#", pLVar.getVarName())
-							  .replace("@","_ri" + pLVar.getIndex())
-							  .replace("-", "_rsl" + pLVar.getIndex());
-						  return new KernelSerializationLine(vLine, pLVar.getIndex());
-					  });
+		setUpExtras();
 		
 		vLogicalVariables.forEach( pLVar -> vLines.add(getSerLine(pLVar)) );
 		
@@ -90,8 +118,6 @@ public class SerializationPlugin extends PDAKernelBuilderPlugin implements IPlug
 		vLines.forEach(pLine -> pCodeBuilder.append(pLine.getSerLine()).append("\n"));
 		pCodeBuilder.append("\n");
 		
-		removeExtra("ser-" + getIntType());
-		removeExtra("ser-" + getDoubleType());
-		removeExtra("ser-" + getStringType());
+		removeExtras();
 	}
 }

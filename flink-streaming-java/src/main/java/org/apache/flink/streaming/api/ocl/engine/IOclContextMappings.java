@@ -13,9 +13,12 @@ public interface IOclContextMappings
 	
 	ITupleBytesDimensionGetters getTupleBytesDimensionGetters();
 	
+	
+	
+	
+	PDAKernelBuilderMapper getKernelBuilderMapper();
+	
 	NumbersByteOrderingStreamWriterMapper getNumbersByteOrderingStreamWriterMapper();
-	
 	NumbersByteOrderingStreamReaderMapper getNumbersByteOrderingStreamReaderMapper();
-	
 	NumbersByteOrderingToIdentityValuesConverterMapper getByteOrderingToIdentityValuesConverterMapper();
 }

@@ -56,7 +56,7 @@ public class OutputVarPlugin extends PDAKernelBuilderPlugin implements IPluginWi
 						 else if(vVarType.equals(getStringLogicalType()))
 						 {
 							 vIndex = 2;
-							 getOutputLines()[3].addVarDef("_rsl" + pVar.getIndex());
+							 getOutputLines()[3].addVarDef("_rsl" + pVar.getIndex() + " = " + pVar.getBytesDim());
 							 vVarName += "[" + pVar.getBytesDim() + "]";
 						 }
 						 getOutputLines()[vIndex].addVarDef(vVarName);
