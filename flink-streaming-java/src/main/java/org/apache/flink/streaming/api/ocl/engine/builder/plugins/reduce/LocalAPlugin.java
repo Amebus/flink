@@ -1,6 +1,6 @@
 package org.apache.flink.streaming.api.ocl.engine.builder.plugins.reduce;
 
-import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilder;
+import org.apache.flink.streaming.api.ocl.engine.builder.KernelBuilder;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.InputVarPlugin;
 
 public class LocalAPlugin extends InputVarPlugin
@@ -33,7 +33,7 @@ public class LocalAPlugin extends InputVarPlugin
 	}
 	
 	@Override
-	public void parseTemplateCode(PDAKernelBuilder pKernelBuilder, StringBuilder pCodeBuilder)
+	public void parseTemplateCode(KernelBuilder pKernelBuilder, StringBuilder pCodeBuilder)
 	{
 		pCodeBuilder.append(" local-a\n");
 		super.parseTemplateCode(pKernelBuilder, pCodeBuilder);

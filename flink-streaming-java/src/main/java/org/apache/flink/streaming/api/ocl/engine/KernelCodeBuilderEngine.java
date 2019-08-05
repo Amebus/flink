@@ -1,7 +1,7 @@
 package org.apache.flink.streaming.api.ocl.engine;
 
-import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilderOptions;
-import org.apache.flink.streaming.api.ocl.engine.builder.mappers.PDAKernelBuilderMapper;
+import org.apache.flink.streaming.api.ocl.engine.builder.KernelBuilderOptions;
+import org.apache.flink.streaming.api.ocl.engine.builder.mappers.KernelBuilderMapper;
 import org.apache.flink.streaming.configuration.ISettingsRepository;
 import org.apache.flink.streaming.configuration.ITupleDefinitionRepository;
 
@@ -13,18 +13,18 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class PDAKernelCodeBuilderEngine
+public class KernelCodeBuilderEngine
 {
 	private ISettingsRepository mSettingsRepository;
 	private ITupleDefinitionRepository mTupleDefinitionRepository;
 	private Iterable<? extends IUserFunction> mUserFunctions;
-	private PDAKernelBuilderMapper mKernelBuilders;
+	private KernelBuilderMapper mKernelBuilders;
 	
-	public PDAKernelCodeBuilderEngine(
+	public KernelCodeBuilderEngine(
 		ISettingsRepository pSettingsRepository,
 		ITupleDefinitionRepository pTupleDefinitionRepository,
 		Iterable<? extends IUserFunction> pUserFunctions,
-		PDAKernelBuilderMapper pKernelBuilderMapper)
+		KernelBuilderMapper pKernelBuilderMapper)
 	{
 		mSettingsRepository = pSettingsRepository;
 		mTupleDefinitionRepository = pTupleDefinitionRepository;
@@ -44,7 +44,7 @@ public class PDAKernelCodeBuilderEngine
 	{
 		return mUserFunctions;
 	}
-	public PDAKernelBuilderMapper getKernelBuilders()
+	public KernelBuilderMapper getKernelBuilders()
 	{
 		return mKernelBuilders;
 	}
@@ -79,7 +79,7 @@ public class PDAKernelCodeBuilderEngine
 		return getKernelBuilders()
 			.resolve(pUserFunction.getType())
 			.setPDAKernelBuilderOptions(
-				new PDAKernelBuilderOptions(
+				new KernelBuilderOptions(
 					pUserFunction,
 					getTupleDefinitionRepository(),
 					getSettingsRepository().getContextOptions(),

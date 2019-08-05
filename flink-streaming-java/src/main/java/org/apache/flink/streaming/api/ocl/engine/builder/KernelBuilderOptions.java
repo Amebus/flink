@@ -1,25 +1,24 @@
 package org.apache.flink.streaming.api.ocl.engine.builder;
 
-import org.apache.flink.streaming.api.ocl.common.mappers.StringKeyMapper;
 import org.apache.flink.streaming.api.ocl.engine.IUserFunction;
 import org.apache.flink.streaming.configuration.IOclContextOptions;
 import org.apache.flink.streaming.configuration.IOclKernelsOptions;
 import org.apache.flink.streaming.configuration.ITupleDefinition;
 import org.apache.flink.streaming.configuration.ITupleDefinitionRepository;
 
-public class PDAKernelBuilderOptions
+public class KernelBuilderOptions
 {
 	private IUserFunction mUserFunction;
 	private ITupleDefinitionRepository mTupleDefinitionsRepository;
 	private IOclContextOptions mContextOptions;
 	private IOclKernelsOptions mKernelOptions;
 	
-//	public PDAKernelBuilderOptions()
+//	public KernelBuilderOptions()
 //	{
 //		this(null, null, null, null);
 //	}
 	
-	public PDAKernelBuilderOptions(
+	public KernelBuilderOptions(
 		IUserFunction pUserFunction,
 		ITupleDefinitionRepository pTupleDefinitionsRepository,
 		IOclContextOptions pContextOptions,
@@ -36,7 +35,7 @@ public class PDAKernelBuilderOptions
 		return mUserFunction;
 	}
 	
-	public PDAKernelBuilderOptions setUserFunction(IUserFunction pUserFunction)
+	public KernelBuilderOptions setUserFunction(IUserFunction pUserFunction)
 	{
 		mUserFunction = pUserFunction;
 		return this;
@@ -68,7 +67,7 @@ public class PDAKernelBuilderOptions
 		return mTupleDefinitionsRepository;
 	}
 	
-	public PDAKernelBuilderOptions setTupleDefinitionsRepository(ITupleDefinitionRepository pTupleDefinitionsRepository)
+	public KernelBuilderOptions setTupleDefinitionsRepository(ITupleDefinitionRepository pTupleDefinitionsRepository)
 	{
 		mTupleDefinitionsRepository = pTupleDefinitionsRepository;
 		return this;
@@ -79,7 +78,7 @@ public class PDAKernelBuilderOptions
 		return mContextOptions;
 	}
 	
-	public PDAKernelBuilderOptions setContextOptions(IOclContextOptions pContextOptions)
+	public KernelBuilderOptions setContextOptions(IOclContextOptions pContextOptions)
 	{
 		mContextOptions = pContextOptions;
 		return this;
@@ -90,7 +89,7 @@ public class PDAKernelBuilderOptions
 		return mKernelOptions;
 	}
 	
-	public PDAKernelBuilderOptions setKernelOptions(IOclKernelsOptions pKernelOptions)
+	public KernelBuilderOptions setKernelOptions(IOclKernelsOptions pKernelOptions)
 	{
 		mKernelOptions = pKernelOptions;
 		return this;

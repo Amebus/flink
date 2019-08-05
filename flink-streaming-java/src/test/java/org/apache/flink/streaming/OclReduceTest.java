@@ -1,10 +1,11 @@
 package org.apache.flink.streaming;
 
 import org.apache.flink.streaming.api.ocl.bridge.OclContext;
-import org.apache.flink.streaming.api.ocl.common.mappers.StringKeyMapper;
 import org.apache.flink.streaming.api.ocl.engine.BuildEngine;
-import org.apache.flink.streaming.api.ocl.engine.builder.*;
-import org.apache.flink.streaming.api.ocl.engine.builder.mappers.PDAKernelBuilderMapper;
+import org.apache.flink.streaming.api.ocl.engine.builder.FilterKernelBuilder;
+import org.apache.flink.streaming.api.ocl.engine.builder.MapKernelBuilder;
+import org.apache.flink.streaming.api.ocl.engine.builder.ReduceKernelBuilder;
+import org.apache.flink.streaming.api.ocl.engine.builder.mappers.KernelBuilderMapper;
 import org.apache.flink.streaming.api.ocl.tuple.IOclTuple;
 import org.apache.flink.streaming.api.ocl.tuple.Tuple1Ocl;
 import org.apache.flink.streaming.helpers.Constants;
@@ -70,55 +71,13 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 		
 		boolean vTemplateFound = vMatcher.find();
 		
-		IKernelTemplatesRepository vRepository = new IKernelTemplatesRepository()
-		{
-			@Override
-			public String getRootTemplateCode()
-			{
-				return vTemplate;
-			}
-			
-			@Override
-			public String getTemplateCode(String pTemplateName)
-			{
-				String vResult;
-				switch (pTemplateName)
-				{
-					case "<[helper-functions]>":
-						vResult = "--repo hf--";
-						break;
-					case "<[defines]>":
-						vResult = "--repo defines--";
-						break;
-					case "<[kernel-name]>":
-						vResult = "--repo kernel name--";
-						break;
-					case "<[kernel-args]>":
-						vResult = "--repo kernel args--";
-						break;
-					case "<[kernel-code]>":
-						vResult = "<[kernel-code-a]><[kernel-code-b]>";
-						break;
-					case "<[kernel-code-a]>":
-						vResult = "--repo kernel code a--";
-						break;
-					case "<[kernel-code-b]>":
-						vResult = "--repo kernel code b--";
-						break;
-					default:
-						vResult = "--";
-				}
-				return vResult;
-			}
-		};
-		
 		OclContext vHelper = getNewOclContext();
 		
 		
-		PDAKernelBuilderMapper vMapper = new PDAKernelBuilderMapper();
+		KernelBuilderMapper vMapper = new KernelBuilderMapper();
 		vMapper.register("map", new MapKernelBuilder());
 		vMapper.register("filter", new FilterKernelBuilder());
-		vMapper.register("reduce", new ReducePDAKernelBuilder());
+		vMapper.register("reduce", new ReduceKernelBuilder());
 		BuildEngine vBuildEngine = new BuildEngine(
 			vHelper.getSettingsRepository(),
 			vMapper);

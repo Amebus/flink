@@ -1,6 +1,6 @@
 package org.apache.flink.streaming.api.ocl.engine.builder.plugins;
 
-import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilder;
+import org.apache.flink.streaming.api.ocl.engine.builder.KernelBuilder;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.utility.KernelDeserializationLine;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.utility.KernelLogicalVariable;
 
@@ -96,7 +96,7 @@ public class DeserializationPlugin extends PDAKernelBuilderPlugin implements IPl
 	}
 	
 	@Override
-	public void parseTemplateCode(PDAKernelBuilder pKernelBuilder, StringBuilder pCodeBuilder)
+	public void parseTemplateCode(KernelBuilder pKernelBuilder, StringBuilder pCodeBuilder)
 	{
 		setKernelAndCodeBuilder(pKernelBuilder, pCodeBuilder);
 		

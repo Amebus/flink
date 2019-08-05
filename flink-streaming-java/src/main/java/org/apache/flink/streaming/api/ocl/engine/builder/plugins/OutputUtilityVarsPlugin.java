@@ -1,6 +1,6 @@
 package org.apache.flink.streaming.api.ocl.engine.builder.plugins;
 
-import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilder;
+import org.apache.flink.streaming.api.ocl.engine.builder.KernelBuilder;
 import org.apache.flink.streaming.configuration.ITupleDefinition;
 
 import static org.apache.flink.streaming.api.ocl.engine.builder.options.DefaultsValues.DEFAULT_TUPLE_BYTES_DIMENSION_GETTER;
@@ -25,7 +25,7 @@ public class OutputUtilityVarsPlugin extends PDAKernelBuilderPlugin
 	}
 	
 	@Override
-	public void parseTemplateCode(PDAKernelBuilder pKernelBuilder, StringBuilder pCodeBuilder)
+	public void parseTemplateCode(KernelBuilder pKernelBuilder, StringBuilder pCodeBuilder)
 	{
 		setKernelAndCodeBuilder(pKernelBuilder, pCodeBuilder);
 		

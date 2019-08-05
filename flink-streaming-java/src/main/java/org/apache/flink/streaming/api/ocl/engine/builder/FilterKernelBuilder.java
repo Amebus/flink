@@ -3,7 +3,7 @@ package org.apache.flink.streaming.api.ocl.engine.builder;
 import org.apache.flink.streaming.api.ocl.engine.builder.mappers.TemplatePluginMapper;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.*;
 
-public class FilterKernelBuilder extends PDAKernelBuilder
+public class FilterKernelBuilder extends KernelBuilder
 {
 	
 	public FilterKernelBuilder()
@@ -20,7 +20,7 @@ public class FilterKernelBuilder extends PDAKernelBuilder
 	}
 	
 	@Override
-	protected PDAKernelBuilder setUpExtras()
+	protected KernelBuilder setUpExtras()
 	{
 		return this.setExtra("input-var-int", PDAKernelBuilderPlugin.Defaults.VarTypes.INT)
 				   .setExtra("input-var-double", PDAKernelBuilderPlugin.Defaults.VarTypes.DOUBLE)
@@ -30,7 +30,7 @@ public class FilterKernelBuilder extends PDAKernelBuilder
 	}
 	
 	@Override
-	protected PDAKernelBuilder setUpTemplatePluginMapper()
+	protected KernelBuilder setUpTemplatePluginMapper()
 	{
 		return super.setUpTemplatePluginMapper()
 			 .registerPlugin("<[utility-vars]>", getUtilityVarsPlugin())
@@ -42,7 +42,7 @@ public class FilterKernelBuilder extends PDAKernelBuilder
 	}
 	
 	@Override
-	protected IPDAKernelBuilderPlugin getKernelCodePlugin()
+	protected IKernelBuilderPlugin getKernelCodePlugin()
 	{
 		return (pBuilder, pCodeBuilder) ->
 			pCodeBuilder
@@ -56,7 +56,7 @@ public class FilterKernelBuilder extends PDAKernelBuilder
 				.append("\t\n");
 	}
 	
-	protected IPDAKernelBuilderPlugin getUtilityVarsPlugin()
+	protected IKernelBuilderPlugin getUtilityVarsPlugin()
 	{
 		return (pBuilder, pCodeBuilder) ->
 			pCodeBuilder
@@ -71,7 +71,7 @@ public class FilterKernelBuilder extends PDAKernelBuilder
 		
 	}
 	
-	private IPDAKernelBuilderPlugin getOutputVarsPlugin()
+	private IKernelBuilderPlugin getOutputVarsPlugin()
 	{
 		return (pKernelBuilder, pCodeBuilder) ->
 			pCodeBuilder
@@ -80,7 +80,7 @@ public class FilterKernelBuilder extends PDAKernelBuilder
 				.append("\n");
 	}
 	
-	private IPDAKernelBuilderPlugin getSerializationPlugin()
+	private IKernelBuilderPlugin getSerializationPlugin()
 	{
 		return ((pKernelBuilder, pCodeBuilder) -> pCodeBuilder.append("\n_result[_gId] = _r;\n"));
 	}

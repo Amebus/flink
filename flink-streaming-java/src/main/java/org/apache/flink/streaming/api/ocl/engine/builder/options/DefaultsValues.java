@@ -2,8 +2,6 @@ package org.apache.flink.streaming.api.ocl.engine.builder.options;
 
 import org.apache.flink.streaming.api.ocl.bridge.identity.BigEndianIdentityValuesConverter;
 import org.apache.flink.streaming.api.ocl.bridge.identity.LittleEndianIdentityValuesConverter;
-import org.apache.flink.streaming.api.ocl.common.comparers.StringKeyCaseInsensitiveComparer;
-import org.apache.flink.streaming.api.ocl.common.mappers.StringKeyMapper;
 import org.apache.flink.streaming.api.ocl.engine.IOclContextMappings;
 import org.apache.flink.streaming.api.ocl.engine.ITupleBytesDimensionGetter;
 import org.apache.flink.streaming.api.ocl.engine.builder.*;
@@ -14,8 +12,6 @@ import org.apache.flink.streaming.api.ocl.serialization.littleendian.LittleEndia
 import org.apache.flink.streaming.api.ocl.serialization.littleendian.LittleEndianStreamWriter;
 
 import java.nio.ByteOrder;
-
-import static org.apache.flink.streaming.api.ocl.common.utility.IterableHelper.getStringIterableFromArgs;
 
 public class DefaultsValues
 {
@@ -36,7 +32,7 @@ public class DefaultsValues
 			return vResult[0];
 		};
 	
-	public static class DefaultKernelBuilderMapper extends PDAKernelBuilderMapper
+	public static class DefaultKernelBuilderMapper extends KernelBuilderMapper
 	{
 		public DefaultKernelBuilderMapper()
 		{
@@ -47,7 +43,7 @@ public class DefaultsValues
 		{
 			register("map", new MapKernelBuilder());
 			register("filter", new FilterKernelBuilder());
-			register("reduce", new ReducePDAKernelBuilder());
+			register("reduce", new ReduceKernelBuilder());
 		}
 	}
 	
@@ -99,7 +95,7 @@ public class DefaultsValues
 		protected ITupleBytesDimensionGetter mTupleBytesDimensionGetters;
 		
 		
-		protected PDAKernelBuilderMapper mKernelBuilderMapper;
+		protected KernelBuilderMapper mKernelBuilderMapper;
 		protected NumbersByteOrderingStreamWriterMapper mNumbersByteOrderingStreamWriterMapper;
 		protected NumbersByteOrderingStreamReaderMapper mNumbersByteOrderingStreamReaderMapper;
 		protected NumbersByteOrderingToIdentityValuesConverterMapper mNumbersByteOrderingToIdentityValuesConverterMapper;
@@ -122,7 +118,7 @@ public class DefaultsValues
 		}
 		
 		@Override
-		public PDAKernelBuilderMapper getKernelBuilderMapper()
+		public KernelBuilderMapper getKernelBuilderMapper()
 		{
 			return mKernelBuilderMapper;
 		}

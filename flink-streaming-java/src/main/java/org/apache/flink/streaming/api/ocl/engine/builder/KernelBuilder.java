@@ -8,7 +8,7 @@ import org.apache.flink.streaming.api.ocl.engine.builder.plugins.PDAKernelBuilde
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class PDAKernelBuilder implements IPDAKernelBuilder
+public abstract class KernelBuilder implements IKernelBuilder
 {
 	public static final String DEFAULT_ROOT_TEMPLATE = "\n" +
 											   "<[helper-functions]>\n" +
@@ -56,20 +56,20 @@ public abstract class PDAKernelBuilder implements IPDAKernelBuilder
 	
 	private final String mRootTemplate;
 	private final TemplatePluginMapper mTemplatePluginMapper;
-	private PDAKernelBuilderOptions mPDAKernelBuilderOptions;
+	private KernelBuilderOptions mKernelBuilderOptions;
 	private StringKeyMapper<Object> mExtras;
 	
-	public PDAKernelBuilder()
+	public KernelBuilder()
 	{
 		this(DEFAULT_ROOT_TEMPLATE);
 	}
 	
-	public PDAKernelBuilder(String pRootTemplate)
+	public KernelBuilder(String pRootTemplate)
 	{
 		this(pRootTemplate, new TemplatePluginMapper());
 	}
 	
-	public PDAKernelBuilder(String pRootTemplate, TemplatePluginMapper pTemplatePluginMapper)
+	public KernelBuilder(String pRootTemplate, TemplatePluginMapper pTemplatePluginMapper)
 	{
 		if(pRootTemplate == null)
 		{
@@ -82,12 +82,12 @@ public abstract class PDAKernelBuilder implements IPDAKernelBuilder
 		this.setUpTemplatePluginMapper();
 	}
 	
-	protected PDAKernelBuilder setUpExtras()
+	protected KernelBuilder setUpExtras()
 	{
 		return this;
 	}
 	
-	protected PDAKernelBuilder setUpTemplatePluginMapper()
+	protected KernelBuilder setUpTemplatePluginMapper()
 	{
 		return this.registerPlugin(getKernelNameTemplate(), getKernelNamePlugin())
 				   .registerPlugin(getKernelCodeTemplate(), getKernelCodePlugin())
@@ -96,7 +96,7 @@ public abstract class PDAKernelBuilder implements IPDAKernelBuilder
 				   .registerPlugin(getKernelArgsTemplate(), getKernelArgsPlugin());
 	}
 	
-	protected IPDAKernelBuilderPlugin getKernelNamePlugin()
+	protected IKernelBuilderPlugin getKernelNamePlugin()
 	{
 		return (pBuilder, pCodeBuilder)
 			-> pCodeBuilder.append(pBuilder.getKernelName());
@@ -119,28 +119,28 @@ public abstract class PDAKernelBuilder implements IPDAKernelBuilder
 		return (T) getExtrasContainer().unregister(pKey);
 	}
 	
-	public PDAKernelBuilder setExtra(String pKey, Object pExtra)
+	public KernelBuilder setExtra(String pKey, Object pExtra)
 	{
 		getExtrasContainer().register(pKey, pExtra);
 		return this;
 	}
 	
-	public PDAKernelBuilder clearExtras()
+	public KernelBuilder clearExtras()
 	{
 		getExtrasContainer().clear();
 		return this;
 	}
 	
-	protected abstract IPDAKernelBuilderPlugin getKernelCodePlugin();
-	protected IPDAKernelBuilderPlugin getHelperFunctionsPlugin()
+	protected abstract IKernelBuilderPlugin getKernelCodePlugin();
+	protected IKernelBuilderPlugin getHelperFunctionsPlugin()
 	{
 		return PDAKernelBuilderPlugin.HELPER_FUNCTIONS;
 	}
-	protected IPDAKernelBuilderPlugin getDefinesPlugin()
+	protected IKernelBuilderPlugin getDefinesPlugin()
 	{
 		return PDAKernelBuilderPlugin.DEFINES;
 	}
-	protected IPDAKernelBuilderPlugin getKernelArgsPlugin()
+	protected IKernelBuilderPlugin getKernelArgsPlugin()
 	{
 		return PDAKernelBuilderPlugin.KERNEL_ARGS;
 	}
@@ -166,13 +166,13 @@ public abstract class PDAKernelBuilder implements IPDAKernelBuilder
 		return vBuilder.toString();
 	}
 	
-	public PDAKernelBuilderOptions getKernelBuilderOptions()
+	public KernelBuilderOptions getKernelBuilderOptions()
 	{
-		return mPDAKernelBuilderOptions;
+		return mKernelBuilderOptions;
 	}
-	public IPDAKernelBuilder setPDAKernelBuilderOptions(PDAKernelBuilderOptions pPDAKernelBuilderOptions)
+	public IKernelBuilder setPDAKernelBuilderOptions(KernelBuilderOptions pKernelBuilderOptions)
 	{
-		mPDAKernelBuilderOptions = pPDAKernelBuilderOptions;
+		mKernelBuilderOptions = pKernelBuilderOptions;
 		return clearExtras()
 			.setUpExtras();
 	}
@@ -181,7 +181,7 @@ public abstract class PDAKernelBuilder implements IPDAKernelBuilder
 	{
 		return mTemplatePluginMapper;
 	}
-	public PDAKernelBuilder registerPlugin(String pTemplate, IPDAKernelBuilderPlugin pPlugin)
+	public KernelBuilder registerPlugin(String pTemplate, IKernelBuilderPlugin pPlugin)
 	{
 		getTemplatePluginMapper().register(pTemplate, pPlugin);
 		return this;

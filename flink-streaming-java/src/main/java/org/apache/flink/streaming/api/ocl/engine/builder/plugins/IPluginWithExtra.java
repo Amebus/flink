@@ -1,9 +1,9 @@
 package org.apache.flink.streaming.api.ocl.engine.builder.plugins;
 
 import org.apache.flink.streaming.api.ocl.engine.builder.FIGenerateExtra;
-import org.apache.flink.streaming.api.ocl.engine.builder.IPDAKernelBuilderPlugin;
+import org.apache.flink.streaming.api.ocl.engine.builder.IKernelBuilderPlugin;
 
-public interface IPluginWithExtra extends IPDAKernelBuilderPlugin
+public interface IPluginWithExtra extends IKernelBuilderPlugin
 {
 	<T> T getExtra(String pKey);
 	default <T> T getExtra(String pKey, FIGenerateExtra<T> pGenerateExtra)

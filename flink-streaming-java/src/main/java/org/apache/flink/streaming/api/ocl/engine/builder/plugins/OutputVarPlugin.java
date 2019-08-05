@@ -1,6 +1,6 @@
 package org.apache.flink.streaming.api.ocl.engine.builder.plugins;
 
-import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilder;
+import org.apache.flink.streaming.api.ocl.engine.builder.KernelBuilder;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.utility.KernelVariablesLine;
 import org.apache.flink.streaming.configuration.ITupleDefinition;
 
@@ -109,7 +109,7 @@ public class OutputVarPlugin extends PDAKernelBuilderPlugin implements IPluginWi
 	}
 	
 	@Override
-	public void parseTemplateCode(PDAKernelBuilder pKernelBuilder, StringBuilder pCodeBuilder)
+	public void parseTemplateCode(KernelBuilder pKernelBuilder, StringBuilder pCodeBuilder)
 	{
 		setKernelAndCodeBuilder(pKernelBuilder, pCodeBuilder);
 		setUpExtra();

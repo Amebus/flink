@@ -10,27 +10,27 @@ import java.nio.file.Files;
 //import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class ReducePDAKernelBuilder extends PDAKernelBuilder
+public class ReduceKernelBuilder extends KernelBuilder
 {
 	public static final String ROOT_TEMPLATE = "<[reduce]>";
 	
-	public ReducePDAKernelBuilder()
+	public ReduceKernelBuilder()
 	{
 		super(ROOT_TEMPLATE);
 	}
 	
-	public ReducePDAKernelBuilder(String pRootTemplate)
+	public ReduceKernelBuilder(String pRootTemplate)
 	{
 		super(pRootTemplate);
 	}
 	
-	public ReducePDAKernelBuilder(String pRootTemplate, TemplatePluginMapper pTemplatePluginMapper)
+	public ReduceKernelBuilder(String pRootTemplate, TemplatePluginMapper pTemplatePluginMapper)
 	{
 		super(pRootTemplate, pTemplatePluginMapper);
 	}
 	
 	@Override
-	protected PDAKernelBuilder setUpTemplatePluginMapper()
+	protected KernelBuilder setUpTemplatePluginMapper()
 	{
 		return super.setUpTemplatePluginMapper()
 					.registerPlugin("<[reduce]>", getKernelCodePlugin())
@@ -46,7 +46,7 @@ public class ReducePDAKernelBuilder extends PDAKernelBuilder
 	}
 	
 	@Override
-	protected IPDAKernelBuilderPlugin getKernelCodePlugin()
+	protected IKernelBuilderPlugin getKernelCodePlugin()
 	{
 		return (pBuilder, pCodeBuilder) ->
 		{
@@ -68,7 +68,7 @@ public class ReducePDAKernelBuilder extends PDAKernelBuilder
 		};
 	}
 	
-	protected IPDAKernelBuilderPlugin getUtilityVarsPlugin()
+	protected IKernelBuilderPlugin getUtilityVarsPlugin()
 	{
 		return (pBuilder, pCodeBuilder) ->
 			pCodeBuilder
@@ -80,32 +80,32 @@ public class ReducePDAKernelBuilder extends PDAKernelBuilder
 		
 	}
 	
-	protected IPDAKernelBuilderPlugin getLocalAPlugin()
+	protected IKernelBuilderPlugin getLocalAPlugin()
 	{
 		return new LocalAPlugin();
 	}
 	
-	protected IPDAKernelBuilderPlugin getLocalBPlugin()
+	protected IKernelBuilderPlugin getLocalBPlugin()
 	{
 		return  new LocalBPlugin();
 	}
 	
-	protected IPDAKernelBuilderPlugin getDeserilizeLocalAPlugin()
+	protected IKernelBuilderPlugin getDeserilizeLocalAPlugin()
 	{
 		return new DeserializationAPlugin();
 	}
 	
-	protected IPDAKernelBuilderPlugin getDeserilizeLocalBPlugin()
+	protected IKernelBuilderPlugin getDeserilizeLocalBPlugin()
 	{
 		return new DeserializationBPlugin();
 	}
 	
-	protected IPDAKernelBuilderPlugin getSerializeToLocalPlugin()
+	protected IKernelBuilderPlugin getSerializeToLocalPlugin()
 	{
 		return new SerializeToLocalPlugin();
 	}
 	
-	protected IPDAKernelBuilderPlugin getTypesCopyPlugin()
+	protected IKernelBuilderPlugin getTypesCopyPlugin()
 	{
 		return (pKernelBuilder, pCodeBuilder) ->
 		{

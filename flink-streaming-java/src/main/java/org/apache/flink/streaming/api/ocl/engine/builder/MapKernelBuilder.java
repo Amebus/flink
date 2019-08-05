@@ -3,7 +3,7 @@ package org.apache.flink.streaming.api.ocl.engine.builder;
 import org.apache.flink.streaming.api.ocl.engine.builder.mappers.TemplatePluginMapper;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.*;
 
-public class MapKernelBuilder extends PDAKernelBuilder
+public class MapKernelBuilder extends KernelBuilder
 {
 	public MapKernelBuilder()
 	{
@@ -19,7 +19,7 @@ public class MapKernelBuilder extends PDAKernelBuilder
 	}
 	
 	@Override
-	protected PDAKernelBuilder setUpTemplatePluginMapper()
+	protected KernelBuilder setUpTemplatePluginMapper()
 	{
 		return super.setUpTemplatePluginMapper()
 					.registerPlugin("<[utility-vars]>", getUtilityVarsPlugin())
@@ -33,7 +33,7 @@ public class MapKernelBuilder extends PDAKernelBuilder
 	}
 	
 	@Override
-	protected IPDAKernelBuilderPlugin getKernelCodePlugin()
+	protected IKernelBuilderPlugin getKernelCodePlugin()
 	{
 		return (pBuilder, pCodeBuilder) ->
 			pCodeBuilder
@@ -48,7 +48,7 @@ public class MapKernelBuilder extends PDAKernelBuilder
 				.append("\t\n");
 	}
 	
-	protected IPDAKernelBuilderPlugin getUtilityVarsPlugin()
+	protected IKernelBuilderPlugin getUtilityVarsPlugin()
 	{
 		return (pBuilder, pCodeBuilder) ->
 			pCodeBuilder

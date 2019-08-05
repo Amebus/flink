@@ -1,8 +1,8 @@
 package org.apache.flink.streaming.api.ocl.engine.builder;
 
-public interface IPDAKernelBuilderPlugin
+public interface IKernelBuilderPlugin
 {
 	void parseTemplateCode(
-		PDAKernelBuilder pKernelBuilder,
+		KernelBuilder pKernelBuilder,
 		StringBuilder pCodeBuilder);
 }

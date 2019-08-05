@@ -1,9 +1,9 @@
 package org.apache.flink.streaming.api.ocl.engine.builder.plugins;
 
 import org.apache.flink.streaming.api.ocl.engine.builder.FIGenerateExtra;
-import org.apache.flink.streaming.api.ocl.engine.builder.IPDAKernelBuilderPlugin;
-import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilder;
-import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilderOptions;
+import org.apache.flink.streaming.api.ocl.engine.builder.IKernelBuilderPlugin;
+import org.apache.flink.streaming.api.ocl.engine.builder.KernelBuilder;
+import org.apache.flink.streaming.api.ocl.engine.builder.KernelBuilderOptions;
 
 import static org.apache.flink.streaming.api.ocl.common.utility.IterableHelper.getIterableFromArgs;
 import static org.apache.flink.streaming.api.ocl.common.utility.IterableHelper.getStringIterableFromArgs;
@@ -11,15 +11,15 @@ import static org.apache.flink.streaming.api.ocl.common.utility.StreamUtility.st
 
 public abstract class PDAKernelBuilderPlugin implements IPluginWithExtra
 {
-	private PDAKernelBuilder mKernelBuilder;
+	private KernelBuilder mKernelBuilder;
 	private StringBuilder mCodeBuilder;
 	
-	public PDAKernelBuilder getKernelBuilder()
+	public KernelBuilder getKernelBuilder()
 	{
 		return mKernelBuilder;
 	}
 	
-	public PDAKernelBuilderOptions getOptions()
+	public KernelBuilderOptions getOptions()
 	{
 		return getKernelBuilder().getKernelBuilderOptions();
 	}
@@ -56,7 +56,7 @@ public abstract class PDAKernelBuilderPlugin implements IPluginWithExtra
 		return getKernelBuilder().removeExtra(pKey);
 	}
 	
-	public PDAKernelBuilderPlugin setKernelBuilder(PDAKernelBuilder pKernelBuilder)
+	public PDAKernelBuilderPlugin setKernelBuilder(KernelBuilder pKernelBuilder)
 	{
 		mKernelBuilder = pKernelBuilder;
 		return this;
@@ -70,19 +70,19 @@ public abstract class PDAKernelBuilderPlugin implements IPluginWithExtra
 	}
 	
 	public PDAKernelBuilderPlugin setKernelAndCodeBuilder(
-		PDAKernelBuilder pKernelBuilder,
+		KernelBuilder pKernelBuilder,
 		StringBuilder pCodeBuilder)
 	{
 		return setKernelBuilder(pKernelBuilder)
 			.setCodeBuilder(pCodeBuilder);
 	}
 	
-	public static final IPDAKernelBuilderPlugin HELPER_FUNCTIONS =
+	public static final IKernelBuilderPlugin HELPER_FUNCTIONS =
 		(pOptions, pCodeBuilder) ->
 			Defaults.getDefaultUtilityFunctions().forEach(p -> pCodeBuilder.append(p).append("\n"));
 	
 	
-	public static final IPDAKernelBuilderPlugin DEFINES =
+	public static final IKernelBuilderPlugin DEFINES =
 		(pOptions, pCodeBuilder) ->
 		{
 			Defaults.getDefaultDeserializationMacrosList().forEach(p -> pCodeBuilder.append(p).append("\n"));
@@ -90,7 +90,7 @@ public abstract class PDAKernelBuilderPlugin implements IPluginWithExtra
 		};
 	
 	
-	public static final IPDAKernelBuilderPlugin KERNEL_ARGS =
+	public static final IKernelBuilderPlugin KERNEL_ARGS =
 		(pOptions, pCodeBuilder) ->
 		{
 			String vArgs = streamFrom(Defaults.getDefaultKernelParameterList())
@@ -99,7 +99,7 @@ public abstract class PDAKernelBuilderPlugin implements IPluginWithExtra
 		};
 	
 	
-	public static IPDAKernelBuilderPlugin USER_FUNCTION =
+	public static IKernelBuilderPlugin USER_FUNCTION =
 		(pBuilder, pCodeBuilder) ->
 			pCodeBuilder
 				.append("\n")
