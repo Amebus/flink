@@ -1,17 +1,14 @@
 package org.apache.flink.streaming.api.ocl.engine;
 
-import org.apache.flink.streaming.api.ocl.common.mappers.StringKeyMapper;
-import org.apache.flink.streaming.api.ocl.engine.builder.mappers.*;
+import org.apache.flink.streaming.api.ocl.engine.builder.mappers.NumbersByteOrderingStreamReaderMapper;
+import org.apache.flink.streaming.api.ocl.engine.builder.mappers.NumbersByteOrderingStreamWriterMapper;
+import org.apache.flink.streaming.api.ocl.engine.builder.mappers.NumbersByteOrderingToIdentityValuesConverterMapper;
+import org.apache.flink.streaming.api.ocl.engine.builder.mappers.PDAKernelBuilderMapper;
 
 public interface IOclContextMappings
 {
-	FunctionKernelBuilderMapper getFunctionKernelBuilderMapper();
 	
-	FunctionKernelBuilderOptionMapper getFunctionKernelBuilderOptionMapper();
-	
-	StringKeyMapper<Byte> getVarTypeToSerializationTypeMapper();
-	
-	ITupleBytesDimensionGetters getTupleBytesDimensionGetters();
+	ITupleBytesDimensionGetter getTupleBytesDimensionGetters();
 	
 	
 	

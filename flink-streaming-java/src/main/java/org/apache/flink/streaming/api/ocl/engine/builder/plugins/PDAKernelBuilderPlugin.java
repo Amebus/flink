@@ -93,7 +93,6 @@ public abstract class PDAKernelBuilderPlugin implements IPluginWithExtra
 	public static final IPDAKernelBuilderPlugin KERNEL_ARGS =
 		(pOptions, pCodeBuilder) ->
 		{
-//			Defaults.getDefaultKernelParameterList().forEach(p -> pCodeBuilder.append(p).append(",").append("\n"));
 			String vArgs = streamFrom(Defaults.getDefaultKernelParameterList())
 				.reduce((a, b) -> a + ",\n" + b).orElse("");
 			pCodeBuilder.append(vArgs);

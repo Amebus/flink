@@ -2,6 +2,7 @@ package org.apache.flink.streaming.api.ocl.bridge;
 
 import org.apache.flink.streaming.api.ocl.bridge.identity.IdentityValueToIdentityArrayConverter;
 import org.apache.flink.streaming.api.ocl.engine.*;
+import org.apache.flink.streaming.api.ocl.engine.builder.options.DefaultsValues;
 import org.apache.flink.streaming.api.ocl.serialization.StreamReader;
 import org.apache.flink.streaming.api.ocl.tuple.IOclTuple;
 import org.apache.flink.streaming.configuration.ISettingsRepository;
@@ -190,9 +191,18 @@ public class OclContext implements Serializable
 		
 		pOutputTuple
 			.forEach(pVarDef ->
-						 vInfoBuilder.setTType(mOclContextMappings
-												   .getVarTypeToSerializationTypeMapper()
-												   .resolve(pVarDef.getType())));
+					 {
+					 	byte vType = DefaultsValues.DefaultsSerializationTypes.INT;
+					 	if(pVarDef.getType().startsWith("d"))
+						{
+							vType = DefaultsValues.DefaultsSerializationTypes.DOUBLE;
+						}
+					 	else if(pVarDef.getType().startsWith("s"))
+						{
+							vType = DefaultsValues.DefaultsSerializationTypes.STRING;
+						}
+						vInfoBuilder.setTType(vType);
+					 });
 		return vInfoBuilder.build();
 	}
 }

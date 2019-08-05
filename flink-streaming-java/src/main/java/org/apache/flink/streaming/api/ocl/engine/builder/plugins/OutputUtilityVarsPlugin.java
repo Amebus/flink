@@ -3,6 +3,8 @@ package org.apache.flink.streaming.api.ocl.engine.builder.plugins;
 import org.apache.flink.streaming.api.ocl.engine.builder.PDAKernelBuilder;
 import org.apache.flink.streaming.configuration.ITupleDefinition;
 
+import static org.apache.flink.streaming.api.ocl.engine.builder.options.DefaultsValues.DEFAULT_TUPLE_BYTES_DIMENSION_GETTER;
+
 public class OutputUtilityVarsPlugin extends PDAKernelBuilderPlugin
 {
 	protected ITupleDefinition getOutputTuple()
@@ -19,17 +21,7 @@ public class OutputUtilityVarsPlugin extends PDAKernelBuilderPlugin
 	
 	protected int getOutputTupleDimension()
 	{
-		final int[] vResult = {0};
-		getOutputTuple()
-			.forEach( pVar ->
-					  {
-						  vResult[0] +=pVar.getMaxReservedBytes();
-						  if(pVar.getType().startsWith("s"))
-						  {
-							  vResult[0]+=4;
-						  }
-					  });
-		return vResult[0];
+		return DEFAULT_TUPLE_BYTES_DIMENSION_GETTER.getTupleDimension(getOutputTuple());
 	}
 	
 	@Override

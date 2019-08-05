@@ -28,17 +28,6 @@ public class JsonUserFunctionRepository implements IUserFunctionsRepository
 		mUserFunctionMap = new HashMap<>();
 		mFileDirectory = pFileDirectory;
 		mFileName = pFileName;
-		setFunctionEngineTypes();
-	}
-	
-	protected int getSupportedFunctionTypesCount()
-	{
-		return DefaultsValues.DefaultFunctionsNames.SUPPORTED_FUNCTION_TYPES_COUNT;
-	}
-	
-	protected void setFunctionEngineTypes()
-	{
-		mFunctionEngineTypes = DefaultsValues.getDefaultFunctionEngineTypes();
 	}
 	
 	protected void loadFunctions()
