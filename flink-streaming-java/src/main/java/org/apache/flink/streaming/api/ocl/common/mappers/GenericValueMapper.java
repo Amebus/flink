@@ -8,6 +8,7 @@ public class GenericValueMapper<K, V>
 	
 	public GenericValueMapper()
 	{
+		super();
 	}
 	
 	public GenericValueMapper(IMapperKeyComparerWrapper<K> pComparer)

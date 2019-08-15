@@ -413,13 +413,13 @@ class OclReduceExecutionInfo : public OclKernelExecutionInfoForOutputTuple
             mLocalCacheSize = sizeof(unsigned char) * mLocalCacheLength;
             mLocalCache = new unsigned char[mLocalCacheLength];
 
-            for(int i = 0; i < mLocalCacheLength; i++)
-            {
-                for(int j = 0; j < mIdentityLength; j++)
-                {
-                    mLocalCache[i] = mIdentity[i];
-                }
-            }
+            // for(int i = 0; i < mLocalCacheLength; i++)
+            // {
+            //     for(int j = 0; j < mIdentityLength; j++)
+            //     {
+            //         mLocalCache[i] = mIdentity[i];
+            //     }
+            // }
             return this;
         }
     public:
@@ -557,6 +557,8 @@ void RunKernel(OclReduceExecutionInfo* pKernelInfo)
         cl::Buffer vIdendityBuffer(gContext, CL_MEM_READ_ONLY, vIdentiySize);;
         cl::Buffer vMidResultBuffer(gContext,  CL_MEM_READ_WRITE, vMidResultSize);
 
+        std::cout << "MidResultLength: " << pKernelInfo->GetMidResultLength() << std::endl;
+
         //cl::Buffer vLocalCacheBuffer(gContext, CL_MEM_READ_WRITE, vLocalCacheSize);
 
         gCommandQueue.enqueueWriteBuffer(vStreamBuffer, CL_TRUE, 0, vStreamSize, pKernelInfo->GetStream());
@@ -583,16 +585,19 @@ void RunKernel(OclReduceExecutionInfo* pKernelInfo)
         vKernel.setArg(vArgIndex++, vMidResultBuffer);
         //std::cout << "Ok" << std::endl;
 
-        // std::cout << "Set arg: LocalCacheBuffer" << std::endl;
+        std::cout << std::endl;
+        std::cout << "Set arg: LocalCacheBuffer" << std::endl;
         // std::cout << "unsigned char - " << sizeof(unsigned char) << std::endl;
-        // std::cout << "length - " << pKernelInfo->GetLocalCacheLength() << std::endl;
+        std::cout << "length - " << pKernelInfo->GetLocalCacheLength() << std::endl;
         // std::cout << "size - " << pKernelInfo->GetLocalCacheSize() << std::endl;
         // std::cout << "stream - " << pKernelInfo->GetStreamLength() << std::endl;
         // std::cout << "finalResult - " << pKernelInfo->GetResultLength() << std::endl;
-        // std::cout << "midResult - " << pKernelInfo->GetMidResultLength() << std::endl;
+        std::cout << "midResult - " << pKernelInfo->GetMidResultLength() << std::endl;
         vKernel.setArg(vArgIndex++, cl::Local(pKernelInfo->GetLocalCacheSize()));
         //std::cout << "Ok" << std::endl;
 
+
+        // std::cout << "stream - " << pKernelInfo->GetIndexesLength() << std::endl;
         cl::NDRange global(pKernelInfo->GetIndexesLength());
         cl::NDRange local(pKernelInfo->GetWorkGroupSize());
 

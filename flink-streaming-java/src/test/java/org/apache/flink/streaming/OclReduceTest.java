@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.apache.flink.streaming.helpers.OclContextHelpers.GetIntegerZeroMeanTuples;
 import static org.junit.Assert.assertEquals;
 
 public class OclReduceTest extends OclContextHelpers.OclTestClass
@@ -78,30 +79,47 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 		vMapper.register("map", new MapKernelBuilder());
 		vMapper.register("filter", new FilterKernelBuilder());
 		vMapper.register("reduce", new ReduceKernelBuilder());
-		BuildEngine vBuildEngine = new BuildEngine(
-			vHelper.getSettingsRepository(),
-			vMapper);
-		
-		vBuildEngine.generateKernels(vHelper.getTupleDefinitionRepository(), vHelper.getFunctionRepository().getUserFunctions());
+//		BuildEngine vBuildEngine = new BuildEngine(
+//			vHelper.getSettingsRepository(),
+//			vMapper);
+//
+//		vBuildEngine.generateKernels(vHelper.getTupleDefinitionRepository(), vHelper.getFunctionRepository().getUserFunctions());
 		int i = 10 + 7;
 	}
 	
 	@Test
 	public void OclReduceInteger()
 	{
-		List<IOclTuple> vTuples = new ArrayList<>(2);
+		List<IOclTuple> vTuples = GetIntegerZeroMeanTuples(8);
 		
-		vTuples.add(new Tuple1Ocl<>(1));
-		vTuples.add(new Tuple1Ocl<>(5));
-		vTuples.add(new Tuple1Ocl<>(73));
-		vTuples.add(new Tuple1Ocl<>(10));
+		for(IOclTuple vTuple : vTuples)
+		{
+			System.out.print(" ");
+			System.out.print(vTuple.getFieldOcl(0));
+			System.out.print(" ");
+		}
+		
+		System.out.println();
+		
+//		vTuples.add(new Tuple1Ocl<>(1));
+//		vTuples.add(new Tuple1Ocl<>(5));
+//		vTuples.add(new Tuple1Ocl<>(2));
+//		vTuples.add(new Tuple1Ocl<>(6));
+//
+//		vTuples.add(new Tuple1Ocl<>(3));
+//		vTuples.add(new Tuple1Ocl<>(2));
+//		vTuples.add(new Tuple1Ocl<>(4));
+//		vTuples.add(new Tuple1Ocl<>(1));
 
 //		vTuples = GetIntegerZeroMeanTuples();
 		
-		IOclTuple vResult = getReduceResult(vTuples, "reduceInteger");
+		int expected = vTuples.stream().mapToInt(pT -> pT.getField(0)).sum();
+		System.out.println("Expected: " + expected);
 		
+		
+		IOclTuple vResult = getReduceResult(vTuples, "reduceInteger");
 		assertEquals(
-			vTuples.stream().mapToInt(pT -> pT.getField(0)).sum(),
+			expected,
 			(int)vResult.getField(0));
 	}
 	

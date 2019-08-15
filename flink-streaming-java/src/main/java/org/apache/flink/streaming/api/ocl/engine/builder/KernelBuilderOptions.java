@@ -1,5 +1,6 @@
 package org.apache.flink.streaming.api.ocl.engine.builder;
 
+import org.apache.flink.streaming.api.ocl.engine.ITupleBytesDimensionGetter;
 import org.apache.flink.streaming.api.ocl.engine.IUserFunction;
 import org.apache.flink.streaming.configuration.IOclContextOptions;
 import org.apache.flink.streaming.configuration.IOclKernelsOptions;
@@ -10,22 +11,20 @@ public class KernelBuilderOptions
 {
 	private IUserFunction mUserFunction;
 	private ITupleDefinitionRepository mTupleDefinitionsRepository;
+	private ITupleBytesDimensionGetter mTupleBytesDimensionGetter;
 	private IOclContextOptions mContextOptions;
 	private IOclKernelsOptions mKernelOptions;
-	
-//	public KernelBuilderOptions()
-//	{
-//		this(null, null, null, null);
-//	}
 	
 	public KernelBuilderOptions(
 		IUserFunction pUserFunction,
 		ITupleDefinitionRepository pTupleDefinitionsRepository,
+		ITupleBytesDimensionGetter pTupleBytesDimensionGetter,
 		IOclContextOptions pContextOptions,
 		IOclKernelsOptions pKernelOptions)
 	{
 		mUserFunction = pUserFunction;
 		mTupleDefinitionsRepository = pTupleDefinitionsRepository;
+		mTupleBytesDimensionGetter = pTupleBytesDimensionGetter;
 		mContextOptions = pContextOptions;
 		mKernelOptions = pKernelOptions;
 	}
@@ -34,7 +33,6 @@ public class KernelBuilderOptions
 	{
 		return mUserFunction;
 	}
-	
 	public KernelBuilderOptions setUserFunction(IUserFunction pUserFunction)
 	{
 		mUserFunction = pUserFunction;
@@ -66,7 +64,6 @@ public class KernelBuilderOptions
 	{
 		return mTupleDefinitionsRepository;
 	}
-	
 	public KernelBuilderOptions setTupleDefinitionsRepository(ITupleDefinitionRepository pTupleDefinitionsRepository)
 	{
 		mTupleDefinitionsRepository = pTupleDefinitionsRepository;
@@ -77,7 +74,6 @@ public class KernelBuilderOptions
 	{
 		return mContextOptions;
 	}
-	
 	public KernelBuilderOptions setContextOptions(IOclContextOptions pContextOptions)
 	{
 		mContextOptions = pContextOptions;
@@ -88,10 +84,19 @@ public class KernelBuilderOptions
 	{
 		return mKernelOptions;
 	}
-	
 	public KernelBuilderOptions setKernelOptions(IOclKernelsOptions pKernelOptions)
 	{
 		mKernelOptions = pKernelOptions;
+		return this;
+	}
+	
+	public ITupleBytesDimensionGetter getTupleBytesDimensionGetter()
+	{
+		return mTupleBytesDimensionGetter;
+	}
+	public KernelBuilderOptions setTupleBytesDimensionGetter(ITupleBytesDimensionGetter pTupleBytesDimensionGetter)
+	{
+		mTupleBytesDimensionGetter = pTupleBytesDimensionGetter;
 		return this;
 	}
 }

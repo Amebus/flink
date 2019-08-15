@@ -8,13 +8,16 @@ public class BuildEngine
 {
 	private ISettingsRepository mSettingsRepository;
 	private CppLibraryInfo mCppLibraryInfo;
+	private ITupleBytesDimensionGetter mTupleBytesDimensionGetter;
 	private KernelBuilderMapper mKernelBuilderMapper;
 	
 	public BuildEngine(
 		ISettingsRepository pSettingsRepository,
+		ITupleBytesDimensionGetter pTupleBytesDimensionGetter,
 		KernelBuilderMapper pKernelBuilderMapper)
 	{
 		mSettingsRepository = pSettingsRepository;
+		mTupleBytesDimensionGetter = pTupleBytesDimensionGetter;
 		mKernelBuilderMapper = pKernelBuilderMapper;
 	}
 	
@@ -26,6 +29,7 @@ public class BuildEngine
 			mSettingsRepository,
 			pTupleDefinitions,
 			pUserFunctions,
+			mTupleBytesDimensionGetter,
 			mKernelBuilderMapper)
 		.generateKernels();
 		return this;

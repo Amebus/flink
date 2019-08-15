@@ -112,7 +112,7 @@ public class DefaultsValues
 		}
 		
 		@Override
-		public ITupleBytesDimensionGetter getTupleBytesDimensionGetters()
+		public ITupleBytesDimensionGetter getTupleBytesDimensionGetter()
 		{
 			return mTupleBytesDimensionGetters;
 		}

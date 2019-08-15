@@ -18,17 +18,20 @@ public class KernelCodeBuilderEngine
 	private ISettingsRepository mSettingsRepository;
 	private ITupleDefinitionRepository mTupleDefinitionRepository;
 	private Iterable<? extends IUserFunction> mUserFunctions;
+	private ITupleBytesDimensionGetter mTupleBytesDimensionGetter;
 	private KernelBuilderMapper mKernelBuilders;
 	
 	public KernelCodeBuilderEngine(
 		ISettingsRepository pSettingsRepository,
 		ITupleDefinitionRepository pTupleDefinitionRepository,
 		Iterable<? extends IUserFunction> pUserFunctions,
+		ITupleBytesDimensionGetter pTupleBytesDimensionGetter,
 		KernelBuilderMapper pKernelBuilderMapper)
 	{
 		mSettingsRepository = pSettingsRepository;
 		mTupleDefinitionRepository = pTupleDefinitionRepository;
 		mUserFunctions = pUserFunctions;
+		mTupleBytesDimensionGetter = pTupleBytesDimensionGetter;
 		mKernelBuilders = pKernelBuilderMapper;
 	}
 	
@@ -43,6 +46,10 @@ public class KernelCodeBuilderEngine
 	public Iterable<? extends IUserFunction> getUserFunctions()
 	{
 		return mUserFunctions;
+	}
+	public ITupleBytesDimensionGetter getTupleBytesDimensionGetter()
+	{
+		return mTupleBytesDimensionGetter;
 	}
 	public KernelBuilderMapper getKernelBuilders()
 	{
@@ -82,6 +89,7 @@ public class KernelCodeBuilderEngine
 				new KernelBuilderOptions(
 					pUserFunction,
 					getTupleDefinitionRepository(),
+					getTupleBytesDimensionGetter(),
 					getSettingsRepository().getContextOptions(),
 					getSettingsRepository().getKernelsOptions()))
 			.build();

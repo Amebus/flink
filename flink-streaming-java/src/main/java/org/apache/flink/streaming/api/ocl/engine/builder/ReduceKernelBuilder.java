@@ -1,5 +1,7 @@
 package org.apache.flink.streaming.api.ocl.engine.builder;
 
+import org.apache.flink.streaming.api.ocl.engine.ITupleBytesDimensionGetter;
+import org.apache.flink.streaming.api.ocl.engine.IUserFunction;
 import org.apache.flink.streaming.api.ocl.engine.builder.mappers.TemplatePluginMapper;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.*;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.reduce.*;
@@ -41,6 +43,7 @@ public class ReduceKernelBuilder extends KernelBuilder
 					.registerPlugin("<[deser-b]>", getDeserilizeLocalBPlugin())
 					.registerPlugin("<[serialize-to-local]>", getSerializeToLocalPlugin())
 					.registerPlugin("<[types-copy]>", getTypesCopyPlugin())
+					.registerPlugin("<[local-cache-dim]>", getLocalCacheDimPlugin())
 					.registerPlugin("<[user-function]>", PDAKernelBuilderPlugin.USER_FUNCTION);
 		
 	}
@@ -70,13 +73,19 @@ public class ReduceKernelBuilder extends KernelBuilder
 	
 	protected IKernelBuilderPlugin getUtilityVarsPlugin()
 	{
-		return (pBuilder, pCodeBuilder) ->
+		return (pKernelBuilder, pCodeBuilder) ->
+		{
+			ITupleDefinition vTuple = pKernelBuilder.getKernelBuilderOptions().getInputTuple();
+			ITupleBytesDimensionGetter vDimensionGetter =
+				pKernelBuilder.getKernelBuilderOptions().getTupleBytesDimensionGetter();
+			
 			pCodeBuilder
 				.append(" utility variables\n")
-				.append("\tunsigned char _arity = ").append(pBuilder.getKernelBuilderOptions().getInputTuple().getArity())
+				.append("\tunsigned char _arity = ").append(vTuple.getArity())
 				.append(";\n")
-				.append("\tuint _roff = 2;\n" + // values to be computed
-						"\tuint _otd = 4;\n");
+				.append("\tuint _roff = ").append(vTuple.getArity() + 1).append(";\n")
+				.append("\tuint _otd = ").append(vDimensionGetter.getTupleDimension(vTuple)).append(";\n");
+		};
 		
 	}
 	
@@ -103,6 +112,19 @@ public class ReduceKernelBuilder extends KernelBuilder
 	protected IKernelBuilderPlugin getSerializeToLocalPlugin()
 	{
 		return new SerializeToLocalPlugin();
+	}
+	
+	protected IKernelBuilderPlugin getLocalCacheDimPlugin()
+	{
+		return (pKernelBuilder, pCodeBuilder) ->
+		{
+			IUserFunction vFunction = pKernelBuilder.getKernelBuilderOptions().getUserFunction();
+			ITupleDefinition vTuple = pKernelBuilder.getKernelBuilderOptions().getInputTuple();
+			ITupleBytesDimensionGetter vDimensionGetter =
+				pKernelBuilder.getKernelBuilderOptions().getTupleBytesDimensionGetter();
+			
+			pCodeBuilder.append(vFunction.getWorkGroupSize() * vDimensionGetter.getTupleDimension(vTuple));
+		};
 	}
 	
 	protected IKernelBuilderPlugin getTypesCopyPlugin()

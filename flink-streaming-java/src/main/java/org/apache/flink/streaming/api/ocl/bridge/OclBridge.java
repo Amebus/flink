@@ -66,6 +66,17 @@ public class OclBridge extends AbstractOclBridge
 				.setTupleListSize(pInputTuplesCount)
 				.writeStream();
 		
+		
+		System.out.println("Identity: ");
+		for(byte vByte : pIdentity)
+		{
+			System.out.print(" ");
+			System.out.print(vByte);
+			System.out.print(" ");
+		}
+		
+		System.out.println();
+		
 		return super.OclReduce(pUserFunctionName,
 							   vWriterResult.getStream(),
 							   vWriterResult.getPositions(),

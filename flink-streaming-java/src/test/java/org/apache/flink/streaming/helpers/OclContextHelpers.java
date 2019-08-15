@@ -242,12 +242,15 @@ public class OclContextHelpers
 	
 	public static List<IOclTuple> GetIntegerZeroMeanTuples()
 	{
-		int vBound = 1000000;
+		return GetIntegerZeroMeanTuples(50000);
+	}
+	public static List<IOclTuple> GetIntegerZeroMeanTuples(int pCount)
+	{
+		int vBound = 128;//000;
 		int vMeanDisplacement = vBound/2;
 		OclRandomGenerator vRnd = new OclRandomGenerator();
-		int vMax = 50000;
 		
-		return GetTestTuple1OclList(vMax, () -> vRnd.nextInt(vBound) - vMeanDisplacement);
+		return GetTestTuple1OclList(pCount, () -> vRnd.nextInt(vBound) - vMeanDisplacement);
 	}
 	
 	public static List<IOclTuple> GetIntegerTestTuples()

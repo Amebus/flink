@@ -7,11 +7,7 @@ import org.apache.flink.streaming.api.ocl.engine.builder.mappers.KernelBuilderMa
 
 public interface IOclContextMappings
 {
-	
-	ITupleBytesDimensionGetter getTupleBytesDimensionGetters();
-	
-	
-	
+	ITupleBytesDimensionGetter getTupleBytesDimensionGetter();
 	
 	KernelBuilderMapper getKernelBuilderMapper();
 	

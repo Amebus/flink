@@ -81,10 +81,8 @@ public class OclContext implements Serializable
 	
 	protected void generatesKernels()
 	{
-//		mCppLibraryInfo = new BuildEngine(mSettingsRepository,
-//										  mOclContextMappings.getFunctionKernelBuilderMapper(),
-//										  mOclContextMappings.getFunctionKernelBuilderOptionMapper())
 		mCppLibraryInfo = new BuildEngine(mSettingsRepository,
+										  mOclContextMappings.getTupleBytesDimensionGetter(),
 										  mOclContextMappings.getKernelBuilderMapper())
 			.generateKernels(mTupleDefinitionRepository, mFunctionRepository.getUserFunctions())
 			.getCppLibraryInfo();
@@ -141,7 +139,7 @@ public class OclContext implements Serializable
 		
 		String vOutputTupleName = mFunctionRepository.getUserFunctionByName(pUserFunctionName).getOutputTupleName();
 		ITupleDefinition vOutputTuple = mTupleDefinitionRepository.getTupleDefinition(vOutputTupleName);
-		int vTupleDim = mOclContextMappings.getTupleBytesDimensionGetters().getTupleDimension(vOutputTuple);
+		int vTupleDim = mOclContextMappings.getTupleBytesDimensionGetter().getTupleDimension(vOutputTuple);
 		OutputTupleInfo vOutputTupleInfo = getOutputTupleInfo(vOutputTuple);
 		
 		byte[] vStream = mOclBridgeContext.map(pUserFunctionName, pTuples, vTupleDim, vOutputTupleInfo, pInputTuplesCount);
@@ -156,7 +154,7 @@ public class OclContext implements Serializable
 		IUserFunction vUserFunction = mFunctionRepository.getUserFunctionByName(pUserFunctionName);
 		String vOutputTupleName = vUserFunction.getInputTupleName();
 		ITupleDefinition vOutputTuple = mTupleDefinitionRepository.getTupleDefinition(vOutputTupleName);
-		int vTupleDim = mOclContextMappings.getTupleBytesDimensionGetters().getTupleDimension(vOutputTuple);
+		int vTupleDim = mOclContextMappings.getTupleBytesDimensionGetter().getTupleDimension(vOutputTuple);
 		IdentityValues vIdentityValues = new IdentityValues(vOutputTuple, vTupleDim);
 		int vWorkGroupSize = vUserFunction.getWorkGroupSize();
 		
