@@ -1,6 +1,5 @@
 package org.apache.flink.streaming.api.ocl.serialization;
 
-import com.sun.istack.internal.NotNull;
 import org.apache.flink.streaming.api.ocl.serialization.reader.IStreamReaderIterator;
 import org.apache.flink.streaming.api.ocl.tuple.IOclTuple;
 
@@ -51,7 +50,7 @@ public abstract class StreamReader implements Iterable<IOclTuple>
 	
 	
 	@Override
-	public @NotNull Iterator<IOclTuple> iterator()
+	public Iterator<IOclTuple> iterator()
 	{
 		return streamReaderIterator();
 	}
