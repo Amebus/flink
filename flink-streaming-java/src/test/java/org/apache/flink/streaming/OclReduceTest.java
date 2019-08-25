@@ -90,7 +90,7 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 	@Test
 	public void OclReduceInteger()
 	{
-		List<IOclTuple> vTuples = GetIntegerZeroMeanTuples(8);
+		List<IOclTuple> vTuples = GetIntegerZeroMeanTuples(4);
 		
 		for(IOclTuple vTuple : vTuples)
 		{

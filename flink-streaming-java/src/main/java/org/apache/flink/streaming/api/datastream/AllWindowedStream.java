@@ -1628,6 +1628,35 @@ public class AllWindowedStream<T, W extends Window> {
 			}, pTupleTypeInfo);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public <R extends IOclTuple> SingleOutputStreamOperator<R> oclReduce(String pUserFunctionName, OclTupleTypeInfo pTupleTypeInfo)
+	{
+		OclContext vOclContext = getExecutionEnvironment().getOclContext();
+		if(vOclContext == null)
+		{
+			throw new NullPointerException("the OclContext can't be null to use the oclReduce function.");
+		}
+		return
+			process(new ProcessAllWindowFunction<T, R, W>()
+			{
+				@Override
+				public void process(Context context, Iterable<T> elements, Collector<R> out)
+				{
+					int vTuplesCount = 0;
+					for (T vElement : elements)
+					{
+						vTuplesCount++;
+					}
+					
+					R vResult =
+						vOclContext.reduce(pUserFunctionName, (Iterable<R>) elements, vTuplesCount);
+					
+					out.collect(vResult);
+					
+				}
+			}, pTupleTypeInfo);
+	}
+	
 	// ------------------------------------------------------------------------
 	//  Utilities
 	// ------------------------------------------------------------------------
