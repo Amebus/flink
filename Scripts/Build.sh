@@ -1,0 +1,1 @@
+g++ -std=c++11 -fPIC -shared ../Cpp/Code/Sources/OclBridge.cpp -o ../Cpp/Out/libOclBridge.so -lOpenCL -I$JAVA_HOME/include -I$JAVA_HOME/include/linux
