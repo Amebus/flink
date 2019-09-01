@@ -1,0 +1,380 @@
+void fillStringWith(int si,int sl, char c, char *s)
+{
+    for (; si < sl; si++) {
+        s[si] = c;
+    }
+}
+void integerToString(int n, char *s, int sl)
+{
+    fillStringWith(0, sl, '\0', s);
+    char const digit[] = "0123456789";
+    char* p = s;
+    if(n<0){
+        *p++ = '-';
+        n *= -1;
+    }
+    int shifter = n;
+    do{
+        ++p;
+        shifter = shifter/10;
+    }while(shifter);
+    *p = '\0';
+    do{
+        *--p = digit[n%10];
+        n = n/10;
+    }while(n);
+}
+int stringToInteger(char *s)
+{
+    const char z = '0';
+    int r = 0, st = 0, p = 1;
+    
+    while(s[st] != '\0')
+    {
+        st++;
+    }
+    for(int i = st-1; i >= 0 && s[i] != '-' ; i--)
+    {
+        r+=((s[i]-z)*p);
+        p*=10;
+    }
+    if(s[0]=='-')
+    {
+        r*=-1;
+    }
+    return r;
+}
+int globalStringToInteger(__global char *s)
+{
+    const char z = '0';
+    int r = 0, st = 0, p = 1;
+    
+    while(s[st] != '\0')
+    {
+        st++;
+    }
+    for(int i = st-1; i >= 0 && s[i] != '-' ; i--)
+    {
+        r+=((s[i]-z)*p);
+        p*=10;
+    }
+    if(s[0]=='-')
+    {
+        r*=-1;
+    }
+    return r;
+}
+
+//ser macro(
+#define SER_INT(i, si, r, t)								\
+        t = (unsigned char*) &i;							\
+        for(int _ser_i = 0; _ser_i < 4; _ser_i++, si++)	\
+        {													\
+            r[si] = t[_ser_i];							\
+        }													\
+
+#define SER_DOUBLE(d, si, r, t)							\
+        t = (unsigned char*) &d;							\
+        for(int _ser_i = 0; _ser_i < 8; _ser_i++, si++)	\
+        {													\
+            r[si] = t[_ser_i];								\
+        }													\
+
+#define SER_STRING(s, si, l, r, t)             \
+        SER_INT(l, si, r, t);					\
+        for(int _ii = 0; _ii < l; _ii++, si++) \
+        {                                      \
+            r[si] = s[_ii];                    \
+        }                                      \
+
+
+
+//deser macro(
+#define DESER_INT(d, si, r) 				\
+			r = (*(__local int*) &d[si]);	\
+			si+=4;							\
+
+#define DESER_DOUBLE(d, si, r)  				\
+			r = (*(__local double*) &d[si]);	\
+			si+=8;								\
+
+#define DESER_STRING(d, si, rs, ri) 			\
+            DESER_INT(d, si, ri);   			\
+            rs = (__local char *)&d[si]; 	\
+            si+=ri;                 			\
+
+
+
+#define INT 1
+#define DOUBLE 2
+#define STRING 3
+
+
+#define LAST_STEP 1
+
+__kernel void reduceInteger(
+	__global unsigned char *_data,
+	__global int *_dataIndexes,
+	__global unsigned char *_finalResult,
+	__global unsigned char *_identity,
+	__global unsigned char *_midResults,
+	__local unsigned char *_localCache)
+
+
+{
+    unsigned char* _serializationTemp;
+    uint _gId = get_global_id(0);
+    uint _gSize = get_global_size(0);
+
+    uint _lId = get_local_id(0);
+    uint _grId = get_group_id(0);
+    uint _grSize = get_local_size(0);
+
+    uint _outputCount = get_num_groups(0);
+    uint _steps = ceil(log2((double)_gSize)/log2((double)_grSize));
+    uint _currentStep;
+
+    int _i = _gId < _gSize ? _dataIndexes[_gId] : -1;
+    int _userIndex = _i;
+
+    //  utility variables
+	unsigned char _arity = 1;
+	uint _roff = 2;
+	uint _otd = 4;
+
+
+    int _kIndex = _i - _roff;
+
+    uint _uiTemp = 0;
+    int _iTemp = 0;
+    unsigned char _tCounter = 0;
+    bool _continueCopy = 1;
+    uint _copyLength = 0;
+
+    //  local-a
+
+    // input-tuple
+    int _a0;
+
+    //  local-b
+
+    // input-tuple
+    int _b0;
+
+    // if(_gId == 0)
+    //     for(uint i = 0; i < 24; i++)
+    //     {
+    //         printf("_gId: %d - _identity[%d]: %d \n", _gId, i, _identity[i]);
+    //     }
+
+    if(_kIndex > -1)
+    {
+        for(uint i = 0, j = _kIndex; i < _otd; i++, j++)
+        {
+            _midResults[j] = _identity[i];
+        }
+    }
+
+    barrier(CLK_GLOBAL_MEM_FENCE);
+    // printf("_gId: %d - _grId: %d - _outputCount: %d - _steps: %d\n", _gId, _grId,_outputCount, _steps);
+    // barrier(CLK_GLOBAL_MEM_FENCE);
+
+    //copy from global to local
+    if(_i > -1)
+    {
+        //  types copy
+		unsigned char _types[1];
+		_types[0] = _data[1];
+
+
+        for(int i = _i, k = _lId * _otd, j = 0; _tCounter < _arity; _tCounter++)
+        {
+            if(_types[_tCounter] < STRING)
+            {
+                _copyLength = 4;
+                if(_types[_tCounter] == DOUBLE)
+                {
+                    _copyLength = 8;
+                }
+                
+                while(j < _copyLength)
+                {
+                    _localCache[k++] = _data[i++];
+                    // if(_gId == 0 || _gId == 1)
+                    //     printf("_gId: %d -\t\tk: %d\t\t_lc: %d\n", _gId, k-1, _localCache[k-1]);
+                    j++;
+                }
+                j = 0;
+            }
+        }
+    }
+    else
+    {
+        printf("_gId: %d - set local chache to identity from %d to %d\n", _gId, _lId * _otd, _lId * _otd + _otd);
+        for(uint i = 0, j = _lId * _otd; i < _otd; i++, j++)
+        {
+            _localCache[j] = _identity[i];
+        }
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    // if(_gId == 0) 
+    // { 
+    //     for(int j = 0; j < _otd; j++) 
+    //     { 
+    //         printf("_gId: %d - _identity[%d]: %d\n", _gId, j, _identity[j]);
+    //     }
+    //     printf("_gId: %d - _grSize[%d]\n", _gId, _grSize);
+    //     for(int j = 0; j < _grSize * _otd; j++)
+    //     {
+    //         printf("_gId: %d - _localCache[%d]: %d\n", _gId, j, _localCache[j]);
+    //     }
+    // }
+    // barrier(CLK_GLOBAL_MEM_FENCE);
+    // if(_gId == 0)
+    // {
+    //     for(int i = 0; i < 16; i++)	printf("0 a  _lc: %d\n", _localCache[i]);
+    // }
+    if(_gId == 0)
+    {
+        // for(int i = 0; i < 8; i++)	printf("2 a  _lc: %d\n", _localCache[i]);
+    }
+    // printf("------ reduce global loop -----\n");
+    for(_currentStep = _steps; _currentStep > 0 && _grId < _outputCount; _currentStep--)
+    {
+        // printf("_gId: %d - _grId: %d - inside global loop - _lId: %d ------ \n", _gId, _grId, _lId);
+        printf("_gId: %d - _grId: %d - _outputCount: %d - _currentStep: %d\n", _gId, _grId,_outputCount, _currentStep);
+        _outputCount = ceil((double)_outputCount/_grSize);
+        if(_currentStep != _steps)
+        {
+            printf("_gId: %d - _grId: %d - _kIndex: %d - _lId: %d - _otd: %d\n", _gId, _grId, _kIndex, _lId, _otd);
+            barrier(CLK_GLOBAL_MEM_FENCE);
+            for(uint i = 0, j = _kIndex, k = _lId * _otd; i < _otd; i++, j++, k++)
+            {
+                _localCache[k] = _midResults[j];
+                _midResults[j] = _identity[i];
+            }
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
+        // if(_currentStep > LAST_STEP)
+        // {
+        //     for(uint i = 0, j = _kIndex; i < _otd; i++, j++)
+        //     {
+        //         _midResults[j] = _identity[i];
+        //         //printf("_gId: %d - _midResults: %d\n", _gId, _midResults[j]);
+        //         // if(_gId == 0) 
+        //         // { 
+        //             for(int j = 0; j < 16; j++) 
+        //             { 
+        //                 // printf("_gId: %d - _midResults[%d]: %d\n", _gId, j, _midResults[j]);
+        //             }
+        //         // }
+        //         barrier(CLK_GLOBAL_MEM_FENCE);
+        //     }
+        // }
+
+        // printf("------ reduce local loop -----\n");
+        for(uint _stride = _grSize/2; _stride > 0 ; _stride /= 2)
+        {
+            // printf("_gId: %d - _grId: %d - inside local loop - _lId: %d ------ \n", _gId, _grId, _lId);
+            if(_lId < _stride)
+            {
+                _iTemp = _lId * _otd;
+                // if(_gId == 0)
+                //     printf("Des a | _lId: %d - _stride: %d - _iTemp: %d\n", _lId, _stride, _iTemp);
+
+                // // deserialization
+                DESER_INT( _localCache, _iTemp, _a0 );
+
+                _iTemp = _lId * _otd + _stride * _otd;
+                // if(_gId == 0)
+                //     printf("Des b | _lId: %d - _stride: %d - _iTemp: %d\n", _lId, _stride, _iTemp);
+
+                // // deserialization
+                DESER_INT( _localCache, _iTemp, _b0 );
+                
+                // if(_gId == 0)
+                // {
+                //     printf("_currentStep: %d - _gSize: %d - _grSize: %d\n", _currentStep, _gSize, _grSize);
+                //     printf("_gId: %d - _a0: %d - _b0: %d\n",_gId, _a0, _b0);
+                // }
+                // 
+                // user function
+                //printf("_currentStep: %d - _gSize: %d - _grSize: %d\n", _currentStep, _gSize, _grSize);
+                // printf("_gId: %d - _a0: %d - _b0: %d\n",_gId, _a0, _b0);
+                _a0 = _a0 + _b0;
+                // printf("_gId: %d - _a0: %d - _b0: %d\n",_gId, _a0, _b0);
+
+
+
+                // if(_gId == 0)
+                //     printf("_gId: %d - _a0: %d - _b0: %d\n",_gId, _a0, _b0);
+                _iTemp = _lId * _otd;
+
+                // // serialization
+                SER_INT( _a0, _iTemp, _localCache, _serializationTemp );
+  
+            }
+            barrier(CLK_LOCAL_MEM_FENCE);
+            //printf("_local - %d\n", _localCache[3]);
+
+            // if(_gId == 0)
+            // {
+            //     printf(" -- printing local cache ---\n");
+            //     for(int i = 0; i < 8; i++)	
+            //         printf("_gId: 0 --- _lc: %d\n", _localCache[i]);
+            // }
+        }
+
+        // if(_gId == 2)
+        // {
+        //     for(int i = 0; i < 16; i++)
+        //     	printf("_midResults: %d\n", _midResults[i]);
+        // }
+        if(_currentStep > LAST_STEP)
+        {
+            for(uint i = 0, j = _grId * _otd; i < _otd; i++, j++)
+            {
+                _midResults[j] = _localCache[i];
+            }
+            
+            if(_gId == 0)
+            {
+                printf("\n");
+                for(int i = 0; i < 32; i+=4)
+                    printf("_midResults: %d %d %d %d\n", _midResults[i], _midResults[i+1], _midResults[i+2], _midResults[i+3]);
+            }
+        }
+        else
+        {
+            barrier(CLK_LOCAL_MEM_FENCE);
+        }
+
+    }
+
+    // for (; _currentStep > 0; _currentStep--)
+    // {
+    //     barrier(CLK_GLOBAL_MEM_FENCE);
+    // }
+
+    if(_gId == 2)
+    {
+        printf("\n");
+        for(int i = 0; i < 32; i+=4)
+            printf("_midResults: %d %d %d %d\n", _midResults[i], _midResults[i+1], _midResults[i+2], _midResults[i+3]);
+    }
+
+    if(_gId == 0)
+    {
+        //printf("final result copy - %d\n", _ri);
+        for(int i = 0, j = _roff; i < _otd; i++, j++)
+        {
+            _finalResult[j] = _localCache[i];
+            //printf("_lc - %d\n", _localCache[i]);
+        }
+    }
+    //printf("_finalResult - %d\n", _finalResult[5]);
+
+};
+
