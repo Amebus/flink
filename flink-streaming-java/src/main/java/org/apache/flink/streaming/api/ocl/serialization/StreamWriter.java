@@ -65,23 +65,23 @@ public abstract class StreamWriter
 			vTupleIndexes[vI++] = writeStream(vTuple, vStream, vArity, mVarTypes);
 		}
 		
-		for(byte vByte : vStream)
-		{
-			System.out.print(" ");
-			System.out.print(vByte);
-			System.out.print(" ");
-		}
-
-		System.out.println();
-
-		for(int vIndex : vTupleIndexes)
-		{
-			System.out.print(" ");
-			System.out.print(vIndex);
-			System.out.print(" ");
-		}
-
-		System.out.println();
+//		for(byte vByte : vStream)
+//		{
+//			System.out.print(" ");
+//			System.out.print(vByte);
+//			System.out.print(" ");
+//		}
+//
+//		System.out.println();
+//
+//		for(int vIndex : vTupleIndexes)
+//		{
+//			System.out.print(" ");
+//			System.out.print(vIndex);
+//			System.out.print(" ");
+//		}
+//
+//		System.out.println();
 		
 		return new StreamWriterResult(vStream, vTupleIndexes);
 	}

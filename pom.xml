@@ -1202,6 +1202,7 @@ under the License.
 				<configuration>
 					<forkCount>${flink.forkCount}</forkCount>
 					<reuseForks>${flink.reuseForks}</reuseForks>
+					<argLine>-Djava.library.path=/home/federico/GitKraken/flink/Cpp/Out</argLine>
 					<systemPropertyVariables>
 						<forkNumber>0${surefire.forkNumber}</forkNumber>
 						<log4j.configuration>${log4j.configuration}</log4j.configuration>

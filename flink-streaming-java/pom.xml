@@ -107,6 +107,7 @@ under the License.
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<reuseForks>false</reuseForks>
+					<argLine>-Djava.library.path=/home/federico/GitKraken/flink/Cpp/Out</argLine>
 				</configuration>
 			</plugin>
 

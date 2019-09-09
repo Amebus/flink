@@ -167,6 +167,8 @@ __kernel void reduceInteger(
     //         printf("_gId: %d - _identity[%d]: %d \n", _gId, i, _identity[i]);
     //     }
 
+
+    // imposto il MidResul a Identity, lo faccio solo se il workItem ha un corrispetivo indice nel MidResult
     if(_kIndex > -1)
     {
         for(uint i = 0, j = _kIndex; i < _otd; i++, j++)
