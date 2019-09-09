@@ -2,12 +2,14 @@ package org.apache.flink.streaming;
 
 import org.apache.flink.streaming.api.ocl.common.utility.StreamUtility;
 import org.apache.flink.streaming.api.ocl.tuple.IOclTuple;
+import org.apache.flink.streaming.api.ocl.tuple.Tuple1Ocl;
 import org.apache.flink.streaming.helpers.Constants;
 import org.apache.flink.streaming.helpers.OclContextHelpers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,7 +51,14 @@ public class OclFilterTest extends OclContextHelpers.OclTestClass
 	@Test
 	public void OclFilterInteger()
 	{
-		List<IOclTuple> vTuples = GetIntegerTestTuples();
+//		List<IOclTuple> vTuples = GetIntegerTestTuples();
+
+		List<IOclTuple> vTuples = new ArrayList<>();
+		vTuples.add(new Tuple1Ocl<>(-1679099059));
+		vTuples.add(new Tuple1Ocl<>(528136394));
+		vTuples.add(new Tuple1Ocl<>(-1528862540));
+		vTuples.add(new Tuple1Ocl<>(-1348335996));
+
 		OclContextHelpers.TupleListInfo vListInfo = new OclContextHelpers.TupleListInfo(vTuples);
 		
 		Iterable<? extends IOclTuple> vResult = getFilterResult(vTuples, "filterInteger");

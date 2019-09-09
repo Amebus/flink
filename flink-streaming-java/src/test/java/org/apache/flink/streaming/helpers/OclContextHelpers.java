@@ -287,14 +287,14 @@ public class OclContextHelpers
 	
 	public static <R> List<IOclTuple> GetTestTuple1OclList(Tuple1ValueGetter<R> pTuple1ValueGetter)
 	{
-		return GetTestTuple1OclList(10000, pTuple1ValueGetter);
+		return GetTestTuple1OclList(50000, pTuple1ValueGetter);
 	}
 	
 	public static <R> List<IOclTuple> GetTestTuple1OclList(
 		List<IOclTuple> pConstTuples,
 		Tuple1ValueGetter<R> pTuple1ValueGetter)
 	{
-		return GetTestTuple1OclList(pConstTuples,10000, pTuple1ValueGetter);
+		return GetTestTuple1OclList(pConstTuples,50000, pTuple1ValueGetter);
 	}
 	
 	public static <R> List<IOclTuple> GetTestTuple1OclList(
