@@ -51,13 +51,13 @@ public class OclFilterTest extends OclContextHelpers.OclTestClass
 	@Test
 	public void OclFilterInteger()
 	{
-//		List<IOclTuple> vTuples = GetIntegerTestTuples();
+		List<IOclTuple> vTuples = GetIntegerTestTuples();
 
-		List<IOclTuple> vTuples = new ArrayList<>();
-		vTuples.add(new Tuple1Ocl<>(-1679099059));
-		vTuples.add(new Tuple1Ocl<>(528136394));
-		vTuples.add(new Tuple1Ocl<>(-1528862540));
-		vTuples.add(new Tuple1Ocl<>(-1348335996));
+//		List<IOclTuple> vTuples = new ArrayList<>();
+//		vTuples.add(new Tuple1Ocl<>(-1679099059));
+//		vTuples.add(new Tuple1Ocl<>(528136394));
+//		vTuples.add(new Tuple1Ocl<>(-1528862540));
+//		vTuples.add(new Tuple1Ocl<>(-1348335996));
 
 		OclContextHelpers.TupleListInfo vListInfo = new OclContextHelpers.TupleListInfo(vTuples);
 		

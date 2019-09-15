@@ -256,10 +256,10 @@ public class OclContextHelpers
 	public static List<IOclTuple> GetIntegerTestTuples()
 	{
 		List<IOclTuple> vConstTuples = new ArrayList<>();
-		vConstTuples.add(new Tuple1Ocl<>(-1679099059));
-		vConstTuples.add(new Tuple1Ocl<>(528136394));
-		vConstTuples.add(new Tuple1Ocl<>(-1528862540));
-		vConstTuples.add(new Tuple1Ocl<>(-1348335996));
+//		vConstTuples.add(new Tuple1Ocl<>(-1679099059));
+//		vConstTuples.add(new Tuple1Ocl<>(528136394));
+//		vConstTuples.add(new Tuple1Ocl<>(-1528862540));
+//		vConstTuples.add(new Tuple1Ocl<>(-1348335996));
 		
 		OclRandomGenerator vRnd = new OclRandomGenerator();
 		
@@ -287,14 +287,14 @@ public class OclContextHelpers
 	
 	public static <R> List<IOclTuple> GetTestTuple1OclList(Tuple1ValueGetter<R> pTuple1ValueGetter)
 	{
-		return GetTestTuple1OclList(50000, pTuple1ValueGetter);
+		return GetTestTuple1OclList(65536, pTuple1ValueGetter);
 	}
 	
 	public static <R> List<IOclTuple> GetTestTuple1OclList(
 		List<IOclTuple> pConstTuples,
 		Tuple1ValueGetter<R> pTuple1ValueGetter)
 	{
-		return GetTestTuple1OclList(pConstTuples,50000, pTuple1ValueGetter);
+		return GetTestTuple1OclList(pConstTuples,65536, pTuple1ValueGetter);
 	}
 	
 	public static <R> List<IOclTuple> GetTestTuple1OclList(
