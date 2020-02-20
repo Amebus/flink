@@ -1,7 +1,8 @@
 package org.apache.flink.streaming.api.ocl.engine.builder;
 
-import org.apache.flink.streaming.api.ocl.engine.builder.mappers.TemplatePluginMapper;
-import org.apache.flink.streaming.api.ocl.engine.builder.plugins.*;
+import org.apache.flink.streaming.api.ocl.engine.builder.plugins.DeserializationPlugin;
+import org.apache.flink.streaming.api.ocl.engine.builder.plugins.InputVarPlugin;
+import org.apache.flink.streaming.api.ocl.engine.builder.plugins.PDAKernelBuilderPlugin;
 
 public class FilterKernelBuilder extends KernelBuilder
 {
@@ -10,13 +11,11 @@ public class FilterKernelBuilder extends KernelBuilder
 	{
 		super();
 	}
-	public FilterKernelBuilder(String pRootTemplate)
+	
+	@Override
+	protected String getKernelType()
 	{
-		super(pRootTemplate);
-	}
-	public FilterKernelBuilder(String pRootTemplate, TemplatePluginMapper pTemplatePluginMapper)
-	{
-		super(pRootTemplate, pTemplatePluginMapper);
+		return "filter";
 	}
 	
 	@Override
@@ -39,21 +38,6 @@ public class FilterKernelBuilder extends KernelBuilder
 			 .registerPlugin("<[input-vars]>", new InputVarPlugin())
 			 .registerPlugin("<[output-vars]>", getOutputVarsPlugin())
 			 .registerPlugin("<[user-function]>", PDAKernelBuilderPlugin.USER_FUNCTION);
-	}
-	
-	@Override
-	protected IKernelBuilderPlugin getKernelCodePlugin()
-	{
-		return (pBuilder, pCodeBuilder) ->
-			pCodeBuilder
-				.append("\t\n")
-				.append("\t<[utility-vars]>\n")
-				.append("\t<[input-vars]>\n")
-				.append("\t<[output-vars]>\n")
-				.append("\t<[deserialization]>\n")
-				.append("\t<[user-function]>\n")
-				.append("\t<[serialization]>")
-				.append("\t\n");
 	}
 	
 	protected IKernelBuilderPlugin getUtilityVarsPlugin()

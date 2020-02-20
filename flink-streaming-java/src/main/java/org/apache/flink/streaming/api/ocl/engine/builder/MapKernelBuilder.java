@@ -9,13 +9,11 @@ public class MapKernelBuilder extends KernelBuilder
 	{
 		super();
 	}
-	public MapKernelBuilder(String pRootTemplate)
+	
+	@Override
+	protected String getKernelType()
 	{
-		super(pRootTemplate);
-	}
-	public MapKernelBuilder(String pRootTemplate, TemplatePluginMapper pTemplatePluginMapper)
-	{
-		super(pRootTemplate, pTemplatePluginMapper);
+		return "map";
 	}
 	
 	@Override
@@ -30,22 +28,6 @@ public class MapKernelBuilder extends KernelBuilder
 					.registerPlugin("<[output-vars]>", new OutputVarPlugin())
 					.registerPlugin("<[user-function]>", PDAKernelBuilderPlugin.USER_FUNCTION);
 		
-	}
-	
-	@Override
-	protected IKernelBuilderPlugin getKernelCodePlugin()
-	{
-		return (pBuilder, pCodeBuilder) ->
-			pCodeBuilder
-				.append("\t\n")
-				.append("\t<[utility-vars]>\n")
-				.append("\t<[output-utility-vars]>\n")
-				.append("\t<[input-vars]>\n")
-				.append("\t<[output-vars]>\n")
-				.append("\t<[deserialization]>\n")
-				.append("\t<[user-function]>\n")
-				.append("\t<[serialization]>")
-				.append("\t\n");
 	}
 	
 	protected IKernelBuilderPlugin getUtilityVarsPlugin()

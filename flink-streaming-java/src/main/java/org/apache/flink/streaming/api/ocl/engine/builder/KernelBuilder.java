@@ -5,37 +5,18 @@ import org.apache.flink.streaming.api.ocl.engine.OclKernel;
 import org.apache.flink.streaming.api.ocl.engine.builder.mappers.TemplatePluginMapper;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.PDAKernelBuilderPlugin;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class KernelBuilder implements IKernelBuilder
 {
-	public static final String DEFAULT_ROOT_TEMPLATE = "\n" +
-											   "<[helper-functions]>\n" +
-											   "\n" +
-											   "<[defines]>\n" +
-											   "\n" +
-											   "__kernel void <[kernel-name]>(\n" +
-											   "    <[kernel-args]>)\n" +
-											   "{\n" +
-											   "    <[kernel-code]>\n" +
-											   "}";
 	
 	public String getKernelNameTemplate()
 	{
 		return "<[kernel-name]>";
-	}
-	public String getKernelCodeTemplate()
-	{
-		return "<[kernel-code]>";
-	}
-	public String getHelperFunctionsTemplate()
-	{
-		return "<[helper-functions]>";
-	}
-	public String getDefinesTemplate()
-	{
-		return "<[defines]>";
 	}
 	public String getKernelArgsTemplate()
 	{
@@ -54,29 +35,15 @@ public abstract class KernelBuilder implements IKernelBuilder
 		return mTemplatePattern;
 	}
 	
-	private final String mRootTemplate;
+	private String mRootTemplate;
 	private final TemplatePluginMapper mTemplatePluginMapper;
 	private KernelBuilderOptions mKernelBuilderOptions;
 	private StringKeyMapper<Object> mExtras;
 	
+	protected abstract String getKernelType();
 	public KernelBuilder()
 	{
-		this(DEFAULT_ROOT_TEMPLATE);
-	}
-	
-	public KernelBuilder(String pRootTemplate)
-	{
-		this(pRootTemplate, new TemplatePluginMapper());
-	}
-	
-	public KernelBuilder(String pRootTemplate, TemplatePluginMapper pTemplatePluginMapper)
-	{
-		if(pRootTemplate == null)
-		{
-			throw new IllegalArgumentException("The template can't be null");
-		}
-		mRootTemplate = pRootTemplate;
-		mTemplatePluginMapper = pTemplatePluginMapper;
+		mTemplatePluginMapper = new TemplatePluginMapper();
 		mExtras = new StringKeyMapper<>();
 		
 		this.setUpTemplatePluginMapper();
@@ -90,9 +57,6 @@ public abstract class KernelBuilder implements IKernelBuilder
 	protected KernelBuilder setUpTemplatePluginMapper()
 	{
 		return this.registerPlugin(getKernelNameTemplate(), getKernelNamePlugin())
-				   .registerPlugin(getKernelCodeTemplate(), getKernelCodePlugin())
-				   .registerPlugin(getHelperFunctionsTemplate(), getHelperFunctionsPlugin())
-				   .registerPlugin(getDefinesTemplate(), getDefinesPlugin())
 				   .registerPlugin(getKernelArgsTemplate(), getKernelArgsPlugin());
 	}
 	
@@ -131,15 +95,6 @@ public abstract class KernelBuilder implements IKernelBuilder
 		return this;
 	}
 	
-	protected abstract IKernelBuilderPlugin getKernelCodePlugin();
-	protected IKernelBuilderPlugin getHelperFunctionsPlugin()
-	{
-		return PDAKernelBuilderPlugin.HELPER_FUNCTIONS;
-	}
-	protected IKernelBuilderPlugin getDefinesPlugin()
-	{
-		return PDAKernelBuilderPlugin.DEFINES;
-	}
 	protected IKernelBuilderPlugin getKernelArgsPlugin()
 	{
 		return PDAKernelBuilderPlugin.KERNEL_ARGS;
@@ -173,6 +128,26 @@ public abstract class KernelBuilder implements IKernelBuilder
 	public IKernelBuilder setPDAKernelBuilderOptions(KernelBuilderOptions pKernelBuilderOptions)
 	{
 		mKernelBuilderOptions = pKernelBuilderOptions;
+		
+		String vFile = getKernelBuilderOptions()
+			.getContextOptions()
+			.getKernelSourcePath(getKernelType());
+		// retrieve code from file
+		StringBuilder vKernelCode = new StringBuilder();
+		try
+		{
+			Files.lines(Paths.get(vFile)).forEach(str -> vKernelCode.append(str).append("\n"));
+		}
+		catch (IOException pE)
+		{
+			throw new IllegalArgumentException("Unable to use the file \"" + vFile +"\"", pE);
+		}
+		mRootTemplate = vKernelCode.toString();
+		if (mRootTemplate.trim().equals(""))
+		{
+			throw new IllegalArgumentException("The template can't be empty");
+		}
+		
 		return clearExtras()
 			.setUpExtras();
 	}

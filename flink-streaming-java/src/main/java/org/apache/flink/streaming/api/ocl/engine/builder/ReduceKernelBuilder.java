@@ -14,28 +14,16 @@ import java.nio.file.Paths;
 
 public class ReduceKernelBuilder extends KernelBuilder
 {
-	public static final String ROOT_TEMPLATE = "<[reduce]>";
-	
-	public ReduceKernelBuilder()
+	@Override
+	protected String getKernelType()
 	{
-		super(ROOT_TEMPLATE);
-	}
-	
-	public ReduceKernelBuilder(String pRootTemplate)
-	{
-		super(pRootTemplate);
-	}
-	
-	public ReduceKernelBuilder(String pRootTemplate, TemplatePluginMapper pTemplatePluginMapper)
-	{
-		super(pRootTemplate, pTemplatePluginMapper);
+		return "reduce";
 	}
 	
 	@Override
 	protected KernelBuilder setUpTemplatePluginMapper()
 	{
 		return super.setUpTemplatePluginMapper()
-					.registerPlugin("<[reduce]>", getKernelCodePlugin())
 					.registerPlugin("<[utility-vars]>", getUtilityVarsPlugin())
 					.registerPlugin("<[local-a]>", getLocalAPlugin())
 					.registerPlugin("<[local-b]>", getLocalBPlugin())
@@ -46,29 +34,6 @@ public class ReduceKernelBuilder extends KernelBuilder
 					.registerPlugin("<[local-cache-dim]>", getLocalCacheDimPlugin())
 					.registerPlugin("<[user-function]>", PDAKernelBuilderPlugin.USER_FUNCTION);
 		
-	}
-	
-	@Override
-	protected IKernelBuilderPlugin getKernelCodePlugin()
-	{
-		return (pBuilder, pCodeBuilder) ->
-		{
-			// ~
-			String vFile = "../Cpp/Code/Sources/reduce.template";
-			// retrieve code from file
-			try
-			{
-//				Path currentRelativePath = Paths.get("");
-//				String s = currentRelativePath.toAbsolutePath().toString();
-//				System.out.println("Current relative path is: " + s);
-				
-				Files.lines(Paths.get(vFile)).forEach(str -> pCodeBuilder.append(str).append("\n"));
-			}
-			catch (IOException pE)
-			{
-				throw new IllegalArgumentException("Unable to use the file \"" + vFile +"\"", pE);
-			}
-		};
 	}
 	
 	protected IKernelBuilderPlugin getUtilityVarsPlugin()

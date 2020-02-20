@@ -5,9 +5,10 @@ import java.nio.ByteOrder;
 
 public interface IOclContextOptions extends Serializable
 {
-	String getKernelsBuildFolder();
-	
 	boolean hasToRemoveTempFoldersOnClose();
 	
 	ByteOrder getNumbersByteOrdering();
+	
+	String getKernelsBuildFolder();
+	String getKernelSourcePath(String pKernelType);
 }

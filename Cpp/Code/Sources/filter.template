@@ -1,0 +1,114 @@
+void fillStringWith(int si,int sl, char c, char *s)
+{
+    for (; si < sl; si++) {
+        s[si] = c;
+    }
+}
+
+void integerToString(int n, char *s, int sl)
+{
+    fillStringWith(0, sl, '\0', s);
+    char const digit[] = "0123456789";
+    char* p = s;
+    if(n<0){
+        *p++ = '-';
+        n *= -1;
+    }
+    int shifter = n;
+    do{
+        ++p;
+        shifter = shifter/10;
+    }while(shifter);
+    *p = '\0';
+    do{
+        *--p = digit[n%10];
+        n = n/10;
+    }while(n);
+}
+
+int stringToInteger(char *s)
+{
+    const char z = '0';
+    int r = 0, st = 0, p = 1;
+    
+    while(s[st] != '\0')
+    {
+        st++;
+    }
+    for(int i = st-1; i >= 0 && s[i] != '-' ; i--)
+    {
+        r+=((s[i]-z)*p);
+        p*=10;
+    }
+    if(s[0]=='-')
+    {
+        r*=-1;
+    }
+    return r;
+}
+
+int globalStringToInteger(__global char *s)
+{
+    const char z = '0';
+    int r = 0, st = 0, p = 1;
+    
+    while(s[st] != '\0')
+    {
+        st++;
+    }
+    for(int i = st-1; i >= 0 && s[i] != '-' ; i--)
+    {
+        r+=((s[i]-z)*p);
+        p*=10;
+    }
+    if(s[0]=='-')
+    {
+        r*=-1;
+    }
+    return r;
+}
+
+#define DESER_INT(d, si, r) 				\
+			r = (*(__global int*) &d[si]);	\
+			si+=4;							\
+
+#define DESER_DOUBLE(d, si, r)  				\
+			r = (*(__global double*) &d[si]);	\
+			si+=8;								\
+
+#define DESER_STRING(d, si, rs, ri) 			\
+            DESER_INT(d, si, ri);   			\
+            rs = (__global char *)&d[si]; 	\
+            si+=ri;                 			\
+
+#define SER_INT(i, si, r, t)								\
+        t = (unsigned char*) &i;							\
+        for(int _ser_i = 0; _ser_i < 4; _ser_i++, si++)	\
+        {													\
+            r[si] = t[_ser_i];							\
+        }													\
+
+#define SER_DOUBLE(d, si, r, t)							\
+        t = (unsigned char*) &d;							\
+        for(int _ser_i = 0; _ser_i < 8; _ser_i++, si++)	\
+        {													\
+            r[si] = t[_ser_i];								\
+        }													\
+
+#define SER_STRING(s, si, l, r, t)             \
+        SER_INT(l, si, r, t);					\
+        for(int _ii = 0; _ii < l; _ii++, si++) \
+        {                                      \
+            r[si] = s[_ii];                    \
+        }                                      \
+
+__kernel void <[kernel-name]>(
+    <[kernel-args]>)
+{
+    <[utility-vars]>
+    <[input-vars]>
+    <[output-vars]>
+    <[deserialization]>
+    <[user-function]>
+    <[serialization]>
+}

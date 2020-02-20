@@ -6,13 +6,11 @@ import io.gsonfire.annotations.PostDeserialize;
 import org.apache.flink.streaming.configuration.IOclContextOptions;
 
 import java.nio.ByteOrder;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OclContextOptions implements IOclContextOptions
 {
-	@SerializedName("kernelsBuildFolder")
-	@Expose
-	private String mKernelsBuildFolder;
-	
 	@SerializedName("removeTempFoldersOnClose")
 	@Expose
 	private boolean mRemoveTempFoldersOnClose;
@@ -23,17 +21,22 @@ public class OclContextOptions implements IOclContextOptions
 	
 	private ByteOrder mNumbersByteOrdering;
 	
+	@SerializedName("kernelsBuildFolder")
+	@Expose
+	private String mKernelsBuildFolder;
+	
+	@SerializedName("kernelSourcePaths")
+	@Expose
+	private Map<String, String> mKernelSourcePaths;
+	
 	public OclContextOptions()
 	{
 		mRemoveTempFoldersOnClose = true;
 		mNumbersByteOrdering = ByteOrder.LITTLE_ENDIAN;
+		mKernelSourcePaths = new HashMap<>();
 	}
 	
-	public String getKernelsBuildFolder()
-	{
-		return mKernelsBuildFolder;
-	}
-	
+	@Override
 	public boolean hasToRemoveTempFoldersOnClose()
 	{
 		return mRemoveTempFoldersOnClose;
@@ -43,6 +46,21 @@ public class OclContextOptions implements IOclContextOptions
 	public ByteOrder getNumbersByteOrdering()
 	{
 		return mNumbersByteOrdering;
+	}
+	
+	@Override
+	public String getKernelsBuildFolder()
+	{
+		return mKernelsBuildFolder;
+	}
+	
+	@Override
+	public String getKernelSourcePath(String pKernelType)
+	{
+		String vResult = mKernelSourcePaths.get(pKernelType);
+		if (vResult == null)
+			vResult = "../Cpp/Code/Sources/$.template".replace("$", pKernelType);
+		return vResult;
 	}
 	
 	@PostDeserialize

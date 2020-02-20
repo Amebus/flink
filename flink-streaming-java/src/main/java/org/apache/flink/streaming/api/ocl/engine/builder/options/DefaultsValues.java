@@ -23,7 +23,7 @@ public class DefaultsValues
 			pTupleDefinition
 				.forEach( pVar ->
 						  {
-							  vResult[0] +=pVar.getMaxReservedBytes();
+							  vResult[0] += pVar.getMaxReservedBytes();
 							  if(pVar.getType().startsWith("s"))
 							  {
 								  vResult[0]+=4;
