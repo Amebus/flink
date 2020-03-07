@@ -79,36 +79,47 @@ int globalStringToInteger(__global char *s)
 			r = (*(__global double*) &d[si]);	\
 			si+=8;								\
 
-#define DESER_STRING(d, si, rs, ri) 			\
-            DESER_INT(d, si, ri);   			\
-            rs = (__global char *)&d[si]; 	\
-            si+=ri;                 			\
+#define DESER_STRING(d, si, rs, ri) 		\
+            DESER_INT(d, si, ri);   		\
+            rs = (__global char *)&d[si];   \
+            si+=ri;                 		\
 
-#define SER_INT(i, si, r, t)								\
-        t = (unsigned char*) &i;							\
-        for(int _ser_i = 0; _ser_i < 4; _ser_i++, si++)	\
-        {													\
+#define SER_INT(i, si, r, t)							\
+        t = (unsigned char*) &i;						\
+        for(int _ser_i = 0; _ser_i < 4; _ser_i++, si++) \
+        {												\
             r[si] = t[_ser_i];							\
-        }													\
+        }												\
 
 #define SER_DOUBLE(d, si, r, t)							\
-        t = (unsigned char*) &d;							\
-        for(int _ser_i = 0; _ser_i < 8; _ser_i++, si++)	\
-        {													\
-            r[si] = t[_ser_i];								\
-        }													\
+        t = (unsigned char*) &d;						\
+        for(int _ser_i = 0; _ser_i < 8; _ser_i++, si++) \
+        {												\
+            r[si] = t[_ser_i];							\
+        }												\
 
-#define SER_STRING(s, si, l, r, t)             \
+#define SER_STRING(s, si, l, r, t)              \
         SER_INT(l, si, r, t);					\
-        for(int _ii = 0; _ii < l; _ii++, si++) \
-        {                                      \
-            r[si] = s[_ii];                    \
-        }                                      \
+        for(int _ii = 0; _ii < l; _ii++, si++)  \
+        {                                       \
+            r[si] = s[_ii];                     \
+        }                                       \
 
 
 __kernel void <[kernel-name]>(
-    <[kernel-args]>)
+     __global unsigned char *_data,
+    __global int *_dataIndexes, 
+    __global unsigned char *_result,
+    int _totalInputTuples)
 {
+    uint _gId = get_global_id(0);
+    if (_gId >= _totalInputTuples)
+        return;
+    
+    // utility- variables
+    int _i = _dataIndexes[_gId];
+    int _userIndex = _i;
+    unsigned char* _serializationTemp;
     <[utility-vars]>
     <[output-utility-vars]>
     <[input-vars]>

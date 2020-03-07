@@ -522,6 +522,8 @@ void RunKernel(OclKernelExecutionInfo* pKernelInfo)
         // std::cout << "Set arg: ResultBuffer" << std::endl;
         vKernel.setArg(vArgIndex++, vResultBuffer);
 
+        vKernel.setArg(vArgIndex++, pKernelInfo->GetIndexesLength());
+
         cl::NDRange global(pKernelInfo->GetIndexesLength());
 
         gCommandQueue.enqueueNDRangeKernel(vKernel, cl::NullRange, global, cl::NullRange);

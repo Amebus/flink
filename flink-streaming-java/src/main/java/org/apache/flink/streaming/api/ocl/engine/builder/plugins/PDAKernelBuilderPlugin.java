@@ -78,15 +78,6 @@ public abstract class PDAKernelBuilderPlugin implements IPluginWithExtra
 	}
 	
 	
-	public static final IKernelBuilderPlugin KERNEL_ARGS =
-		(pOptions, pCodeBuilder) ->
-		{
-			String vArgs = streamFrom(Defaults.getDefaultKernelParameterList())
-				.reduce((a, b) -> a + ",\n" + b).orElse("");
-			pCodeBuilder.append(vArgs);
-		};
-	
-	
 	public static IKernelBuilderPlugin USER_FUNCTION =
 		(pBuilder, pCodeBuilder) ->
 			pCodeBuilder

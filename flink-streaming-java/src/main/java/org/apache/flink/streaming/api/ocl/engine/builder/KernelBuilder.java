@@ -18,10 +18,6 @@ public abstract class KernelBuilder implements IKernelBuilder
 	{
 		return "<[kernel-name]>";
 	}
-	public String getKernelArgsTemplate()
-	{
-		return "<[kernel-args]>";
-	}
 	
 	private Pattern mTemplatePattern;
 	public String getTemplateStringPattern()
@@ -56,8 +52,7 @@ public abstract class KernelBuilder implements IKernelBuilder
 	
 	protected KernelBuilder setUpTemplatePluginMapper()
 	{
-		return this.registerPlugin(getKernelNameTemplate(), getKernelNamePlugin())
-				   .registerPlugin(getKernelArgsTemplate(), getKernelArgsPlugin());
+		return this.registerPlugin(getKernelNameTemplate(), getKernelNamePlugin());
 	}
 	
 	protected IKernelBuilderPlugin getKernelNamePlugin()
@@ -93,11 +88,6 @@ public abstract class KernelBuilder implements IKernelBuilder
 	{
 		getExtrasContainer().clear();
 		return this;
-	}
-	
-	protected IKernelBuilderPlugin getKernelArgsPlugin()
-	{
-		return PDAKernelBuilderPlugin.KERNEL_ARGS;
 	}
 	
 	public String getKernelName()

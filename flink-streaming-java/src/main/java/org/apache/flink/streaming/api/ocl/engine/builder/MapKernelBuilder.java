@@ -34,15 +34,9 @@ public class MapKernelBuilder extends KernelBuilder
 	{
 		return (pBuilder, pCodeBuilder) ->
 			pCodeBuilder
-				.append("\n")
-				.append("// utility variables\n")
-				.append("\tuint _gId = get_global_id(0);\n")
 				.append("\tunsigned char _arity = ")
 				.append(pBuilder.getKernelBuilderOptions().getInputTuple().getArity())
-				.append(";\n")
-				.append("\tint _i = _dataIndexes[_gId];\n")
-				.append("\tint _userIndex = _i;\n")
-				.append("\tunsigned char* _serializationTemp;\n");
+				.append(";\n");
 			
 	}
 }
