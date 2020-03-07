@@ -524,6 +524,10 @@ void RunKernel(OclKernelExecutionInfo* pKernelInfo)
 
         vKernel.setArg(vArgIndex++, pKernelInfo->GetIndexesLength());
 
+        std::cout << "StreamBufferSize: " << vStreamSize << std::endl;
+        std::cout << "IndexesBuffer: " << vIndexesSize << std::endl;
+        std::cout << "ResultBuffer: " << vResultSize << std::endl;
+
         cl::NDRange global(pKernelInfo->GetIndexesLength());
 
         gCommandQueue.enqueueNDRangeKernel(vKernel, cl::NullRange, global, cl::NullRange);
