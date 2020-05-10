@@ -7,4 +7,6 @@ import java.util.Iterator;
 public interface IStreamReaderIterator extends Iterator<IOclTuple>
 {
 	<R extends IOclTuple> R nextTuple();
+	
+	long getDeserNanoTime();
 }

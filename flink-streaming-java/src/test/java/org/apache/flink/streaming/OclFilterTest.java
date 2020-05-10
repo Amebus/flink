@@ -51,47 +51,13 @@ public class OclFilterTest extends OclContextHelpers.OclTestClass
 	@Test
 	public void OclFilterInteger()
 	{
-//		List<IOclTuple> vTuples = GetIntegerTestTuples();
+		List<IOclTuple> vTuples = GetIntegerTestTuples();
 
 //		List<IOclTuple> vTuples = new ArrayList<>();
 //		vTuples.add(new Tuple1Ocl<>(-1679099059));
 //		vTuples.add(new Tuple1Ocl<>(528136394));
 //		vTuples.add(new Tuple1Ocl<>(-1528862540));
 //		vTuples.add(new Tuple1Ocl<>(-1348335996));
-		
-		List<IOclTuple> vTuples = new ArrayList<>();
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(20));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(-50));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(20));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(-50));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(20));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(-50));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(20));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(-50));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(20));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(-50));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(20));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(-50));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(20));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(-50));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(20));
-		vTuples.add(new Tuple1Ocl<>(-10));
-		vTuples.add(new Tuple1Ocl<>(-50));
 
 		OclContextHelpers.TupleListInfo vListInfo = new OclContextHelpers.TupleListInfo(vTuples);
 		
@@ -119,41 +85,13 @@ public class OclFilterTest extends OclContextHelpers.OclTestClass
 	public void OclFilterDouble()
 	{
 		
-//		List<IOclTuple> vTuples = GetDoubleTestTuples();
+		List<IOclTuple> vTuples = GetDoubleTestTuples();
 		
-		List<IOclTuple> vTuples = new ArrayList<>();
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(20D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(-50D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(20D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(-50D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(20D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(-50D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(20D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(-50D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(20D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(-50D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(20D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(-50D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(20D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(-50D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(20D));
-		vTuples.add(new Tuple1Ocl<>(-10D));
-		vTuples.add(new Tuple1Ocl<>(-50D));
+//		List<IOclTuple> vTuples = new ArrayList<>();
+//		vTuples.add(new Tuple1Ocl<>(-10D));
+//		vTuples.add(new Tuple1Ocl<>(20D));
+//		vTuples.add(new Tuple1Ocl<>(-10D));
+//		vTuples.add(new Tuple1Ocl<>(-50D));
 		
 		OclContextHelpers.TupleListInfo vListInfo = new OclContextHelpers.TupleListInfo(vTuples);
 		
@@ -180,33 +118,14 @@ public class OclFilterTest extends OclContextHelpers.OclTestClass
 	@Test
 	public void OclFilterString()
 	{
-//		List<IOclTuple> vTuples = GetStringTestTuples();
+		List<IOclTuple> vTuples = GetStringTestTuples();
 		
-		List<IOclTuple> vTuples = new ArrayList<>();
-		vTuples.add(new Tuple1Ocl<>("-10"));
-		vTuples.add(new Tuple1Ocl<>("20"));
-		vTuples.add(new Tuple1Ocl<>("-10"));
-		vTuples.add(new Tuple1Ocl<>("-50"));
-		vTuples.add(new Tuple1Ocl<>("-10"));
-		vTuples.add(new Tuple1Ocl<>("20"));
-		vTuples.add(new Tuple1Ocl<>("-10"));
-		vTuples.add(new Tuple1Ocl<>("-50"));
-		vTuples.add(new Tuple1Ocl<>("-10"));
-		vTuples.add(new Tuple1Ocl<>("20"));
-		vTuples.add(new Tuple1Ocl<>("-10"));
-		vTuples.add(new Tuple1Ocl<>("-50"));
-		vTuples.add(new Tuple1Ocl<>("-10"));
-		vTuples.add(new Tuple1Ocl<>("20"));
-		vTuples.add(new Tuple1Ocl<>("-10"));
-		vTuples.add(new Tuple1Ocl<>("-50"));
-		vTuples.add(new Tuple1Ocl<>("-10"));
-		vTuples.add(new Tuple1Ocl<>("20"));
-		vTuples.add(new Tuple1Ocl<>("-10"));
-		vTuples.add(new Tuple1Ocl<>("-50"));
-		vTuples.add(new Tuple1Ocl<>("-10"));
-		vTuples.add(new Tuple1Ocl<>("20"));
-		vTuples.add(new Tuple1Ocl<>("-10"));
-		vTuples.add(new Tuple1Ocl<>("-50"));
+//		List<IOclTuple> vTuples = new ArrayList<>();
+//		vTuples.add(new Tuple1Ocl<>("-10"));
+//		vTuples.add(new Tuple1Ocl<>("20"));
+//		vTuples.add(new Tuple1Ocl<>("-10"));
+//		vTuples.add(new Tuple1Ocl<>("-50"));
+		
 		OclContextHelpers.TupleListInfo vListInfo = new OclContextHelpers.TupleListInfo(vTuples);
 		
 		Iterable<? extends IOclTuple> vResult = getFilterResult(vTuples, "filterString");

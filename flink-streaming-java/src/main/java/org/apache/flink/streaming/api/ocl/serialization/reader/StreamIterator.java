@@ -1,5 +1,6 @@
 package org.apache.flink.streaming.api.ocl.serialization.reader;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.flink.streaming.api.ocl.engine.builder.options.DefaultsValues;
 import org.apache.flink.streaming.api.ocl.serialization.StreamReader;
 
@@ -15,10 +16,12 @@ public abstract class StreamIterator implements IStreamReaderIterator
 	protected int mTypeIndex;
 	protected int mResultIndex;
 	protected int mStringLength;
+	protected StopWatch mReadStopWatch;
 	
 	
 	protected StreamIterator(StreamReader pStreamReader)
 	{
+		mReadStopWatch = new StopWatch();
 		byte vArity = pStreamReader.getArity();
 		mStream = pStreamReader.getStream();
 		if (mArity != vArity)
@@ -30,10 +33,13 @@ public abstract class StreamIterator implements IStreamReaderIterator
 		mTypeIndex = 1;
 		mResultIndex = 0;
 		mStringLength = 0;
+		mReadStopWatch.start();
+		mReadStopWatch.suspend();
 	}
 	
 	protected Object[] readValuesFromStream()
 	{
+		mReadStopWatch.resume();
 		byte vType;
 		
 		for (mResultIndex = 0; mResultIndex < mArity; mResultIndex++)
@@ -55,6 +61,7 @@ public abstract class StreamIterator implements IStreamReaderIterator
 			}
 		}
 		mTypeIndex = 1;
+		mReadStopWatch.suspend();
 		return mResult;
 	}
 	
@@ -76,6 +83,12 @@ public abstract class StreamIterator implements IStreamReaderIterator
 		}
 		mResult[mResultIndex] = new String(mStream, mIndex, vStringLength);
 		mIndex+=mStringLength;
+	}
+	
+	@Override
+	public long getDeserNanoTime()
+	{
+		return mReadStopWatch.getNanoTime();
 	}
 	
 	@Override

@@ -1,6 +1,12 @@
 package org.apache.flink.streaming.api.ocl.bridge;
 
+import org.apache.commons.lang3.time.StopWatch;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.ocl.bridge.identity.IdentityValueToIdentityArrayConverter;
+import org.apache.flink.streaming.api.ocl.common.profiling.ProfilingFile;
+import org.apache.flink.streaming.api.ocl.common.profiling.ProfilingRecord;
+import org.apache.flink.streaming.api.ocl.common.profiling.Stopwatch;
 import org.apache.flink.streaming.api.ocl.engine.*;
 import org.apache.flink.streaming.api.ocl.engine.builder.options.DefaultsValues;
 import org.apache.flink.streaming.api.ocl.serialization.StreamReader;
@@ -28,6 +34,11 @@ public class OclContext implements Serializable
 	
 	transient private StreamReader mStreamReader;
 	transient private CppLibraryInfo mCppLibraryInfo;
+	transient private ProfilingFile mProfilingFile;
+	
+	// Profiling
+	StopWatch mTotalStopWatch = new StopWatch();
+	StopWatch mDeserStopWatch = new StopWatch();
 	
 	private OclBridge mOclBridgeContext;
 	
@@ -36,6 +47,7 @@ public class OclContext implements Serializable
 					  IUserFunctionsRepository pUserFunctionsRepository,
 					  IOclContextMappings pOclContextMappings)
 	{
+		mProfilingFile = new ProfilingFile();
 		mSettingsRepository = pSettingsRepository;
 		mTupleDefinitionRepository = pTupleDefinitionRepository;
 		mFunctionRepository = pUserFunctionsRepository;
@@ -118,16 +130,32 @@ public class OclContext implements Serializable
 												 Iterable< ? extends IOclTuple> pTuples,
 												 int pTuplesCount)
 	{
-		boolean[] vFilter = mOclBridgeContext.filter(pUserFunctionName, pTuples, pTuplesCount);
+		// Profiling
+		ProfilingRecord vProfilingRecord = new ProfilingRecord(pUserFunctionName, "filter");
+		mTotalStopWatch.start();
+		
+		Tuple2<boolean[], Long> vFilterResult = mOclBridgeContext.filter(pUserFunctionName, pTuples, pTuplesCount);
+		vProfilingRecord.setSerialization(vFilterResult.f1);
+		
+		mDeserStopWatch.start();
 		List<IOclTuple> vResult = new LinkedList<>();
 		int i = 0;
 		
 		for (IOclTuple vTuple : pTuples)
 		{
-			if(vFilter[i])
+			if(vFilterResult.f0[i])
 				vResult.add(vTuple);
 			i++;
 		}
+		mDeserStopWatch.stop();
+		vProfilingRecord.setDeserialization(mDeserStopWatch.getNanoTime());
+		mDeserStopWatch.reset();
+		
+		
+		vProfilingRecord.setTotal(mTotalStopWatch.getNanoTime());
+		mTotalStopWatch.reset();
+		
+		mProfilingFile.addProfilingRecord(vProfilingRecord);
 		return vResult;
 	}
 	
@@ -136,14 +164,23 @@ public class OclContext implements Serializable
 		Iterable< ? extends IOclTuple> pTuples,
 		int pInputTuplesCount)
 	{
+		// Profiling
+		ProfilingRecord vProfilingRecord = new ProfilingRecord(pUserFunctionName, "map");
+		mTotalStopWatch.start();
 		
 		String vOutputTupleName = mFunctionRepository.getUserFunctionByName(pUserFunctionName).getOutputTupleName();
 		ITupleDefinition vOutputTuple = mTupleDefinitionRepository.getTupleDefinition(vOutputTupleName);
 		int vTupleDim = mOclContextMappings.getTupleBytesDimensionGetter().getTupleDimension(vOutputTuple);
 		OutputTupleInfo vOutputTupleInfo = getOutputTupleInfo(vOutputTuple);
 		
-		byte[] vStream = mOclBridgeContext.map(pUserFunctionName, pTuples, vTupleDim, vOutputTupleInfo, pInputTuplesCount);
-		return mStreamReader.setStream(vStream);
+		Tuple2<byte[], Long> vMapResult = mOclBridgeContext.map(pUserFunctionName, pTuples, vTupleDim, vOutputTupleInfo, pInputTuplesCount);
+		vProfilingRecord.setSerialization(vMapResult.f1);
+		
+		vProfilingRecord.setTotal(mTotalStopWatch.getNanoTime());
+		mTotalStopWatch.reset();
+		
+		mProfilingFile.addProfilingRecord(vProfilingRecord);
+		return mStreamReader.setStream(vMapResult.f0);
 	}
 	
 	public <R extends IOclTuple> R reduce(
@@ -151,6 +188,10 @@ public class OclContext implements Serializable
 		Iterable<R> pTuples,
 		int pInputTuplesCount)
 	{
+		// Profiling
+		ProfilingRecord vProfilingRecord = new ProfilingRecord(pUserFunctionName, "reduce");
+		mTotalStopWatch.start();
+		
 		IUserFunction vUserFunction = mFunctionRepository.getUserFunctionByName(pUserFunctionName);
 		String vOutputTupleName = vUserFunction.getInputTupleName();
 		ITupleDefinition vOutputTuple = mTupleDefinitionRepository.getTupleDefinition(vOutputTupleName);
@@ -158,6 +199,7 @@ public class OclContext implements Serializable
 		IdentityValues vIdentityValues = new IdentityValues(vOutputTuple, vTupleDim);
 		int vWorkGroupSize = vUserFunction.getWorkGroupSize();
 		
+
 		if(!vUserFunction.isWorkGroupSpecified())
 		{
 			throw new IllegalArgumentException("The WorkGroupSize of the Reduce function must be specified");
@@ -168,7 +210,7 @@ public class OclContext implements Serializable
 				.getByteOrderingToIdentityValuesConverterMapper()
 				.resolve(mSettingsRepository.getContextOptions().getNumbersByteOrdering());
 		
-		byte[] vStream =
+		Tuple2<byte[], Long> vReduceResult =
 			mOclBridgeContext
 				.reduce(
 					pUserFunctionName,
@@ -177,8 +219,18 @@ public class OclContext implements Serializable
 					vConverter.toIdentityArray(vIdentityValues),
 					pInputTuplesCount,
 					vWorkGroupSize);
-		return mStreamReader.setStream(vStream).streamReaderIterator().nextTuple();
-//		return (R) new Tuple1Ocl<>();
+		vProfilingRecord.setSerialization(vReduceResult.f1);
+		
+		mDeserStopWatch.start();
+		R vResult = mStreamReader.setStream(vReduceResult.f0).streamReaderIterator().nextTuple();
+		vProfilingRecord.setDeserialization(mDeserStopWatch.getNanoTime());
+		mDeserStopWatch.reset();
+		
+		vProfilingRecord.setTotal(mTotalStopWatch.getNanoTime());
+		mTotalStopWatch.reset();
+		
+		mProfilingFile.addProfilingRecord(vProfilingRecord);
+		return vResult;
 	}
 	
 	private OutputTupleInfo getOutputTupleInfo(ITupleDefinition pOutputTuple)
