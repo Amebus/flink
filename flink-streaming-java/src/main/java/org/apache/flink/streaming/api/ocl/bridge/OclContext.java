@@ -155,6 +155,10 @@ public class OclContext implements Serializable
 		vProfilingRecord.setTotal(mTotalStopWatch.getNanoTime());
 		mTotalStopWatch.reset();
 		
+		long[] r = mOclBridgeContext.gGetKernelProfiling(pUserFunctionName);
+		vProfilingRecord.setJavaToC(r[0]);
+		vProfilingRecord.setKernelComputation(r[1]);
+		
 		mProfilingFile.addProfilingRecord(vProfilingRecord);
 		return vResult;
 	}
@@ -178,6 +182,10 @@ public class OclContext implements Serializable
 		
 		vProfilingRecord.setTotal(mTotalStopWatch.getNanoTime());
 		mTotalStopWatch.reset();
+		
+		long[] r = mOclBridgeContext.gGetKernelProfiling(pUserFunctionName);
+		vProfilingRecord.setJavaToC(r[0]);
+		vProfilingRecord.setKernelComputation(r[1]);
 		
 		mProfilingFile.addProfilingRecord(vProfilingRecord);
 		return mStreamReader.setStream(vMapResult.f0);
@@ -228,6 +236,10 @@ public class OclContext implements Serializable
 		
 		vProfilingRecord.setTotal(mTotalStopWatch.getNanoTime());
 		mTotalStopWatch.reset();
+		
+		long[] r = mOclBridgeContext.gGetKernelProfiling(pUserFunctionName);
+		vProfilingRecord.setJavaToC(r[0]);
+		vProfilingRecord.setKernelComputation(r[1]);
 		
 		mProfilingFile.addProfilingRecord(vProfilingRecord);
 		return vResult;

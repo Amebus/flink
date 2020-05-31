@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <iomanip>
 #include <unordered_map>
+#include <chrono>
 
 void printStatus(const cl_int status, const int line)
 {
@@ -165,6 +166,103 @@ void PrintClError(cl::Error& error, const int line)
 	std::cout << "Error" << std::endl;
 	std::cout << error.what() << "(" << error.err() << ")" << " - line: " << line << std::endl;
 }
+
+#pragma region StopWatch
+class Stopwatch{
+public:
+   enum TimeFormat{ NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS };
+
+   Stopwatch(): start_time(), laps({}) {
+      start();
+   }
+
+   void start(){
+      start_time = std::chrono::high_resolution_clock::now();
+      laps = {start_time};
+   }
+
+   template<TimeFormat fmt = TimeFormat::MILLISECONDS>
+   std::uint64_t lap(){
+      const auto t = std::chrono::high_resolution_clock::now();
+      const auto last_r = laps.back();
+      laps.push_back( t );
+      return ticks<fmt>(last_r, t);
+   }
+
+   template<TimeFormat fmt = TimeFormat::MILLISECONDS>
+   std::uint64_t elapsed(){
+      const auto end_time = std::chrono::high_resolution_clock::now();
+      return ticks<fmt>(start_time, end_time);
+   }
+
+   template<TimeFormat fmt_total = TimeFormat::MILLISECONDS, TimeFormat fmt_lap = fmt_total>
+   std::pair<std::uint64_t, std::vector<std::uint64_t>> elapsed_laps(){
+      std::vector<std::uint64_t> lap_times;
+      lap_times.reserve(laps.size()-1);
+
+      for( std::size_t idx = 0; idx <= laps.size()-2; idx++){
+         const auto lap_end = laps[idx+1];
+         const auto lap_start = laps[idx];
+         lap_times.push_back( ticks<fmt_lap>(lap_start, lap_end) );
+      }
+
+      return { ticks<fmt_total>(start_time, laps.back()), lap_times };
+   }
+
+private:
+   typedef std::chrono::time_point<std::chrono::high_resolution_clock> time_pt;
+   time_pt start_time;
+   std::vector<time_pt> laps;
+
+   template<TimeFormat fmt = TimeFormat::MILLISECONDS>
+   static std::uint64_t ticks( const time_pt& start_time, const time_pt& end_time){
+      const auto duration = end_time - start_time;
+      const std::uint64_t ns_count = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+
+      switch(fmt){
+      case TimeFormat::NANOSECONDS:
+      {
+         return ns_count;
+      }
+      case TimeFormat::MICROSECONDS:
+      {
+         std::uint64_t up = ((ns_count/100)%10 >= 5) ? 1 : 0;
+         const auto mus_count = (ns_count /1000) + up;
+         return mus_count;
+      }
+      case TimeFormat::MILLISECONDS:
+      {
+         std::uint64_t up = ((ns_count/100000)%10 >= 5) ? 1 : 0;
+         const auto ms_count = (ns_count /1000000) + up;
+         return ms_count;
+      }
+      case TimeFormat::SECONDS:
+      {
+         std::uint64_t up = ((ns_count/100000000)%10 >= 5) ? 1 : 0;
+         const auto s_count = (ns_count /1000000000) + up;
+         return s_count;
+      }
+      }
+    }
+};
+
+constexpr Stopwatch::TimeFormat nanoseconds = Stopwatch::TimeFormat::NANOSECONDS;
+constexpr Stopwatch::TimeFormat microseconds = Stopwatch::TimeFormat::MICROSECONDS;
+constexpr Stopwatch::TimeFormat milliseconds = Stopwatch::TimeFormat::MILLISECONDS;
+constexpr Stopwatch::TimeFormat seconds = Stopwatch::TimeFormat::SECONDS;
+
+
+std::string show_times( const std::vector<std::uint64_t>& times ){
+    std::string result("{");
+    for( const auto& t : times ){
+        result += std::to_string(t) + ",";
+    }
+    result.back() = static_cast<char>('}');
+    return result;
+}
+#pragma endregion
+
+std::unordered_map<std::string, std::uint64_t[2]> gProgrmasProfiling;
 
 std::unordered_map<std::string, cl::Program> gProgrmasList;
 //std::unordered_map<std::string, cl_program> gProgramsList;
@@ -524,9 +622,9 @@ void RunKernel(OclKernelExecutionInfo* pKernelInfo)
 
         vKernel.setArg(vArgIndex++, pKernelInfo->GetIndexesLength());
 
-        std::cout << "StreamBufferSize: " << vStreamSize << std::endl;
-        std::cout << "IndexesBuffer: " << vIndexesSize << std::endl;
-        std::cout << "ResultBuffer: " << vResultSize << std::endl;
+        // std::cout << "StreamBufferSize: " << vStreamSize << std::endl;
+        // std::cout << "IndexesBuffer: " << vIndexesSize << std::endl;
+        // std::cout << "ResultBuffer: " << vResultSize << std::endl;
 
         cl::NDRange global(pKernelInfo->GetIndexesLength());
 
@@ -777,13 +875,34 @@ JNIEXPORT void Java_org_apache_flink_streaming_api_ocl_bridge_AbstractOclBridge_
     DisposeContext();
 }
 
+JNIEXPORT jlongArray JNICALL Java_org_apache_flink_streaming_api_ocl_bridge_AbstractOclBridge_GetKernelProfiling(
+    JNIEnv *pEnv, jobject pObj, jstring pKernelName)
+{
+    std::string vKernelName = GetStringFromJavaString(pEnv, pKernelName);
+
+    jlongArray vRet = pEnv->NewLongArray(2);
+    pEnv->SetLongArrayRegion(vRet, 0, 2, GetKernelElapsed(vKernelName));
+    return vRet;
+}
+
 JNIEXPORT jbyteArray JNICALL Java_org_apache_flink_streaming_api_ocl_bridge_AbstractOclBridge_OclMap(
     JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes, 
     jint pOutputTupleDimension, jbyteArray pOutputTupleInfo)
 {
+    Stopwatch vJavaToCWatch;
+
     OclKernelExecutionInfo *vKernelInfo = new OclMapExecutionInfo(pEnv, pObj, pKernelName, pStream, pIndexes, pOutputTupleDimension, pOutputTupleInfo);
-    
+
+    std::uint64_t javaToCElapsed = vJavaToCWatch.elapsed<nanoseconds>();
+    SetJavaToCElapsed(vKernelInfo->GetKernelName(), javaToCElapsed);
+
+
+    Stopwatch vKernelExecutionWatch;
+
     RunKernel(vKernelInfo);
+
+    std::uint64_t kernelExexutionElapsed = vKernelExecutionWatch.elapsed<nanoseconds>();
+    SetComputationElapsed(vKernelInfo->GetKernelName(), javaToCElapsed);
 
     jbyteArray vRet = pEnv->NewByteArray(vKernelInfo->GetResultLength());
 	pEnv->SetByteArrayRegion(vRet, 0, vKernelInfo->GetResultLength(), (signed char *)vKernelInfo->GetResult());
@@ -795,16 +914,26 @@ JNIEXPORT jbooleanArray JNICALL
 Java_org_apache_flink_streaming_api_ocl_bridge_AbstractOclBridge_OclFilter(
     JNIEnv *pEnv, jobject pObj, jstring pKernelName, jbyteArray pStream, jintArray pIndexes)
 {
-    std::string vKernelName = GetStringFromJavaString(pEnv, pKernelName);
+    // std::string vKernelName = GetStringFromJavaString(pEnv, pKernelName);
 
     // unsigned char* vStream;
     // int* vIndexes;
 
     // int vStreamLength, vIndexesLegth, vResultLength;
     // size_t vStreamSize, vIndexesSize, vResultSize;
+    Stopwatch vJavaToCWatch;
+
     OclFilterExecutionInfo *vKernelInfo = new OclFilterExecutionInfo(pEnv, pObj, pKernelName, pStream, pIndexes);
 
+    std::uint64_t javaToCElapsed = vJavaToCWatch.elapsed<nanoseconds>();
+    SetJavaToCElapsed(vKernelInfo->GetKernelName(), javaToCElapsed);
+
+    Stopwatch vKernelExecutionWatch;
+
     RunKernel(vKernelInfo);
+
+    std::uint64_t kernelExexutionElapsed = vKernelExecutionWatch.elapsed<nanoseconds>();
+    SetComputationElapsed(vKernelInfo->GetKernelName(), javaToCElapsed);
 
     jbooleanArray vRet = pEnv->NewBooleanArray(vKernelInfo->GetResultLength());
 	pEnv->SetBooleanArrayRegion(vRet, 0, vKernelInfo->GetResultLength(), vKernelInfo->GetResult());
@@ -984,6 +1113,38 @@ void StoreKernelProgram(std::string pKernelName, cl::Program pKernelProgram)
 	{
         gProgrmasList[pKernelName] = pKernelProgram;
 	}
+}
+
+void SetJavaToCElapsed(std::string pKernelName, std::uint64_t elapsedNanosconds)
+{
+    std::unordered_map<std::string,std::uint64_t[2]>::const_iterator vIter = gProgrmasProfiling.find(pKernelName);
+    if (vIter == gProgrmasProfiling.end())
+    {
+        gProgrmasProfiling[pKernelName][0] = elapsedNanosconds;
+    }
+    else
+    {
+        gProgrmasProfiling[pKernelName][0] = elapsedNanosconds;
+    }
+}
+
+void SetComputationElapsed(std::string pKernelName, std::uint64_t elapsedNanosconds)
+{
+    std::unordered_map<std::string,std::uint64_t[2]>::const_iterator vIter = gProgrmasProfiling.find(pKernelName);
+    if (vIter == gProgrmasProfiling.end())
+    {
+        gProgrmasProfiling[pKernelName][1] = elapsedNanosconds;
+    }
+    else
+    {
+        gProgrmasProfiling[pKernelName][1] = elapsedNanosconds;
+    }
+    
+}
+
+long* GetKernelElapsed(std::string pKernelName)
+{
+    return (long *)gProgrmasProfiling[pKernelName];
 }
 
 #pragma endregion

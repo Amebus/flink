@@ -19,6 +19,10 @@ cl::Program CompileKernelProgram(std::string pSourceCode);
 
 void StoreKernelProgram(std::string pKernelName, cl::Program pKernelProgram);
 
+void SetJavaToCElapsed(std::string pKernelName, std::uint64_t elapsedNanosconds);
+void SetComputationElapsed(std::string pKernelName, std::uint64_t elapsedNanosconds);
+long* GetKernelElapsed(std::string pKernelName);
+
 void CompileAndStoreOclKernel(std::string pKernelsFolder, std::string pKernelName);
 
 void CompileAndStoreOclKernels(std::string pKernelsFolder, std::vector<std::string> pKernelsFiles);

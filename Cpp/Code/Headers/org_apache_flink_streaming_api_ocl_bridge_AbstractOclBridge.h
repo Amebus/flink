@@ -33,6 +33,14 @@ JNIEXPORT void JNICALL Java_org_apache_flink_streaming_api_ocl_bridge_AbstractOc
 
 /*
  * Class:     org_apache_flink_streaming_api_ocl_bridge_AbstractOclBridge
+ * Method:    GetKernelProfiling
+ * Signature: (Ljava/lang/String;)[J
+ */
+JNIEXPORT jlongArray JNICALL Java_org_apache_flink_streaming_api_ocl_bridge_AbstractOclBridge_GetKernelProfiling
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     org_apache_flink_streaming_api_ocl_bridge_AbstractOclBridge
  * Method:    OclMap
  * Signature: (Ljava/lang/String;[B[II[B)[B
  */

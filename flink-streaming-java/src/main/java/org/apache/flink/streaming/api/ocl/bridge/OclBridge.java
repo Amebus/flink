@@ -29,6 +29,11 @@ public class OclBridge extends AbstractOclBridge
 		ListDevices();
 	}
 	
+	public long[] gGetKernelProfiling(String pUserFunctionName)
+	{
+		return this.GetKernelProfiling(pUserFunctionName);
+	}
+	
 	public Tuple2<boolean[], Long> filter(String pUserFunctionName, Iterable< ? extends IOclTuple> pTuples, int pTuplesCount)
 	{
 		mSerialisationStopWatch.start();

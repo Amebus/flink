@@ -40,7 +40,7 @@ public class ProfilingFile
 			vRecord.f3 = pr.getSerialization();
 			vRecord.f4 = pr.getDeserialization();
 			vRecord.f5 = pr.getJavaToC();
-			vRecord.f6 = pr.getCToJava();
+			vRecord.f6 = pr.getKernelComputation();
 			
 			try
 			{

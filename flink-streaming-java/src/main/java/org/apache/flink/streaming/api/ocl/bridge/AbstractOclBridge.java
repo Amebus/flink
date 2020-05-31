@@ -20,6 +20,9 @@ public abstract class AbstractOclBridge implements Serializable
 	protected final native void Dispose();
 	
 	
+	// Profiling
+	protected final native long[] GetKernelProfiling(String pKernelName);
+	
 	
 	//Transformations
 	

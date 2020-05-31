@@ -11,9 +11,10 @@ public class ProfilingRecord
 	 * Serialization | *
 	 * Deserialization *
 	 *
+	 *
+	 *
 	 * Java to C++ | c++
-	 * Host to GPU ? | c++
-	 * GPU to Host | c++
+	 * Computation | c++
 	 * */
 	
 	
@@ -25,10 +26,8 @@ public class ProfilingRecord
 	private long mDeserialization;
 	
 	private long mJavaToC;
-	private long mCToJava;
+	private long mKernelComputation;
 	
-	private long mHostToGpu; // ?
-	private long mGpuToHost; // ?
 	
 	
 	public ProfilingRecord(String pKernelName, String pKernelType)
@@ -41,7 +40,6 @@ public class ProfilingRecord
 	{
 		return mKernelName;
 	}
-	
 	public String getKernelType()
 	{
 		return mKernelType;
@@ -51,7 +49,6 @@ public class ProfilingRecord
 	{
 		return mTotal;
 	}
-	
 	public void setTotal(long pTotal)
 	{
 		mTotal = pTotal;
@@ -61,7 +58,6 @@ public class ProfilingRecord
 	{
 		return mSerialization;
 	}
-	
 	public void setSerialization(long pSerialization)
 	{
 		mSerialization = pSerialization;
@@ -71,7 +67,6 @@ public class ProfilingRecord
 	{
 		return mDeserialization;
 	}
-	
 	public void setDeserialization(long pDeserialization)
 	{
 		mDeserialization = pDeserialization;
@@ -81,39 +76,17 @@ public class ProfilingRecord
 	{
 		return mJavaToC;
 	}
-	
 	public void setJavaToC(long pJavaToC)
 	{
 		mJavaToC = pJavaToC;
 	}
 	
-	public long getCToJava()
+	public long getKernelComputation()
 	{
-		return mCToJava;
+		return mKernelComputation;
 	}
-	
-	public void setCToJava(long pCToJava)
+	public void setKernelComputation(long pKernelComputation)
 	{
-		mCToJava = pCToJava;
-	}
-	
-	public long getHostToGpu()
-	{
-		return mHostToGpu;
-	}
-	
-	public void setHostToGpu(long pHostToGpu)
-	{
-		mHostToGpu = pHostToGpu;
-	}
-	
-	public long getGpuToHost()
-	{
-		return mGpuToHost;
-	}
-	
-	public void setGpuToHost(long pGpuToHost)
-	{
-		mGpuToHost = pGpuToHost;
+		mKernelComputation = pKernelComputation;
 	}
 }
