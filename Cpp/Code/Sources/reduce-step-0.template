@@ -1,0 +1,174 @@
+void fillStringWith(int si,int sl, char c, char *s)
+{
+    for (; si < sl; si++) {
+        s[si] = c;
+    }
+}
+
+//ser macro(
+#define SER_INT(i, si, r, t)								\
+        t = (unsigned char*) &i;							\
+        for(int _ser_i = 0; _ser_i < 4; _ser_i++, si++)	\
+        {													\
+            r[si] = t[_ser_i];							\
+        }													\
+
+#define SER_DOUBLE(d, si, r, t)							\
+        t = (unsigned char*) &d;							\
+        for(int _ser_i = 0; _ser_i < 8; _ser_i++, si++)	\
+        {													\
+            r[si] = t[_ser_i];								\
+        }													\
+
+#define SER_STRING(s, si, l, r, t)             \
+        SER_INT(l, si, r, t);					\
+        for(int _ii = 0; _ii < l; _ii++, si++) \
+        {                                      \
+            r[si] = s[_ii];                    \
+        }                                      \
+
+
+
+//deser macro(
+#define DESER_INT(d, si, r) 				\
+			r = (*(__local int*) &d[si]);	\
+			si+=4;							\
+
+#define DESER_DOUBLE(d, si, r)  				\
+			r = (*(__local double*) &d[si]);	\
+			si+=8;								\
+
+#define DESER_STRING(d, si, rs, ri) 			\
+            DESER_INT(d, si, ri);   			\
+            rs = (__local char *)&d[si]; 	\
+            si+=ri;                 			\
+
+
+
+#define INT 1
+#define DOUBLE 2
+#define STRING 3
+
+
+#define LAST_STEP 1
+
+__kernel void <[kernel-name]>(
+	__global unsigned char *_data,
+	__global int *_dataIndexes,
+	__global unsigned char *_midResults,
+	__global unsigned char *_identity,
+	__local unsigned char *_localCache)
+{
+    unsigned char* _serializationTemp;
+    uint _globalId = get_global_id(0);
+    uint _globlSize = get_global_size(0);
+
+    uint _localId = get_local_id(0);
+    uint _groupId = get_group_id(0);
+    uint _groupSize = get_local_size(0);
+
+    uint _outputCount = get_num_groups(0);
+
+    // <[utility-vars]>
+
+    uint _localCacheDim = _groupSize * _otd;
+    int _i = _globalId < _globlSize ? _dataIndexes[_globalId] : -1;
+    int _userIndex = _i;
+
+    uint _uiTemp = 0;
+    int _iTemp = 0;
+    unsigned char _tCounter = 0;
+    bool _continueCopy = 1;
+    uint _copyLength = 0;
+
+    // <[local-a]>
+
+    // <[local-b]>
+
+    // for(uint i = 0, j = _i; i < _otd; i++, j++)
+    // {
+    //     _midResults[j] = _identity[i];
+    // }
+    
+
+    // barrier(CLK_GLOBAL_MEM_FENCE);
+
+    // maybe not needed
+    // init _localCache to '\0' | TODO -> only if contains string
+    // for(uint i = _localId; i < _localCacheDim; i+= _grSize)
+    // {
+    //     _localCache[i] = '\0';
+    // }
+    // barrier(CLK_LOCAL_MEM_FENCE);
+
+    //copy from global to local
+    if (_i > -1)
+    {
+        // <[types-copy]>
+        for(int i = _i, k = _localId * _otd, j = 0; _tCounter < _arity; _tCounter++)
+        {
+            if(_types[_tCounter] < STRING)
+            {
+                _copyLength = 4;
+                if(_types[_tCounter] == DOUBLE)
+                {
+                    _copyLength = 8;
+                }
+                
+                for( j = 0; j < _copyLength, j++)
+                {
+                    _localCache[k++] = _data[i++];
+                }
+            }
+            else 
+            {
+                unsigned char _tempChar;
+                do
+                {
+                    _tempChar = _data[i++]
+                    _localCache[k++] = _tempChar;
+                } while (_tempChar != '\0')
+            }
+        }
+    }
+    else
+    {
+        for(uint i = 0, j = _localId * _otd; i < _otd; i++, j++)
+        {
+            _localCache[j] = _identity[i];
+        }
+    }
+
+            
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    for(uint _stride = _groupSize/2; _stride > 0 ; _stride /= 2)
+    {
+        if(_localId < _stride)
+        {
+            _iTemp = _localId * _otd;
+            // <[deser-a]>
+
+            _iTemp = _localId * _otd + _stride * _otd;
+
+            // <[deser-b]>
+            
+            // <[user-function]>
+
+            _iTemp = _localId * _otd;
+
+            // <[serialize-to-local]>
+            
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
+    }
+
+
+    for(uint i = 0, j = _groupId * _otd; i < _otd; i++, j++)
+    {
+        _midResults[j] = _localCache[i];
+    }
+        
+    barrier(CLK_GLOBAL_MEM_FENCE);
+
+};

@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.knl": "opencl",
         "iostream": "cpp",
         "*.tcc": "cpp",
         "array": "cpp",
@@ -35,6 +36,9 @@
         "type_traits": "cpp",
         "tuple": "cpp",
         "typeinfo": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "chrono": "cpp",
+        "memory": "cpp",
+        "ratio": "cpp"
     }
 }
