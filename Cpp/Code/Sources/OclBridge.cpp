@@ -606,12 +606,13 @@ void RunKernel(OclKernelExecutionInfo* pKernelInfo)
         int vArgIndex = 0;
         cl::Kernel vKernel = cl::Kernel(gProgrmasList[pKernelInfo->GetKernelName()], pKernelInfo->GetCharKernelName());
 
-        cl::Buffer vStreamBuffer(gContext, CL_MEM_READ_ONLY, vStreamSize);
-        cl::Buffer vIndexesBuffer(gContext, CL_MEM_READ_ONLY, vIndexesSize);
+        
+        cl::Buffer vStreamBuffer(gContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, vStreamSize, pKernelInfo->GetStream());
+        cl::Buffer vIndexesBuffer(gContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, vIndexesSize, pKernelInfo->GetIndexes());
         cl::Buffer vResultBuffer(gContext, CL_MEM_WRITE_ONLY, vResultSize);
 
-        gCommandQueue.enqueueWriteBuffer(vStreamBuffer, CL_TRUE, 0, vStreamSize, pKernelInfo->GetStream());
-        gCommandQueue.enqueueWriteBuffer(vIndexesBuffer, CL_TRUE, 0, vIndexesSize, pKernelInfo->GetIndexes());
+        // gCommandQueue.enqueueWriteBuffer(vStreamBuffer, CL_TRUE, 0, vStreamSize, pKernelInfo->GetStream());
+        // gCommandQueue.enqueueWriteBuffer(vIndexesBuffer, CL_TRUE, 0, vIndexesSize, pKernelInfo->GetIndexes());
 
         // std::cout << "Set arg: StreamBuffer" << std::endl;
         vKernel.setArg(vArgIndex++, vStreamBuffer);
