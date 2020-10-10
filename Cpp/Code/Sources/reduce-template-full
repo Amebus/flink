@@ -367,7 +367,7 @@ __kernel void reduceInteger(
             printf("_midResults: %d %d %d %d\n", _midResults[i], _midResults[i+1], _midResults[i+2], _midResults[i+3]);
     }
 
-    if(_gId == 0)
+    if(_gId == 0) // copiare in parallelo
     {
         //printf("final result copy - %d\n", _ri);
         for(int i = 0, j = _roff; i < _otd; i++, j++)

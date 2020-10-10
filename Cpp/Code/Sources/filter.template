@@ -88,7 +88,6 @@ __kernel void <[kernel-name]>(
     int _totalInputTuples)
 {
     uint _gId = get_global_id(0);
-    printf("_gId: %d - _totalInputTuples: %d \n", _gId, _totalInputTuples);
     if (_gId >= _totalInputTuples)
         return;
 

@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <unordered_map>
 #include <chrono>
+#include <math.h> 
 
 void printStatus(const cl_int status, const int line)
 {
@@ -646,67 +647,99 @@ void RunKernel(OclReduceExecutionInfo* pKernelInfo)
     vStreamSize = pKernelInfo->GetStreamSize();
     vIndexesSize = pKernelInfo->GetIndexesSize();
     vResultSize = pKernelInfo->GetResultSize();
-    vLocalCacheSize = pKernelInfo->GetLocalCacheSize();
     vIdentiySize = pKernelInfo->GetIdentitySize();
     vMidResultSize = pKernelInfo->GetMidResultSize();
     std::vector<cl::Buffer> vBuffers;
+    int vSteps = ceil(log2((double)pKernelInfo->GetIndexesLength())/log2((double)pKernelInfo->GetWorkGroupSize()));
+    int vCurrentStep = 0;
+    // std::cout << "idexes length: " << pKernelInfo->GetIndexesLength();
+    // std::cout << "wk size: " << pKernelInfo->GetWorkGroupSize() << " - Steps: " << vSteps << std::endl;
     try
     {
         int vArgIndex = 0;
-        cl::Kernel vKernel = cl::Kernel(gProgrmasList[pKernelInfo->GetKernelName()], pKernelInfo->GetCharKernelName());
 
-        cl::Buffer vStreamBuffer(gContext, CL_MEM_READ_ONLY, vStreamSize);
-        cl::Buffer vIndexesBuffer(gContext, CL_MEM_READ_ONLY, vIndexesSize);
+        std::string vKernelNameStep0(pKernelInfo->GetKernelName());
+        vKernelNameStep0.append("_step0");
+        std::string vKernelNameStep1(pKernelInfo->GetKernelName());
+        vKernelNameStep1.append("_step1");
+
+
+        cl::Kernel vKernelStep0 = cl::Kernel(gProgrmasList[vKernelNameStep0], vKernelNameStep0.c_str());
+        cl::Kernel vKernelStep1 = cl::Kernel(gProgrmasList[vKernelNameStep1], vKernelNameStep1.c_str());
+
+
+        cl::Buffer vStreamBuffer(gContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, vStreamSize, pKernelInfo->GetStream());
+        cl::Buffer vIndexesBuffer(gContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, vIndexesSize, pKernelInfo->GetIndexes());
         cl::Buffer vResultBuffer(gContext, CL_MEM_WRITE_ONLY, vResultSize);
 
-        cl::Buffer vIdendityBuffer(gContext, CL_MEM_READ_ONLY, vIdentiySize);;
-        cl::Buffer vMidResultBuffer(gContext,  CL_MEM_READ_WRITE, vMidResultSize);
-
-        std::cout << "MidResultLength: " << pKernelInfo->GetMidResultLength() << std::endl;
-
-        //cl::Buffer vLocalCacheBuffer(gContext, CL_MEM_READ_WRITE, vLocalCacheSize);
-
-        gCommandQueue.enqueueWriteBuffer(vStreamBuffer, CL_TRUE, 0, vStreamSize, pKernelInfo->GetStream());
-        gCommandQueue.enqueueWriteBuffer(vIndexesBuffer, CL_TRUE, 0, vIndexesSize, pKernelInfo->GetIndexes());
-        gCommandQueue.enqueueWriteBuffer(vIdendityBuffer, CL_TRUE, 0, vIdentiySize, pKernelInfo->GetIdentity());
+        cl::Buffer vIdendityBuffer(gContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, vIdentiySize, pKernelInfo->GetIdentity());;
+        cl::Buffer vMidResultBuffer(gContext,  CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, vMidResultSize, pKernelInfo->GetMidResult());
         
-        //gCommandQueue.enqueueWriteBuffer(vLocalCacheBuffer, CL_TRUE, 0, vLocalCacheSize, pKernelInfo->GetLocalCache());
 
-        //std::cout << "Set arg: StreamBuffer" << std::endl;
-        vKernel.setArg(vArgIndex++, vStreamBuffer);
+        // gCommandQueue.enqueueWriteBuffer(vStreamBuffer, CL_TRUE, 0, vStreamSize, pKernelInfo->GetStream());
+        // gCommandQueue.enqueueWriteBuffer(vIndexesBuffer, CL_TRUE, 0, vIndexesSize, pKernelInfo->GetIndexes());
+        // gCommandQueue.enqueueWriteBuffer(vIdendityBuffer, CL_TRUE, 0, vIdentiySize, pKernelInfo->GetIdentity());
+
+        // std::cout << "Set arg: StreamBuffer" << std::endl;
+        vKernelStep0.setArg(vArgIndex++, vStreamBuffer);
         //std::cout << "Ok" << std::endl;
-        //std::cout << "Set arg: IndexesBuffer" << std::endl;
-        vKernel.setArg(vArgIndex++, vIndexesBuffer);
+        // std::cout << "Set arg: IndexesBuffer" << std::endl;
+        vKernelStep0.setArg(vArgIndex++, vIndexesBuffer);
         // std::cout << "Ok" << std::endl;
         // std::cout << "Set arg: ResultBuffer" << std::endl;
-        vKernel.setArg(vArgIndex++, vResultBuffer);
+        // vKernelStep0.setArg(vArgIndex++, vResultBuffer);
         //std::cout << "Ok" << std::endl;
 
-        //std::cout << "Set arg: IdendityBuffer" << std::endl;
-        vKernel.setArg(vArgIndex++, vIdendityBuffer);
+        // std::cout << "Set arg: MidResultBuffer" << std::endl;
+        vKernelStep0.setArg(vArgIndex++, vMidResultBuffer);
         //std::cout << "Ok" << std::endl;
 
-        //std::cout << "Set arg: MidResultBuffer" << std::endl;
-        vKernel.setArg(vArgIndex++, vMidResultBuffer);
+        // std::cout << "Set arg: IdendityBuffer" << std::endl;
+        vKernelStep0.setArg(vArgIndex++, vIdendityBuffer);
         //std::cout << "Ok" << std::endl;
 
         std::cout << std::endl;
-        std::cout << "Set arg: LocalCacheBuffer" << std::endl;
+        // std::cout << "Set arg: LocalCacheBuffer" << std::endl;
         // std::cout << "unsigned char - " << sizeof(unsigned char) << std::endl;
-        std::cout << "length - " << pKernelInfo->GetLocalCacheLength() << std::endl;
+        // std::cout << "length - " << pKernelInfo->GetLocalCacheLength() << std::endl;
         // std::cout << "size - " << pKernelInfo->GetLocalCacheSize() << std::endl;
         // std::cout << "stream - " << pKernelInfo->GetStreamLength() << std::endl;
         // std::cout << "finalResult - " << pKernelInfo->GetResultLength() << std::endl;
-        std::cout << "midResult - " << pKernelInfo->GetMidResultLength() << std::endl;
-        vKernel.setArg(vArgIndex++, cl::Local(pKernelInfo->GetLocalCacheSize()));
+        // std::cout << "midResult - " << pKernelInfo->GetMidResultLength() << std::endl;
+        vKernelStep0.setArg(vArgIndex++, cl::Local(pKernelInfo->GetLocalCacheSize()));
         //std::cout << "Ok" << std::endl;
 
 
         // std::cout << "stream - " << pKernelInfo->GetIndexesLength() << std::endl;
-        cl::NDRange global(pKernelInfo->GetIndexesLength());
-        cl::NDRange local(pKernelInfo->GetWorkGroupSize());
+        cl::NDRange vGlobal(vSteps * pKernelInfo->GetWorkGroupSize());
+        cl::NDRange vLocal(pKernelInfo->GetWorkGroupSize());
 
-        gCommandQueue.enqueueNDRangeKernel(vKernel, cl::NullRange, global, local);
+        gCommandQueue.enqueueNDRangeKernel(vKernelStep0, cl::NullRange, vGlobal, vLocal);
+
+        vCurrentStep++;
+
+        int vCurrentGlobalSize = pKernelInfo->GetIndexesLength();
+        do
+        {   
+            vArgIndex = 0;
+            vCurrentGlobalSize = vSteps * pKernelInfo->GetWorkGroupSize();
+            cl::NDRange vNewGlobal(vCurrentGlobalSize);
+
+            vKernelStep1.setArg(vArgIndex++, vMidResultBuffer);
+
+            vKernelStep1.setArg(vArgIndex++, vIdendityBuffer);
+
+            vKernelStep1.setArg(vArgIndex++, vResultBuffer);
+
+            vKernelStep1.setArg(vArgIndex++, cl::Local(pKernelInfo->GetLocalCacheSize()));
+
+            vCurrentStep++;
+            vKernelStep1.setArg(vArgIndex++, vSteps - vCurrentStep);
+
+            gCommandQueue.enqueueNDRangeKernel(vKernelStep1, cl::NullRange, vNewGlobal , vLocal);
+            
+        } while (vCurrentStep < vSteps);
+        
 
         gCommandQueue.enqueueReadBuffer(vResultBuffer, CL_TRUE, 0, vResultSize, pKernelInfo->GetResult());
     }
@@ -1051,7 +1084,7 @@ std::vector<std::string> GetKernelsSourceFiles(std::string pKernelsFolder)
         }
         closedir (vDirectory);
     }
-
+    
     return vFiles;
 }
 

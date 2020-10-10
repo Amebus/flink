@@ -2,6 +2,7 @@ package org.apache.flink.streaming.api.ocl.engine.builder;
 
 import org.apache.flink.streaming.api.ocl.engine.ITupleBytesDimensionGetter;
 import org.apache.flink.streaming.api.ocl.engine.IUserFunction;
+import org.apache.flink.streaming.api.ocl.engine.OclKernel;
 import org.apache.flink.streaming.api.ocl.engine.builder.mappers.TemplatePluginMapper;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.*;
 import org.apache.flink.streaming.api.ocl.engine.builder.plugins.reduce.*;
@@ -11,13 +12,42 @@ import java.io.IOException;
 import java.nio.file.Files;
 //import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReduceKernelBuilder extends KernelBuilder
 {
+	private String mStep1Template;
+	private int mBuildStep;
+	
+	public ReduceKernelBuilder()
+	{
+		mBuildStep = 0;
+	}
+	
 	@Override
 	protected String getKernelType()
 	{
 		return "reduce";
+	}
+	
+	@Override
+	public String getKernelName()
+	{
+		String vResult = super.getKernelName();
+		return vResult + "_step" + mBuildStep;
+	}
+	
+	@Override
+	public IKernelBuilder setPDAKernelBuilderOptions(KernelBuilderOptions pKernelBuilderOptions)
+	{
+		super.setPDAKernelBuilderOptions(pKernelBuilderOptions);
+		String vFile = getKernelBuilderOptions()
+			.getContextOptions()
+			.getKernelSourcePath(getKernelType())
+			.replace("reduce", "reduce_step_1");
+		mStep1Template = getTemplate(vFile);
+		return this;
 	}
 	
 	@Override
@@ -61,7 +91,7 @@ public class ReduceKernelBuilder extends KernelBuilder
 	
 	protected IKernelBuilderPlugin getLocalBPlugin()
 	{
-		return  new LocalBPlugin();
+		return new LocalBPlugin();
 	}
 	
 	protected IKernelBuilderPlugin getDeserilizeLocalAPlugin()
@@ -111,5 +141,18 @@ public class ReduceKernelBuilder extends KernelBuilder
 								   .append("_data[").append(pVarDef.getIndex() + 1).append("];\n")
 						  );
 		};
+	}
+	
+	@Override
+	public Iterable<OclKernel> build()
+	{
+		OclKernel vStep0 = super.build().iterator().next();
+		this.clearExtras();
+		mBuildStep++;
+		OclKernel vStep1 = new OclKernel(getKernelName(), parseTemplateCode(mStep1Template));
+		List<OclKernel> vResult = new ArrayList<>();
+		vResult.add(vStep0);
+		vResult.add(vStep1);
+		return vResult;
 	}
 }

@@ -53,11 +53,11 @@ void fillStringWith(int si,int sl, char c, char *s)
 #define LAST_STEP 1
 
 __kernel void <[kernel-name]>(
-	__global unsigned char *_midResults,
+	__global unsigned char *_midResult,
 	__global unsigned char *_identity,
     __global unsigned char *_finalResult,
 	__local unsigned char *_localCache,
-    bool _isFinalStep)
+    int _isNotFinalStep)
 {
     unsigned char* _serializationTemp;
     uint _globalId = get_global_id(0);
@@ -77,7 +77,6 @@ __kernel void <[kernel-name]>(
 
     uint _uiTemp = 0;
     int _iTemp = 0;
-    unsigned char _tCounter = 0;
     bool _continueCopy = 1;
     uint _copyLength = 0;
 
@@ -102,31 +101,9 @@ __kernel void <[kernel-name]>(
     // barrier(CLK_LOCAL_MEM_FENCE);
 
     //copy from global to local
-        // <[types-copy]>
-    for(int i = _i, k = _localId * _otd, j = 0; _tCounter < _arity; _tCounter++)
+    for(int i = _i, k = _localId * _otd, j = 0; j > _otd; j++)
     {
-        if(_types[_tCounter] < STRING)
-        {
-            _copyLength = 4;
-            if(_types[_tCounter] == DOUBLE)
-            {
-                _copyLength = 8;
-            }
-            
-            for( j = 0; j < _copyLength, j++)
-            {
-                _localCache[k++] = _midResults[i++];
-            }
-        }
-        else 
-        {
-            unsigned char _tempChar;
-            do
-            {
-                _tempChar = _midResults[i++]
-                _localCache[k++] = _tempChar;
-            } while (_tempChar != '\0')
-        }
+        _localCache[k++] = _midResult[i++];
     }
 
             
@@ -153,9 +130,28 @@ __kernel void <[kernel-name]>(
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 
-    if (_isFinalStep)
+    if (_isNotFinalStep)
     {
-        if(_gId == 0) // copiare in parallelo
+        for(uint i = 0, j = _groupId * _otd; i < _otd; i++, j++)
+        {
+            _midResult[j] = _localCache[i];
+            // printf("_gId: %d, _localCache: %d\n", _gId, (*(__local int*) &_localCache[i]) );
+        }
+        if(_lId == 0)
+        {
+            // printf(" -- printing local cache ---\n");
+            // for(int i = 0; i < 8; i++)	
+            //     printf("_gId: 0 --- _lc: %d\n", _localCache[i]);
+            printf("\n");
+            for(int i = 0; i < 8; i+=4)
+                // printf("_midResults: %d %d %d %d %d\n", _midResults[i], _midResults[i+1], _midResults[i+2], _midResults[i+3],(*(__global int*) &_midResults[i]) );
+                printf("_gId: %d, _localCache: %d\n", _gId, (*(__local int*) &_localCache[i]) );
+        
+        }
+    }
+    else 
+    {
+        if(_globalId == 0) // copiare in parallelo
         {
             //printf("final result copy - %d\n", _ri);
             for(int i = 0, j = _roff; i < _otd; i++, j++)
@@ -165,13 +161,6 @@ __kernel void <[kernel-name]>(
             }
         }
         //printf("_finalResult - %d\n", _finalResult[5]);
-    }
-    else 
-    {
-        for(uint i = 0, j = _groupId * _otd; i < _otd; i++, j++)
-        {
-            _midResults[j] = _localCache[i];
-        }
     }
     barrier(CLK_GLOBAL_MEM_FENCE);
 

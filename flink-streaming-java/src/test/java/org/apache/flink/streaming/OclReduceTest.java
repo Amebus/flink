@@ -91,7 +91,7 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 	@Test
 	public void OclReduceInteger()
 	{
-		List<IOclTuple> vTuples = GetIntegerZeroMeanTuples(4);
+		List<IOclTuple> vTuples = GetIntegerZeroMeanTuples(0);
 		
 		for(IOclTuple vTuple : vTuples)
 		{
@@ -102,10 +102,10 @@ public class OclReduceTest extends OclContextHelpers.OclTestClass
 		
 		System.out.println();
 		
-//		vTuples.add(new Tuple1Ocl<>(1));
-//		vTuples.add(new Tuple1Ocl<>(5));
-//		vTuples.add(new Tuple1Ocl<>(2));
-//		vTuples.add(new Tuple1Ocl<>(6));
+		vTuples.add(new Tuple1Ocl<>(1));
+		vTuples.add(new Tuple1Ocl<>(5));
+		vTuples.add(new Tuple1Ocl<>(2));
+		vTuples.add(new Tuple1Ocl<>(6));
 //
 //		vTuples.add(new Tuple1Ocl<>(3));
 //		vTuples.add(new Tuple1Ocl<>(2));

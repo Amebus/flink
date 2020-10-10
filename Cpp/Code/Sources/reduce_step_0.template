@@ -105,7 +105,7 @@ __kernel void <[kernel-name]>(
     if (_i > -1)
     {
         // <[types-copy]>
-        for(int i = _i, k = _localId * _otd, j = 0; _tCounter < _arity; _tCounter++)
+        for(int i = _i, k = _localId * _otd, j = 0 ; _tCounter < _arity; _tCounter++)
         {
             if(_types[_tCounter] < STRING)
             {
@@ -115,7 +115,7 @@ __kernel void <[kernel-name]>(
                     _copyLength = 8;
                 }
                 
-                for( j = 0; j < _copyLength, j++)
+                for( j = 0; j < _copyLength; j++)
                 {
                     _localCache[k++] = _data[i++];
                 }
@@ -125,9 +125,9 @@ __kernel void <[kernel-name]>(
                 unsigned char _tempChar;
                 do
                 {
-                    _tempChar = _data[i++]
+                    _tempChar = _data[i++];
                     _localCache[k++] = _tempChar;
-                } while (_tempChar != '\0')
+                } while (_tempChar != '\0');
             }
         }
     }

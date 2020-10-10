@@ -229,19 +229,32 @@ __kernel void <[kernel-name]>(
         // for(int i = 0; i < 8; i++)	printf("2 a  _lc: %d\n", _localCache[i]);
     }
     // printf("------ reduce global loop -----\n");
-    for(_currentStep = _steps; _currentStep > 0 && _grId < _outputCount; _currentStep--)
+    for(_currentStep = _steps; _currentStep > 0; _currentStep--)
     {
+        if(_grId < _outputCount)
+        {
+            
+        
+
+            // if(_gId == 0)
+            // {
+            //     printf("\n");
+            //     for(int i = 0; i < 16; i+=4)
+            //         // printf("_midResults: %d %d %d %d %d\n", _midResults[i], _midResults[i+1], _midResults[i+2], _midResults[i+3],(*(__global int*) &_midResults[i]) );
+            //         printf("_midResults: %d\n",(*(__global int*) &_midResults[i]) );
+            // }
+
         // printf("_gId: %d - _grId: %d - inside global loop - _lId: %d ------ \n", _gId, _grId, _lId);
-        printf("_gId: %d - _grId: %d - _outputCount: %d - _currentStep: %d\n", _gId, _grId,_outputCount, _currentStep);
+        // printf("_gId: %d - _grId: %d - _outputCount: %d - _currentStep: %d\n", _gId, _grId,_outputCount, _currentStep);
         _outputCount = ceil((double)_outputCount/_grSize);
         if(_currentStep != _steps)
         {
-            printf("_gId: %d - _grId: %d - _kIndex: %d - _lId: %d - _otd: %d\n", _gId, _grId, _kIndex, _lId, _otd);
-            barrier(CLK_GLOBAL_MEM_FENCE);
+            // printf("_gId: %d - _grId: %d - _kIndex: %d - _lId: %d - _otd: %d\n", _gId, _grId, _kIndex, _lId, _otd);
+            
             for(uint i = 0, j = _kIndex, k = _lId * _otd; i < _otd; i++, j++, k++)
             {
                 _localCache[k] = _midResults[j];
-                _midResults[j] = _identity[i];
+                //_midResults[j] = _identity[i];
             }
         }
         barrier(CLK_LOCAL_MEM_FENCE);
@@ -297,38 +310,42 @@ __kernel void <[kernel-name]>(
             barrier(CLK_LOCAL_MEM_FENCE);
             //printf("_local - %d\n", _localCache[3]);
 
-            // if(_gId == 0)
-            // {
-            //     printf(" -- printing local cache ---\n");
-            //     for(int i = 0; i < 8; i++)	
-            //         printf("_gId: 0 --- _lc: %d\n", _localCache[i]);
-            // }
+            if(_lId == 0)
+            {
+                // printf(" -- printing local cache ---\n");
+                // for(int i = 0; i < 8; i++)	
+                //     printf("_gId: 0 --- _lc: %d\n", _localCache[i]);
+                printf("\n");
+                for(int i = 0; i < 8; i+=4)
+                    // printf("_midResults: %d %d %d %d %d\n", _midResults[i], _midResults[i+1], _midResults[i+2], _midResults[i+3],(*(__global int*) &_midResults[i]) );
+                    printf("_gId: %d, _localCache: %d\n", _gId, (*(__local int*) &_localCache[i]) );
+            
+            }
         }
+
+
 
         // if(_gId == 2)
         // {
         //     for(int i = 0; i < 16; i++)
         //     	printf("_midResults: %d\n", _midResults[i]);
         // }
-        if(_currentStep > LAST_STEP)
-        {
-            for(uint i = 0, j = _grId * _otd; i < _otd; i++, j++)
+        for(uint i = 0, j = _grId * _otd; i < _otd; i++, j++)
             {
+                printf(" --- _lid: %d, _gId: %d, _localCache: %d\n", _lId, _gId, (*(__local int*) &_localCache[0]) );
                 _midResults[j] = _localCache[i];
+                printf(" --- _lid: %d, _gId: %d, _midResults: %d\n", _lId, _gId, (*(__global int*) &_midResults[_grId * _otd]) );
             }
+        // if(_currentStep > LAST_STEP && _lId == 0)
+        // {
+        }
             
-            if(_gId == 0)
-            {
-                printf("\n");
-                for(int i = 0; i < 32; i+=4)
-                    printf("_midResults: %d %d %d %d\n", _midResults[i], _midResults[i+1], _midResults[i+2], _midResults[i+3]);
-            }
-        }
-        else
-        {
-            barrier(CLK_LOCAL_MEM_FENCE);
-        }
-
+        // }
+        // else
+        // {
+        //     barrier(CLK_LOCAL_MEM_FENCE);
+        // }
+        barrier(CLK_GLOBAL_MEM_FENCE);
     }
 
     // for (; _currentStep > 0; _currentStep--)
@@ -336,12 +353,19 @@ __kernel void <[kernel-name]>(
     //     barrier(CLK_GLOBAL_MEM_FENCE);
     // }
 
-    if(_gId == 2)
-    {
-        printf("\n");
-        for(int i = 0; i < 32; i+=4)
-            printf("_midResults: %d %d %d %d\n", _midResults[i], _midResults[i+1], _midResults[i+2], _midResults[i+3]);
-    }
+    // if(_gId == 2)
+    // {
+    //     printf("\n");
+    //     for(int i = 0; i < 16; i+=4)
+    //         printf("_midResults: %d %d %d %d %d\n", _midResults[i], _midResults[i+1], _midResults[i+2], _midResults[i+3], (*(__global int*) &_midResults[i]));
+    // }
+    if(_gId == 0)
+            {
+                printf("--- final ---\n");
+                for(int i = 0; i < 16; i+=4)
+                    // printf("_midResults: %d %d %d %d %d\n", _midResults[i], _midResults[i+1], _midResults[i+2], _midResults[i+3],(*(__global int*) &_midResults[i]) );
+                    printf("_midResults: %d\n",(*(__global int*) &_midResults[i]) );
+            }
 
     if(_gId == 0)
     {

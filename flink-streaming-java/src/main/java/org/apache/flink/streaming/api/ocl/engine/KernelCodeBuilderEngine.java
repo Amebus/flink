@@ -61,7 +61,11 @@ public class KernelCodeBuilderEngine
 		List<OclKernel> vResult = new LinkedList<>();
 		for (IUserFunction vUserFunction : getUserFunctions())
 		{
-			vResult.add(generateKernel(vUserFunction));
+			Iterable<OclKernel> vKernels = generateKernel(vUserFunction);
+			for (OclKernel vKernel : vKernels)
+			{
+				vResult.add(vKernel);
+			}
 		}
 		
 		String vKernelsFolderPrefix = getSettingsRepository().getContextOptions().getKernelsBuildFolder();
@@ -81,7 +85,7 @@ public class KernelCodeBuilderEngine
 		return new CppLibraryInfo(vKernelsFolder.toAbsolutePath().toString());
 	}
 	
-	private OclKernel generateKernel(IUserFunction pUserFunction)
+	private Iterable<OclKernel> generateKernel(IUserFunction pUserFunction)
 	{
 		return getKernelBuilders()
 			.resolve(pUserFunction.getType())

@@ -8,6 +8,8 @@ import org.apache.flink.streaming.api.ocl.engine.builder.plugins.PDAKernelBuilde
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -121,25 +123,32 @@ public abstract class KernelBuilder implements IKernelBuilder
 		
 		String vFile = getKernelBuilderOptions()
 			.getContextOptions()
-			.getKernelSourcePath(getKernelType());
+			.getKernelSourcePath(getKernelType())
+			.replace("reduce", "reduce_step_0");
 		// retrieve code from file
-		StringBuilder vKernelCode = new StringBuilder();
-		try
-		{
-			Files.lines(Paths.get(vFile)).forEach(str -> vKernelCode.append(str).append("\n"));
-		}
-		catch (IOException pE)
-		{
-			throw new IllegalArgumentException("Unable to use the file \"" + vFile +"\"", pE);
-		}
-		mRootTemplate = vKernelCode.toString();
-		if (mRootTemplate.trim().equals(""))
-		{
-			throw new IllegalArgumentException("The template can't be empty");
-		}
+		mRootTemplate = getTemplate(vFile);
 		
 		return clearExtras()
 			.setUpExtras();
+	}
+	
+	protected String getTemplate(String pSourcePath)
+	{
+		StringBuilder vKernelCode = new StringBuilder();
+		try
+		{
+			Files.lines(Paths.get(pSourcePath)).forEach(str -> vKernelCode.append(str).append("\n"));
+		}
+		catch (IOException pE)
+		{
+			throw new IllegalArgumentException("Unable to use the file \"" + pSourcePath +"\"", pE);
+		}
+		String vResult = vKernelCode.toString();
+		if (vResult.trim().equals(""))
+		{
+			throw new IllegalArgumentException("The template can't be empty");
+		}
+		return vResult;
 	}
 	
 	public TemplatePluginMapper getTemplatePluginMapper()
@@ -153,10 +162,12 @@ public abstract class KernelBuilder implements IKernelBuilder
 	}
 	
 	@Override
-	public OclKernel build()
+	public Iterable<OclKernel> build()
 	{
 		checkKernelBuilderOptions();
-		return new OclKernel(getKernelName(), parseTemplateCode(getRootTemplateCode()));
+		List<OclKernel> vResult = new ArrayList<>();
+		vResult.add(new OclKernel(getKernelName(), parseTemplateCode(getRootTemplateCode())));
+		return vResult;
 	}
 	
 	protected String parseTemplateCode(String pTemplateCode)
