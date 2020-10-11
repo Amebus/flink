@@ -650,10 +650,14 @@ void RunKernel(OclReduceExecutionInfo* pKernelInfo)
     vIdentiySize = pKernelInfo->GetIdentitySize();
     vMidResultSize = pKernelInfo->GetMidResultSize();
     std::vector<cl::Buffer> vBuffers;
-    int vSteps = ceil(log2((double)pKernelInfo->GetIndexesLength())/log2((double)pKernelInfo->GetWorkGroupSize()));
+    int vWorkGroupSize = pKernelInfo->GetWorkGroupSize();
+    int vSteps = ceil(log2((double)pKernelInfo->GetIndexesLength())/log2((double)vWorkGroupSize));
     int vCurrentStep = 0;
     // std::cout << "idexes length: " << pKernelInfo->GetIndexesLength();
-    // std::cout << "wk size: " << pKernelInfo->GetWorkGroupSize() << " - Steps: " << vSteps << std::endl;
+    std::cout << "wk size: " << pKernelInfo->GetWorkGroupSize() << " - Steps: " << vSteps << std::endl;
+    int vCurrentGlobalSize = ceil(pKernelInfo->GetIndexesLength() / (double)vWorkGroupSize) * vWorkGroupSize;
+    // int vCurrentGlobalSize = pow(vWorkGroupSize, vSteps);
+    std::cout << pKernelInfo->GetIndexesLength() << " vCurrentGlobalSize: " << vCurrentGlobalSize << std::endl;
     try
     {
         int vArgIndex = 0;
@@ -709,20 +713,36 @@ void RunKernel(OclReduceExecutionInfo* pKernelInfo)
         vKernelStep0.setArg(vArgIndex++, cl::Local(pKernelInfo->GetLocalCacheSize()));
         //std::cout << "Ok" << std::endl;
 
+        vKernelStep0.setArg(vArgIndex++, pKernelInfo->GetIndexesLength());
 
         // std::cout << "stream - " << pKernelInfo->GetIndexesLength() << std::endl;
-        cl::NDRange vGlobal(vSteps * pKernelInfo->GetWorkGroupSize());
-        cl::NDRange vLocal(pKernelInfo->GetWorkGroupSize());
+        cl::NDRange vGlobal(vCurrentGlobalSize);
+        cl::NDRange vLocal(vWorkGroupSize);
 
         gCommandQueue.enqueueNDRangeKernel(vKernelStep0, cl::NullRange, vGlobal, vLocal);
-
+        std::cout << "Current Step: " << vCurrentStep << std::endl;
+        
         vCurrentStep++;
 
-        int vCurrentGlobalSize = pKernelInfo->GetIndexesLength();
+        
         do
-        {   
+        { 
+            std::cout << "Current Step: " << vCurrentStep << std::endl;  
             vArgIndex = 0;
-            vCurrentGlobalSize = vSteps * pKernelInfo->GetWorkGroupSize();
+            
+            // vCurrentGlobalSize = pow(vWorkGroupSize, vSteps - vCurrentStep);
+            int vTemp = ceil(vCurrentGlobalSize / (double)vWorkGroupSize);
+            int vOffset = vTemp % vWorkGroupSize;
+            std::cout << "vCurrentGlobalSize: " << vCurrentGlobalSize << 
+                " vTemp: " << vTemp << " vOffset: " << vOffset << std::endl;
+            if (vOffset != 0 )
+            {
+                vOffset = vWorkGroupSize - vOffset;
+            }
+            vCurrentGlobalSize = vTemp + vOffset;
+
+
+            std::cout << "sdad vCurrentGlobalSize: " << vCurrentGlobalSize << std::endl;
             cl::NDRange vNewGlobal(vCurrentGlobalSize);
 
             vKernelStep1.setArg(vArgIndex++, vMidResultBuffer);
@@ -735,6 +755,8 @@ void RunKernel(OclReduceExecutionInfo* pKernelInfo)
 
             vCurrentStep++;
             vKernelStep1.setArg(vArgIndex++, vSteps - vCurrentStep);
+
+            vKernelStep1.setArg(vArgIndex++, vTemp);
 
             gCommandQueue.enqueueNDRangeKernel(vKernelStep1, cl::NullRange, vNewGlobal , vLocal);
             

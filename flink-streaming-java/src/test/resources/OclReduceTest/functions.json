@@ -3,7 +3,7 @@
     "type":"reduce",
     "name":"reduceInteger",
     "input":"tuple1Integer",
-    "workGroupSize": 2,
+    "workGroupSize": 4,
     "function": [
       "//printf(\"_currentStep: %d - _gSize: %d - _grSize: %d\\n\", _currentStep, _gSize, _grSize);",
       "// printf(\"_gId: %d - _a0: %d - _b0: %d\\n\",_gId, _a0, _b0);",

@@ -57,7 +57,8 @@ __kernel void <[kernel-name]>(
 	__global unsigned char *_identity,
     __global unsigned char *_finalResult,
 	__local unsigned char *_localCache,
-    int _isNotFinalStep)
+    int _isNotFinalStep,
+    int _dataIndexesLength)
 {
     unsigned char* _serializationTemp;
     uint _globalId = get_global_id(0);
@@ -80,6 +81,9 @@ __kernel void <[kernel-name]>(
     bool _continueCopy = 1;
     uint _copyLength = 0;
 
+    if (_localId == 0)
+        printf("Step1 - idx length - _gId: %d, _dataIndexesLength: %d\n", _globalId, _dataIndexesLength );
+
     // <[local-a]>
 
     // <[local-b]>
@@ -100,13 +104,41 @@ __kernel void <[kernel-name]>(
     // }
     // barrier(CLK_LOCAL_MEM_FENCE);
 
-    //copy from global to local
-    for(int i = _i, k = _localId * _otd, j = 0; j > _otd; j++)
+    // if(_localId == 0)
+    // {
+    //     printf("\n");
+    //     for(int i = 0; i < 8; i+=4)
+    //         printf("Step1 - _gId: %d, _midResult: %d\n", _globalId, (*(__global int*) &_midResult[i]) );
+    
+    // }
+    if (_globalId < _dataIndexesLength)
     {
-        _localCache[k++] = _midResult[i++];
+        //copy from global to local
+        for(int i = _i, k = _localId * _otd, j = 0; j < _otd; j++)
+        {
+            // printf("Step1 - _gId: %d, k: %d, i: %d\n", _globalId, k, i );
+            _localCache[k++] = _midResult[i++];
+            
+        }
+    }
+    else {
+        printf("Step1 - identity copy - _gId: %d, _identity: %d\n", _globalId, (*(__global int*) &_identity[0]) );
+        for(uint i = 0, j = _localId * _otd; i < _otd; i++, j++)
+        {   
+            _localCache[j] = _identity[i];
+        }
     }
 
             
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    // if(_localId == 0)
+    // {
+    //     printf("\n");
+    //     for(int i = 0; i < 8; i+=4)
+    //         printf("Step1 - _gId: %d, _localCache: %d\n", _globalId, (*(__local int*) &_localCache[i]) );
+    
+    // }
     barrier(CLK_LOCAL_MEM_FENCE);
 
     for(uint _stride = _groupSize/2; _stride > 0 ; _stride /= 2)
@@ -137,17 +169,7 @@ __kernel void <[kernel-name]>(
             _midResult[j] = _localCache[i];
             // printf("_gId: %d, _localCache: %d\n", _gId, (*(__local int*) &_localCache[i]) );
         }
-        if(_lId == 0)
-        {
-            // printf(" -- printing local cache ---\n");
-            // for(int i = 0; i < 8; i++)	
-            //     printf("_gId: 0 --- _lc: %d\n", _localCache[i]);
-            printf("\n");
-            for(int i = 0; i < 8; i+=4)
-                // printf("_midResults: %d %d %d %d %d\n", _midResults[i], _midResults[i+1], _midResults[i+2], _midResults[i+3],(*(__global int*) &_midResults[i]) );
-                printf("_gId: %d, _localCache: %d\n", _gId, (*(__local int*) &_localCache[i]) );
         
-        }
     }
     else 
     {

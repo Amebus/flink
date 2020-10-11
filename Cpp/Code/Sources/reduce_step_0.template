@@ -57,7 +57,8 @@ __kernel void <[kernel-name]>(
 	__global int *_dataIndexes,
 	__global unsigned char *_midResults,
 	__global unsigned char *_identity,
-	__local unsigned char *_localCache)
+	__local unsigned char *_localCache,
+    int _dataIndexesLength)
 {
     unsigned char* _serializationTemp;
     uint _globalId = get_global_id(0);
@@ -72,8 +73,11 @@ __kernel void <[kernel-name]>(
     // <[utility-vars]>
 
     uint _localCacheDim = _groupSize * _otd;
-    int _i = _globalId < _globlSize ? _dataIndexes[_globalId] : -1;
+    int _i = _globalId < _dataIndexesLength ? _dataIndexes[_globalId] : -1;
     int _userIndex = _i;
+
+    if (_localId == 0)
+        printf("Step0 - idx length - _gId: %d, _dataIndexesLength: %d\n", _globalId, _dataIndexesLength );
 
     uint _uiTemp = 0;
     int _iTemp = 0;
@@ -133,6 +137,7 @@ __kernel void <[kernel-name]>(
     }
     else
     {
+        printf("Step0 - identity copy - _gId: %d, _identity: %d\n", _globalId, (*(__global int*) &_identity[0]) );
         for(uint i = 0, j = _localId * _otd; i < _otd; i++, j++)
         {
             _localCache[j] = _identity[i];
@@ -140,6 +145,15 @@ __kernel void <[kernel-name]>(
     }
 
             
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    // if(_localId == 0)
+    // {
+    //     printf("\n");
+    //     for(int i = 0; i < 8; i+=4)
+    //         printf("Step0 - bf reduce - _gId: %d, _localCache: %d\n", _globalId, (*(__local int*) &_localCache[i]) );
+    
+    // }
     barrier(CLK_LOCAL_MEM_FENCE);
 
     for(uint _stride = _groupSize/2; _stride > 0 ; _stride /= 2)
@@ -162,7 +176,14 @@ __kernel void <[kernel-name]>(
         }
         barrier(CLK_LOCAL_MEM_FENCE);
     }
-
+    // if(_localId == 0)
+    // {
+    //     printf("\n");
+    //     for(int i = 0; i < 8; i+=4)
+    //         printf("Step0 - _gId: %d, _localCache: %d\n", _globalId, (*(__local int*) &_localCache[i]) );
+    
+    // }
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     for(uint i = 0, j = _groupId * _otd; i < _otd; i++, j++)
     {
